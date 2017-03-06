@@ -2,12 +2,11 @@ import numpy as np
 import numpy.random as rnd
 import pickle
 
-class ESN:
+class CESN:
     def __init__(self, n_input, n_reservoir, n_output,
                 spectral_radius=1.0, noise_level=0.01, input_scaling=None,
-                leak_rate=1.0, sparsness=0.2, random_seed=None,
-                out_activation=lambda x:x, out_inverse_activation=lambda x:x,
-                weight_generation='naive'):
+                leak_rate=1.0, sparsness=0.2,
+                random_seed=None, weight_generation='naive'):
 
                 self.n_input = n_input
                 self.n_reservoir = n_reservoir
@@ -21,9 +20,6 @@ class ESN:
                 if (input_scaling is None):
                     input_scaling = np.ones(n_input)
                 self._input_scaling_matrix = np.diag(input_scaling)
-
-                self.out_activation = out_activation
-                self.out_inverse_activation = out_inverse_activation
 
                 if (random_seed is not None):
                     rnd.seed(random_seed)
@@ -69,28 +65,34 @@ class ESN:
         #random weight matrix for the input from -0.5 to 0.5
         self._W_input = np.random.rand(self.n_reservoir, 1+self.n_input)-0.5
 
-    def fit(self, inputData, outputData, transient_quota=0.05, regression_parameter=None):
-        if (inputData.shape[0] != outputData.shape[0]):
-            raise ValueError("Amount of input and output datasets is not equal - {0} != {1}".format(inputData.shape[0], outputData.shape[0]))
+    def fit(self, inputList, outputList, regression_parameter=None):
+        if (len(inputList) != len(outputList)):
+            raise ValueError("Amount of input and output datasets is not equal - {0} != {1}".format(len(inputList), len(outputList)))
 
-        trainLength = inputData.shape[0]-1
-        skipLength = int(trainLength*transient_quota)
+        trainLength = 0
+        for item in inputList:
+            trainLength += item.shape[0]
+        skipLength = 0
 
         #define states' matrix
         self._X = np.zeros((1+self.n_input+self.n_reservoir,trainLength-skipLength))
 
-        self._x = np.zeros((self.n_reservoir,1))
+        t = 0
+        for item in inputList:
+            self._x = np.zeros((self.n_reservoir,1))
 
-        for t in range(trainLength):
-            u = self._input_scaling_matrix.dot(inputData[t].reshape(self.n_input, 1))
-            self._x = (1.0-self.leak_rate)*self._x + self.leak_rate*np.arctan(np.dot(self._W_input, np.vstack((1, u))) + np.dot(self._W, self._x)) + (np.random.rand()-0.5)*self.noise_level
-            if (t >= skipLength):
-                #add valueset to the states' matrix
-                self._X[:,t-skipLength] = np.vstack((1,u, self._x))[:,0]
+            for i in range(item.shape[0]):
+                u = self._input_scaling_matrix.dot(item[i].reshape(self.n_input, 1))
+                self._x = (1.0-self.leak_rate)*self._x + self.leak_rate*np.arctan(np.dot(self._W_input, np.vstack((1, u))) + np.dot(self._W, self._x)) + (np.random.rand()-0.5)*self.noise_level
+                self._X[:,t] = np.vstack((1,u, self._x))[:,0]
+                t+=1
 
         #define the target values
         #                                  +1
-        Y_target = self.out_inverse_activation(outputData).T[:,skipLength+1:trainLength+1]
+        Y_target = np.empty((0, self.n_output))
+        for item in outputList:
+            Y_target = np.append(Y_target, item, axis=0)
+        Y_target = Y_target.T
 
         #W_out = Y_target.dot(X.T).dot(np.linalg.inv(X.dot(X.T) + regressionParameter*np.identity(1+reservoirInputCount+reservoirSize)) )
         if (regression_parameter is None):
@@ -98,49 +100,18 @@ class ESN:
         else:
             self._W_out = np.dot(np.dot(Y_target, self._X.T),np.linalg.inv(np.dot(self._X,self._X.T) + regression_parameter*np.identity(1+self.n_input+self.n_reservoir)))
 
-    def generate(self, n, initial_input, continuation=True, initial_data=None, update_processor=lambda x:x):
-        if (self.n_input != self.n_output):
-            raise ValueError("n_input does not equal n_output. The generation mode uses its own output as its input. Therefore, n_input has to be equal to n_output - please adjust these numbers!")
 
-        if (not continuation):
-            self._x = np.zeros(self._x.shape)
-
-            if (initial_data is not None):
-                for t in range(initial_data.shape[0]):
-                    u = self._input_scaling_matrix.dot(initial_data[t].reshape(self.n_input, 1))
-                    self._x = (1.0-self.leak_rate)*self._x + self.leak_rate*np.arctan(np.dot(self._W_input, np.vstack((1, u))) + np.dot(self._W, self._x)) + (np.random.rand()-0.5)*self.noise_level
-
-        predLength = n
-
-        Y = np.zeros((self.n_output,predLength))
-        u = self._input_scaling_matrix.dot(initial_input.reshape(self.n_input, 1))
-        for t in range(predLength):
-            self._x = (1.0-self.leak_rate)*self._x + self.leak_rate*np.arctan(np.dot(self._W_input, np.vstack((1, u))) + np.dot(self._W, self._x))
-            y = np.dot(self._W_out, np.vstack((1,u,self._x)))
-            Y[:,t] = update_processor(self.out_activation(y[:,0]))
-            u = y
-
-        return Y
-
-    def predict(self, inputData, initial_input, continuation=True, initial_data=None, update_processor=lambda x:x):
-        if (not continuation):
-            self._x = np.zeros(self._x.shape)
-
-            if (initial_data is not None):
-                for t in range(initial_data.shape[0]):
-                    u = initial_data[t].reshape(self.n_input, 1)
-                    self._x = (1.0-self.leak_rate)*self._x + self.leak_rate*np.arctan(np.dot(self._W_input, np.vstack((1, u))) + np.dot(self._W, self._x)) + (np.random.rand()-0.5)*self.noise_level
+    def predict(self, inputData):
+        self._x = np.zeros(self._x.shape)
 
         predLength = inputData.shape[0]
 
         Y = np.zeros((self.n_output,predLength))
-        u = initial_input.reshape(self.n_input,1)
         for t in range(predLength):
+            u = self._input_scaling_matrix.dot(inputData[t].reshape(self.n_input,1))
             self._x = (1.0-self.leak_rate)*self._x + self.leak_rate*np.arctan(np.dot(self._W_input, np.vstack((1, u))) + np.dot(self._W, self._x))
             y = np.dot(self._W_out, np.vstack((1,u,self._x)))
-            Y[:,t] = update_processor(self.out_activation(y[:,0]))
-
-            u = inputData[t].reshape(self.n_input,1)
+            Y[:,t] = y[:,0]
 
         return Y
 
