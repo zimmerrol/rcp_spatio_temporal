@@ -2,14 +2,17 @@ import numpy as np
 import numpy.random as rnd
 import pickle
 
-class NLROCESN:
-    def __init__(self, n_input, n_reservoir,
+#uses the last STATE for the predictions
+class LSESN:
+    def __init__(self, n_input, n_reservoir, n_output,
                 spectral_radius=1.0, noise_level=0.01, input_scaling=None,
-                leak_rate=1.0, sparsness=0.2,
-                random_seed=None, weight_generation='naive', bias=1.0, output_bias=1.0, output_input_scaling=1.0):
+                leak_rate=1.0, sparsness=0.2, random_seed=None,
+                out_activation=lambda x:x, out_inverse_activation=lambda x:x,
+                weight_generation='naive', bias=1.0, output_bias=1.0, output_input_scaling=1.0):
 
                 self.n_input = n_input
                 self.n_reservoir = n_reservoir
+                self.n_output = n_output
 
                 self.spectral_radius = spectral_radius
                 self.noise_level = noise_level
@@ -26,7 +29,8 @@ class NLROCESN:
 
                 self._input_scaling_matrix = np.diag(np.append([1.0],input_scaling))
 
-                self._random_seed = random_seed
+                self.out_activation = out_activation
+                self.out_inverse_activation = out_inverse_activation
 
                 if (random_seed is not None):
                     rnd.seed(random_seed)
@@ -73,67 +77,59 @@ class NLROCESN:
             raise ValueError("The weight_generation property must be one of the following values: naive, advanced")
 
         #random weight matrix for the input from -0.5 to 0.5
-        self._W_input = np.random.rand(self.n_reservoir, 1+self.n_input)-0.5
-        self._W_input = self._W_input.dot(self._expanded_input_scaling_matrix)
+        self._W_input = np.random.rand(self.n_reservoir, self.n_input+1)-0.5
+        self._W_input = self._W_input.dot(self._input_scaling_matrix)
 
+    def fit(self, inputDataList, outputData, regression_parameter=None):
+        if (inputDataList.shape[0] != outputData.shape[0]):
+            raise ValueError("Amount of input and output datasets is not equal - {0} != {1}".format(inputDataList.shape[0], outputData.shape[0]))
 
-    def fit(self, inputList, outputList, mode="SVC", readout_parameters={}):
-        #mode can be SVC, SVR or LR
+        trialLength = len(inputDataList)
+        if (trialLength == 0):
+            return
 
-        if (len(inputList) != len(outputList)):
-            raise ValueError("Amount of input and output datasets is not equal - {0} != {1}".format(len(inputList), len(outputList)))
-        trainLength = 0
-        for item in inputList:
-            trainLength += item.shape[0]
-        skipLength = 0
+        trainLength = inputDataList[0].shape[0]-1
 
         #define states' matrix
-        self._X = np.zeros((1+self.n_input+self.n_reservoir,trainLength-skipLength))
+        self._X = np.zeros((1 + self.n_input + self.n_reservoir, trialLength*1))
 
-        t = 0
-        for item in inputList:
+
+        for j in range(trialLength):
+            if (np.mod(j,100) == 0):
+                print(j)
+
             self._x = np.zeros((self.n_reservoir,1))
-
-            for i in range(item.shape[0]):
-                u = self._input_scaling_matrix.dot(item[i].reshape(self.n_input, 1))
+            for t in range(trainLength):
+                u = inputDataList[j][t].reshape(self.n_input, 1)
                 self._x = (1.0-self.leak_rate)*self._x + self.leak_rate*np.arctan(np.dot(self._W_input, np.vstack((self.bias, u))) + np.dot(self._W, self._x)) + (np.random.rand()-0.5)*self.noise_level
-                self._X[:,t] = np.vstack((self.output_bias, self.output_input_scaling*u, self._x))[:,0]
-                t+=1
+                #print(self._W_input)
+            #add valueset to the states' matrix
+            self._X[:,j*1] = np.vstack((self.output_bias, self.output_input_scaling*u, self._x))[:,0]
 
         #define the target values
-        Y_target = np.empty((0, 1))
-        for item in outputList:
-            Y_target = np.append(Y_target, item, axis=0)
+        #                                  +1
+        Y_target = self.out_inverse_activation(outputData).T
 
-        from sklearn.svm import SVC
-        from sklearn.svm import SVR
-        from sklearn.linear_model import LogisticRegression
-
-        if (mode == "LR"):
-            self._clf = LogisticRegression(**readout_parameters)
-        elif (mode == "SVR"):
-            self._clf = SVR(**readout_parameters)
+        #W_out = Y_target.dot(X.T).dot(np.linalg.inv(X.dot(X.T) + regressionParameter*np.identity(1+reservoirInputCount+reservoirSize)) )
+        if (regression_parameter is None):
+            self._W_out = np.dot(Y_target, np.linalg.pinv(self._X))
         else:
-            self._clf = SVC(**readout_parameters)
-        self._clf.fit(self._X.T, Y_target[:,0])
+            self._W_out = np.dot(np.dot(Y_target, self._X.T),np.linalg.inv(np.dot(self._X,self._X.T) + regression_parameter*np.identity(1+self.n_input+self.n_reservoir)))
 
-    def predict(self, inputData):
+
+    def predict(self, inputData, update_processor=lambda x:x):
         self._x = np.zeros(self._x.shape)
 
         predLength = inputData.shape[0]
 
-        Y = np.zeros((1,predLength))
-
-        X = np.zeros((predLength, self._x.shape[0]+1+self.n_input))
-
+        Y = np.zeros((self.n_output, 1))
         for t in range(predLength):
-            u = self._input_scaling_matrix.dot(inputData[t].reshape(self.n_input,1))
+            u = inputData[t].reshape(self.n_input,1)
             self._x = (1.0-self.leak_rate)*self._x + self.leak_rate*np.arctan(np.dot(self._W_input, np.vstack((self.bias, u))) + np.dot(self._W, self._x))
-            X[t,:] = np.vstack((self.output_bias, self.output_input_scaling*u, self._x))[:,0]
-            #y = self._clf.predict(np.array(np.vstack((1,u, self._x))[:,0]))[0]  #np.dot(self._W_out, np.vstack((1,u,self._x)))
-            #Y[:,t] = y
 
-        Y = self._clf.predict_proba(X) #_clf.predict(X)
+        y = np.dot(self._W_out, np.vstack((self.output_bias, self.output_input_scaling*u, self._x)))
+
+        Y[:, 0] = update_processor(self.out_activation(y)).reshape(self.n_output)
 
         return Y
 
