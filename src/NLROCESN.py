@@ -24,7 +24,8 @@ class NLROCESN:
                     if (len(input_scaling) != self.n_input):
                         raise ValueError("Dimension of input_scaling ({0}) does not match the input data dimension ({1})".format(len(input_scaling), n_input))
 
-                self._input_scaling_matrix = np.diag(np.append([1.0],input_scaling))
+                self._input_scaling_matrix = np.diag(input_scaling)
+                self._expanded_input_scaling_matrix = np.diag(np.append([1.0],input_scaling))
 
                 self._random_seed = random_seed
 
