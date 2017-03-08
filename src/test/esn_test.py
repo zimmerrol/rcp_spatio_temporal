@@ -48,7 +48,7 @@ data = data[:,:]
 
 #esn = ESN.load("dat.obj")
 
-mode = "pred50"
+mode = "pred"
 
 if mode == "gen":
     print("set up")
@@ -164,7 +164,7 @@ if mode == "pred":
     esn.fit(inputData=data[:trainLength,0].reshape(trainLength, 1), outputData=data[:trainLength,1].reshape(trainLength, 1))
 
     print("predicting...")
-    Y = esn.predict(inputData=data[trainLength:trainLength+testLength,0], initial_input=data[trainLength-1, 0])
+    Y = esn.predict(inputData=data[trainLength:trainLength+testLength,0])
     print("done.")
 
     # compute MSE for the first errorLen time steps
