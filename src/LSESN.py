@@ -10,10 +10,9 @@ class LSESN(BaseESN):
                 out_activation=lambda x:x, out_inverse_activation=lambda x:x,
                 weight_generation='naive', bias=1.0, output_bias=1.0, output_input_scaling=1.0):
 
-        super(LSESN, self).__init__(n_input, n_reservoir, spectral_radius, noise_level, input_scaling, leak_rate, sparseness, random_seed, out_activation,
+        super(LSESN, self).__init__(n_input, n_reservoir, n_output, spectral_radius, noise_level, input_scaling, leak_rate, sparseness, random_seed, out_activation,
                 out_inverse_activation, weight_generation, bias, output_bias, output_input_scaling)
 
-        self.n_output = n_output
 
     def fit(self, inputDataList, outputData, regression_parameter=None):
         if (inputDataList.shape[0] != outputData.shape[0]):

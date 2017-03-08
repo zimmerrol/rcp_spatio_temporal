@@ -3,14 +3,16 @@ import numpy.random as rnd
 import pickle
 
 class BaseESN:
-    def __init__(self, n_input, n_reservoir,
+    def __init__(self, n_input, n_reservoir, n_output,
                 spectral_radius=1.0, noise_level=0.01, input_scaling=None,
                 leak_rate=1.0, sparseness=0.2, random_seed=None,
                 out_activation=lambda x:x, out_inverse_activation=lambda x:x,
-                weight_generation='naive', bias=1.0, output_bias=1.0, output_input_scaling=1.0):
+                weight_generation='naive', bias=1.0, output_bias=1.0, output_input_scaling=1.0,
+                feedback=False):
 
                 self.n_input = n_input
                 self.n_reservoir = n_reservoir
+                self.n_output = n_output
 
                 self.spectral_radius = spectral_radius
                 self.noise_level = noise_level
@@ -37,9 +39,9 @@ class BaseESN:
                 self.bias = bias
                 self.output_bias = output_bias
                 self.output_input_scaling = output_input_scaling
-                self._create_reservoir(weight_generation)
+                self._create_reservoir(weight_generation, feedback)
 
-    def _create_reservoir(self, weight_generation):
+    def _create_reservoir(self, weight_generation, feedback=False):
         if (weight_generation == 'naive'):
             #random weight matrix from -0.5 to 0.5
             self._W = rnd.rand(self.n_reservoir, self.n_reservoir) - 0.5
@@ -79,6 +81,9 @@ class BaseESN:
         self._W_input = np.random.rand(self.n_reservoir, 1+self.n_input)-0.5
         self._W_input = self._W_input.dot(self._expanded_input_scaling_matrix)
 
+        if (feedback):
+            self._W_feedback = np.random.rand(self.n_reservoir, self.n_output) - 0.5
+
     def update(self, inputData):
         """
         returns the UNSCALED but reshaped input of this step
@@ -87,6 +92,24 @@ class BaseESN:
         self._x = (1.0-self.leak_rate)*self._x + self.leak_rate*np.arctan(np.dot(self._W_input, np.vstack((self.bias, u))) + np.dot(self._W, self._x)) + (np.random.rand()-0.5)*self.noise_level
 
         return u
+
+    def update_feedback(self, inputData, outputData):
+        """
+        returns the UNSCALED but reshaped input of this step
+        """
+
+        #the input is allowed to be "empty" (size=0)
+        if (self.n_input != 0):
+            u = inputData.reshape(self.n_input, 1)
+            outputData = outputData.reshape(self.n_output, 1)
+            #TODO: Fix the brackets arround the noise!
+            self._x = (1.0-self.leak_rate)*self._x + self.leak_rate*np.arctan(np.dot(self._W_input, np.vstack((self.bias, u))) + np.dot(self._W, self._x) + np.dot(self._W_feedback, outputData)) + (np.random.rand()-0.5)*self.noise_level
+
+            return u
+        else:
+            outputData = outputData.reshape(self.n_output, 1)
+            self._x = (1.0-self.leak_rate)*self._x + self.leak_rate*np.arctan(np.dot(self._W, self._x) + np.dot(self._W_feedback, outputData) + (np.random.rand()-0.5)*self.noise_level)
+            return np.empty((0,1))
 
     def save(self, path):
         f = open(path, "wb")

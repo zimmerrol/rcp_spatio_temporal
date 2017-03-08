@@ -8,10 +8,9 @@ class CESN(BaseESN):
                 leak_rate=1.0, sparseness=0.2,
                 random_seed=None, weight_generation='naive', bias=1.0, output_bias=1.0, output_input_scaling=1.0):
 
-        super(CESN, self).__init__(n_input, n_reservoir, spectral_radius, noise_level, input_scaling, leak_rate, sparseness, random_seed, lambda x:x,
+        super(CESN, self).__init__(n_input, n_reservoir, n_output, spectral_radius, noise_level, input_scaling, leak_rate, sparseness, random_seed, lambda x:x,
                 lambda x:x, weight_generation, bias, output_bias, output_input_scaling)
 
-        self.n_output = n_output
 
     def fit(self, inputList, outputList, regression_parameter=None):
         if (len(inputList) != len(outputList)):

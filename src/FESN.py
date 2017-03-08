@@ -2,22 +2,26 @@ import numpy as np
 import numpy.random as rnd
 from BaseESN import BaseESN
 
-class ESN(BaseESN):
+#allows a feedback connection to allow autonomous usage of the reservoir
+class FESN(BaseESN):
     def __init__(self, n_input, n_reservoir, n_output,
                 spectral_radius=1.0, noise_level=0.01, input_scaling=None,
                 leak_rate=1.0, sparseness=0.2, random_seed=None,
                 out_activation=lambda x:x, out_inverse_activation=lambda x:x,
                 weight_generation='naive', bias=1.0, output_bias=1.0, output_input_scaling=1.0):
 
-        super(ESN, self).__init__(n_input, n_reservoir, n_output, spectral_radius, noise_level, input_scaling, leak_rate, sparseness, random_seed, out_activation,
-                out_inverse_activation, weight_generation, bias, output_bias, output_input_scaling)
+        super(FESN, self).__init__(n_input, n_reservoir, n_output, spectral_radius, noise_level, input_scaling, leak_rate, sparseness, random_seed, out_activation,
+                out_inverse_activation, weight_generation, bias, output_bias, output_input_scaling, feedback=True)
 
 
     def fit(self, inputData, outputData, transient_quota=0.05, regression_parameter=None):
-        if (inputData.shape[0] != outputData.shape[0]):
-            raise ValueError("Amount of input and output datasets is not equal - {0} != {1}".format(inputData.shape[0], outputData.shape[0]))
+        if (self.n_input != 0):
+            if (inputData.shape[0] != outputData.shape[0]):
+                raise ValueError("Amount of input and output datasets is not equal - {0} != {1}".format(inputData.shape[0], outputData.shape[0]))
+        else:
+            inputData = np.empty((len(outputData), 0))
 
-        trainLength = inputData.shape[0]-1
+        trainLength = outputData.shape[0]-1
         skipLength = int(trainLength*transient_quota)
 
         #define states' matrix
@@ -25,11 +29,14 @@ class ESN(BaseESN):
 
         self._x = np.zeros((self.n_reservoir,1))
 
+        oldOutput = np.zeros((self.n_output,1))
         for t in range(trainLength):
-            u = super(ESN, self).update(inputData[t])
+            u = super(FESN, self).update_feedback(inputData[t], oldOutput)
+
             if (t >= skipLength):
                 #add valueset to the states' matrix
                 self._X[:,t-skipLength] = np.vstack((self.output_bias, self.output_input_scaling*u, self._x))[:,0]
+            oldOutput = outputData[t]
 
         #define the target values
         #                                  +1
@@ -41,46 +48,31 @@ class ESN(BaseESN):
         else:
             self._W_out = np.dot(np.dot(Y_target, self._X.T),np.linalg.inv(np.dot(self._X,self._X.T) + regression_parameter*np.identity(1+self.n_input+self.n_reservoir)))
 
-    def generate(self, n, initial_input, continuation=True, initial_data=None, update_processor=lambda x:x):
-        if (self.n_input != self.n_output):
-            raise ValueError("n_input does not equal n_output. The generation mode uses its own output as its input. Therefore, n_input has to be equal to n_output - please adjust these numbers!")
+    def predict(self, inputData, n=None, continuation=True, initial_input_data=None, initial_output_data=None, start_output = None, update_processor=lambda x:x):
+        if (self.n_input == 0):
+            if (n is None):
+                raise ValueError("Either n or n_input have to be greater than zero.")
+
+            inputData = np.empty((n ,0))
 
         if (not continuation):
             self._x = np.zeros(self._x.shape)
 
-            if (initial_data is not None):
+            if (initial_input_data is not None):
                 for t in range(initial_data.shape[0]):
-                    #TODO Fix
-                    super(ESN, self).update(initial_data[t])
-
-        predLength = n
-
-        Y = np.zeros((self.n_output,predLength))
-        inputData = initial_input
-        for t in range(predLength):
-            u = super(ESN, self).update(inputData)
-            y = np.dot(self._W_out, np.vstack((self.output_bias, self.output_input_scaling*u, self._x)))
-            y = self.out_activation(y[:,0])
-            Y[:,t] = update_processor(y)
-            inputData = y
-
-        return Y
-
-    def predict(self, inputData, continuation=True, initial_data=None, update_processor=lambda x:x):
-        if (not continuation):
-            self._x = np.zeros(self._x.shape)
-
-            if (initial_data is not None):
-                for t in range(initial_data.shape[0]):
-                    super(ESN, self).update(initial_data[t])
+                    super(FESN, self).update_feedback(initial_data[t], initial_output_data[t])
 
         predLength = inputData.shape[0]
 
         Y = np.zeros((self.n_output,predLength))
 
+        if (start_output is None):
+            start_output = np.zeros((self.n_output,1))
+        oldOutput = start_output
         for t in range(predLength):
-            u = super(ESN, self).update(inputData[t])
+            u = super(FESN, self).update_feedback(inputData[t], oldOutput)
             y = np.dot(self._W_out, np.vstack((self.output_bias, self.output_input_scaling*u, self._x)))
             Y[:,t] = update_processor(self.out_activation(y[:,0]))
+            oldOutput = Y[:,t]
 
         return Y
