@@ -40,7 +40,7 @@ def generate_trial():
 
 x_train, y_train = generate_trial()
 
-esn = LSESN(n_input=2, n_output=1, n_reservoir=100, random_seed=42, noise_level=0.0000, leak_rate=0.0001, spectral_radius=3.0, sparsness=0.1,
+esn = LSESN(n_input=2, n_output=1, n_reservoir=100, random_seed=42, noise_level=0.0000, leak_rate=0.0001, spectral_radius=3.0, sparseness=0.1,
             weight_generation='naive', bias=0.0, output_bias=0.0, output_input_scaling=0.0, input_scaling=[0.01, 0.01])
 esn.fit(inputDataList=x_train, outputData=y_train)
 

@@ -5,10 +5,10 @@ from BaseESN import BaseESN
 class NLROCESN(BaseESN):
     def __init__(self, n_input, n_reservoir,
                 spectral_radius=1.0, noise_level=0.01, input_scaling=None,
-                leak_rate=1.0, sparsness=0.2,
+                leak_rate=1.0, sparseness=0.2,
                 random_seed=None, weight_generation='naive', bias=1.0, output_bias=1.0, output_input_scaling=1.0):
 
-        super(NLROCESN, self).__init__(n_input, n_reservoir, spectral_radius, noise_level, input_scaling, leak_rate, sparsness, random_seed, lambda x:x,
+        super(NLROCESN, self).__init__(n_input, n_reservoir, spectral_radius, noise_level, input_scaling, leak_rate, sparseness, random_seed, lambda x:x,
                 lambda x:x, weight_generation, bias, output_bias, output_input_scaling)
 
     def fit(self, inputList, outputList, mode="SVC", readout_parameters={}):

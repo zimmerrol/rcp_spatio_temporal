@@ -19,7 +19,7 @@ def sineshit():
     x = np.linspace(1,200*np.pi, 20000)
     y = (0*np.log(x)+np.sin(x)*np.cos(x)).reshape(20000,1)*2
 
-    esn = ESN(n_input=1, n_output=1, n_reservoir=200, random_seed=42, noise_level=0.001, leak_rate=0.7, spectral_radius=1.35, sparsness=0.1)
+    esn = ESN(n_input=1, n_output=1, n_reservoir=200, random_seed=42, noise_level=0.001, leak_rate=0.7, spectral_radius=1.35, sparseness=0.1)
     esn.fit(inputData=y[:5000, :], outputData=y[:5000,:], transient_quota=0.4, regression_parameter=2e-4)
 
     Y = esn.generate(n=15000, continuation=True, initial_input=y[5000,:])
@@ -75,7 +75,7 @@ def read_data(path, sizeString):
 trainX, trainY = read_data("ae.train", "30 30 30 30 30 30 30 30 30")
 testX, testY = read_data("ae.test", "31 35 88 44 29 24 40 50 29")
 
-esn = CESN(n_input=12, n_output=9, n_reservoir=1000, leak_rate=0.8, spectral_radius=0.2, random_seed=41, noise_level=0.01, sparsness=0.30)
+esn = CESN(n_input=12, n_output=9, n_reservoir=1000, leak_rate=0.8, spectral_radius=0.2, random_seed=41, noise_level=0.01, sparseness=0.30)
 esn.fit(inputList=trainX, outputList=trainY)
 
 err = 0.0

@@ -56,7 +56,7 @@ x_train, y_train = generate_trial()
 np.set_printoptions(linewidth=200)
 
 #it is somehow strange, that we have to set the first 4 inputs to zero for this test... there is probably somewhere a big error!
-esn = LSESN(n_input=6, n_output=4, n_reservoir=100, random_seed=42, noise_level=0.0000, leak_rate=0.0001, spectral_radius=0.65, sparsness=0.1,
+esn = LSESN(n_input=6, n_output=4, n_reservoir=100, random_seed=42, noise_level=0.0000, leak_rate=0.0001, spectral_radius=0.65, sparseness=0.1,
             weight_generation='naive', bias=0.0, output_bias=0.0, output_input_scaling=0.0, input_scaling=[0,0,0,0,.15,15])
 esn.fit(inputDataList=x_train, outputData=y_train)
 

@@ -5,7 +5,7 @@ import pickle
 class BaseESN:
     def __init__(self, n_input, n_reservoir,
                 spectral_radius=1.0, noise_level=0.01, input_scaling=None,
-                leak_rate=1.0, sparsness=0.2, random_seed=None,
+                leak_rate=1.0, sparseness=0.2, random_seed=None,
                 out_activation=lambda x:x, out_inverse_activation=lambda x:x,
                 weight_generation='naive', bias=1.0, output_bias=1.0, output_input_scaling=1.0):
 
@@ -14,7 +14,7 @@ class BaseESN:
 
                 self.spectral_radius = spectral_radius
                 self.noise_level = noise_level
-                self.sparsness = sparsness
+                self.sparseness = sparseness
                 self.leak_rate = leak_rate
 
                 if (input_scaling is None):
@@ -44,8 +44,8 @@ class BaseESN:
             #random weight matrix from -0.5 to 0.5
             self._W = rnd.rand(self.n_reservoir, self.n_reservoir) - 0.5
 
-            #set sparsness% to zero
-            mask = rnd.rand(self.n_reservoir, self.n_reservoir) > self.sparsness
+            #set sparseness% to zero
+            mask = rnd.rand(self.n_reservoir, self.n_reservoir) > self.sparseness
             self._W[mask] = 0.0
 
             _W_eigenvalues = np.abs(np.linalg.eig(self._W)[0])
@@ -62,7 +62,7 @@ class BaseESN:
             self._W = rnd.rand(self.n_reservoir, self.n_reservoir) / 2
 
             #set sparseness% to zero
-            mask = rnd.rand(self.n_reservoir, self.n_reservoir) > self.sparsness
+            mask = rnd.rand(self.n_reservoir, self.n_reservoir) > self.sparseness
             self._W[mask] = 0.0
 
             _W_eigenvalues = np.abs(np.linalg.eig(self._W)[0])
