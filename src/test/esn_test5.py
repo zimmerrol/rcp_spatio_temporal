@@ -34,7 +34,11 @@ def pred48():
     y_train = y[:8000]
     y_test = y[8000-48:]
 
-    esn = ESN(n_input=1, n_output=1, n_reservoir=500, noise_level=0.001, spectral_radius=.3, leak_rate=0.2, random_seed=42, sparseness=0.2)
+    #manual optimization
+    #esn = ESN(n_input=1, n_output=1, n_reservoir=1000, noise_level=0.001, spectral_radius=.4, leak_rate=0.2, random_seed=42, sparseness=0.2)
+
+    #gridsearch results
+    esn = ESN(n_input=1, n_output=1, n_reservoir=1000, noise_level=0.001, spectral_radius=.35, leak_rate=0.2, random_seed=42, sparseness=0.2)
     train_acc = esn.fit(inputData=y_train[:-48], outputData=y_train[48:])
     print("training acc: {0:4f}\r\n".format(train_acc))
 
@@ -52,4 +56,23 @@ def pred48():
     plt.legend()
     plt.show()
 
+def GridSearchTest():
+    #first tst of the gridsearch for the pred48 task
+
+    from GridSearch import GridSearch
+    y_train = y[:8000]
+    y_test = y[8000-48:]
+
+    aa = GridSearch(param_grid={"n_reservoir": [900, 1000, 1100], "spectral_radius": [0.3, .35, 0.4, .45], "leak_rate": [.2, .25, .3]},
+        fixed_params={"n_output": 1, "n_input": 1, "noise_level": 0.001, "sparseness": .2, "random_seed": 42},
+        esnType=ESN)
+    print("start fitting...")
+    results = aa.fit(y_train[:-48], y_train[48:], [(y_test[:-48], y_test[48:])])
+    print("done:\r\n")
+    print(results)
+
+    print("\r\nBest result (mse =  {0}):\r\n".format(aa._best_mse))
+    print(aa._best_params)
+
+#GridSearchTest()
 pred48()

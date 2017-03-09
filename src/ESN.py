@@ -20,7 +20,7 @@ class ESN(BaseESN):
         trainLength = inputData.shape[0]
 
         skipLength = int(trainLength*transient_quota)
-    
+
         #define states' matrix
         self._X = np.zeros((1+self.n_input+self.n_reservoir,trainLength-skipLength))
 
