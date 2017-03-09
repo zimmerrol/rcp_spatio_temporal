@@ -48,7 +48,7 @@ data = data[:,:]
 
 #esn = ESN.load("dat.obj")
 
-mode = "gen"
+mode = "cross"
 
 if mode == "gen":
     print("set up")
@@ -62,22 +62,22 @@ if mode == "gen":
     Y = esn.generate(n=testLength, initial_input=data[trainLength])
     errorLength = 4000
 
-    mse = np.sum(np.square(data.T[0,trainLength:trainLength+errorLength] - Y[0,:errorLength]))/errorLength
+    mse = np.sum(np.square(data[trainLength:trainLength+errorLength, 0] - Y[:errorLength, 0]))/errorLength
     rmse = np.sqrt(mse)
-    nrmse = rmse/np.var(data.T[0,trainLength:trainLength+errorLength])
+    nrmse = rmse/np.var(data[trainLength:trainLength+errorLength, 0])
     print ('MSE = ' + str( mse ))
     print ('RMSE = ' + str( rmse ))
     print ('NRMSE = ' + str( nrmse ))
 
     plt.figure()
-    plt.plot( data.T[0,trainLength:trainLength+testLength], 'g', linestyle=":" )
-    plt.plot(Y[0,:], 'b' , linestyle="--")
+    plt.plot(data[trainLength:trainLength+testLength, 0], 'g', linestyle=":" )
+    plt.plot(Y[:, 0], 'b' , linestyle="--")
     plt.title('Target and generated signals $y(n)$ starting at $n=0$')
     plt.ylim([-20,20])
     plt.legend(['Target signal', 'Free-running predicted signal'])
 
     plt.figure()
-    plt.plot( data.T[0,trainLength+1:trainLength+testLength+1]-Y[0,:testLength], 'g', linestyle=":" )
+    plt.plot( data[trainLength+1:trainLength+testLength+1, 0]-Y[:testLength, 0], 'g', linestyle=":" )
     plt.title('Error of target and predicted signals $y(n)$ starting at $n=0$')
     plt.ylim([-10,10])
     plt.legend(['Error of predicted signal'])
@@ -97,27 +97,26 @@ if mode == "pred50":
     Y = esn.predict(inputData=data[trainLength:trainLength+testLength,:], initial_input=data[trainLength-1, :])
     errorLength = 4000
 
-    mse = np.sum(np.square(data.T[0,trainLength+predDist:trainLength+errorLength+predDist] - Y[0,:errorLength]))/errorLength
+    mse = np.sum(np.square(data[trainLength+predDist:trainLength+errorLength+predDist, 0] - Y[:errorLength, 0]))/errorLength
     rmse = np.sqrt(mse)
-    nrmse = rmse/np.var(data.T[0,trainLength+predDist:trainLength+errorLength+predDist])
+    nrmse = rmse/np.var(data[trainLength+predDist:trainLength+errorLength+predDist, 0])
     print ('MSE = ' + str( mse ))
     print ('RMSE = ' + str( rmse ))
     print ('NRMSE = ' + str( nrmse ))
 
     plt.figure()
-    plt.plot( data.T[0,trainLength+predDist:trainLength+testLength+predDist], 'g', linestyle=":" )
-    plt.plot(Y[0,:], 'b' , linestyle="--")
+    plt.plot( data[trainLength+predDist:trainLength+testLength+predDist, 0], 'g', linestyle=":" )
+    plt.plot(Y[:, 0], 'b' , linestyle="--")
     plt.title('Target and generated signals $y(n)$ starting at $n=0$')
     plt.ylim([-20,20])
     plt.legend(['Target signal', 'Free-running predicted signal'])
 
 
     plt.figure()
-    plt.plot( data.T[0,trainLength+predDist:trainLength+testLength+predDist]-Y[0,:testLength], 'g', linestyle=":" )
+    plt.plot( data[trainLength+predDist:trainLength+testLength+predDist, 0]-Y[:testLength, 0], 'g', linestyle=":" )
     plt.title('Error of target and predicted signals $y(n)$ starting at $n=0$')
     plt.ylim([-10,10])
     plt.legend(['Error of predicted signal'])
-
 
     plt.show()
 
@@ -134,23 +133,22 @@ if mode == "pred100":
     Y = esn.predict(inputData=data[trainLength:trainLength+testLength,:], initial_input=data[trainLength-1, :])
     errorLength = 4000
 
-    mse = np.sum(np.square(data.T[0,trainLength+predDist:trainLength+errorLength+predDist] - Y[0,:errorLength]))/errorLength
+    mse = np.sum(np.square(data[trainLength+predDist:trainLength+errorLength+predDist, 0] - Y[:errorLength, 0]))/errorLength
     rmse = np.sqrt(mse)
-    nrmse = rmse/np.var(data.T[0,trainLength+predDist:trainLength+errorLength+predDist])
+    nrmse = rmse/np.var(data[trainLength+predDist:trainLength+errorLength+predDist, 0])
     print ('MSE = ' + str( mse ))
     print ('RMSE = ' + str( rmse ))
     print ('NRMSE = ' + str( nrmse ))
 
     plt.figure()
-    plt.plot( data.T[0,trainLength+predDist:trainLength+testLength+predDist], 'g', linestyle=":" )
-    plt.plot(Y[0,:], 'b' , linestyle="--")
+    plt.plot( data[trainLength+predDist:trainLength+testLength+predDist, 0], 'g', linestyle=":" )
+    plt.plot(Y[:, 0], 'b' , linestyle="--")
     plt.title('Target and generated signals $y(n)$ starting at $n=0$')
     plt.ylim([-20,20])
     plt.legend(['Target signal', 'Free-running predicted signal'])
 
-
     plt.figure()
-    plt.plot( data.T[0,trainLength+predDist:trainLength+testLength+predDist]-Y[0,:testLength], 'g', linestyle=":" )
+    plt.plot( data[trainLength+predDist:trainLength+testLength+predDist, 0]-Y[:testLength, 0], 'g', linestyle=":" )
     plt.title('Error of target and predicted signals $y(n)$ starting at $n=0$')
     plt.ylim([-10,10])
     plt.legend(['Error of predicted signal'])
@@ -170,26 +168,24 @@ if mode == "cross":
 
     # compute MSE for the first errorLen time steps
     errorLength = 4000
-    mse = np.sum( np.square(data.T[1,trainLength:trainLength+errorLength] - Y[0,:errorLength] ) ) / errorLength
+    mse = np.sum(np.square(data[trainLength:trainLength+errorLength,1] - Y[:errorLength,0])) / errorLength
     rmse = np.sqrt(mse)
-    nrmse = rmse/np.var(data.T[1,trainLength:trainLength+errorLength])
+    nrmse = rmse/np.var(data[trainLength:trainLength+errorLength,1])
     print ('MSE = ' + str( mse ))
     print ('RMSE = ' + str( rmse ))
     print ('NRMSE = ' + str( nrmse ))
 
     # plot some signals
-
-
     plt.figure()
-    plt.plot( data.T[1,trainLength:trainLength+testLength], 'g', linestyle=":" )
-    plt.plot(Y[0,:], 'b' , linestyle="--")
+    plt.plot( data[trainLength:trainLength+testLength,1], 'g', linestyle=":" )
+    plt.plot(Y[:,0], 'b' , linestyle="--")
     plt.title('Target and generated signals $y(n)$ starting at $n=0$')
     plt.ylim([-20,20])
     plt.legend(['Target signal', 'Free-running predicted signal'])
 
 
     plt.figure()
-    plt.plot( data.T[1,trainLength+1:trainLength+testLength+1]-Y[0,:], 'g', linestyle=":" )
+    plt.plot( data[trainLength+1:trainLength+testLength+1,1]-Y[:,0], 'g', linestyle=":" )
     plt.title('Error of target and predicted signals $y(n)$ starting at $n=0$')
     plt.ylim([-20,20])
     plt.legend(['Error of predicted signal'])

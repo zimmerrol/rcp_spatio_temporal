@@ -31,7 +31,7 @@ def simple_sine():
     #plt.plot(np.arange(trainLength), Y, 'r')
 
     plt.plot(x,y[:,0], "b", linestyle="--")
-    plt.plot(x[500:],Y[0,:], "r")
+    plt.plot(x[500:],Y[:,0], "r")
     plt.show()
 
 #simple_sine()
@@ -91,8 +91,8 @@ def freq_gen():
         spectral_radius=0.13, sparseness=0.30)
 
     esn.fit(train_ctrl[:,1], train_output, transient_quota=0.1)
-    pred_test = esn.predict(test_ctrl[:,1]).T
-    pred_test2 = esn.predict(frequency_control2[:,1]).T
+    pred_test = esn.predict(test_ctrl[:,1])
+    pred_test2 = esn.predict(frequency_control2[:,1])
 
     #test acc
     print(np.sqrt(np.mean((pred_test - test_output)**2)))
@@ -120,3 +120,4 @@ def freq_gen():
     plt.show()
 
 freq_gen()
+#simple_sine()

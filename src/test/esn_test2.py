@@ -27,9 +27,9 @@ def sineshit():
     Y = esn.generate(n=15000, continuation=True, initial_input=y[5000,:])
 
     print(x[5000:].shape)
-    print(Y[0,:].shape)
+    print(Y[:, 0].shape)
     plt.plot(x,y[:,0], "b", linestyle="--")
-    plt.plot(x[5000:],Y[0,:], "r", linestyle=":")
+    plt.plot(x[5000:],Y[:, 0], "r", linestyle=":")
     #plt.plot(x[5000:],Y[0,:]-y[5000:,0], linestyle=":")
     plt.show()
 

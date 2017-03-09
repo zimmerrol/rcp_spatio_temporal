@@ -56,7 +56,7 @@ def pred48():
     plt.legend()
     plt.show()
 
-def GridSearchTest():
+def GridSearchTestForPred48():
     #first tst of the gridsearch for the pred48 task
 
     from GridSearch import GridSearch
@@ -74,5 +74,5 @@ def GridSearchTest():
     print("\r\nBest result (mse =  {0}):\r\n".format(aa._best_mse))
     print(aa._best_params)
 
-#GridSearchTest()
+#GridSearchTestForPred48()
 pred48()

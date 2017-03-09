@@ -1,6 +1,7 @@
 import numpy as np
 import itertools
 from ESN import ESN
+import operator
 
 class GridSearch:
     def __init__(self, param_grid, fixed_params, esnType):
@@ -26,14 +27,13 @@ class GridSearch:
             test_mse = []
             for (testInput, testOutput) in testingDataSequence:
                 esn._x = current_state
-                out_pred = esn.predict(testInput).T
+                out_pred = esn.predict(testInput)
                 test_mse.append(np.mean((testOutput - out_pred)**2))
 
             test_mse = np.mean(test_mse)
 
             results.append((test_mse, params))
 
-        import operator
         res = min(results, key=operator.itemgetter(0))
 
         self._best_params = res[1]

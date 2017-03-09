@@ -71,7 +71,7 @@ class ESN(BaseESN):
             Y[:,t] = update_processor(y)
             inputData = y
 
-        return Y
+        return Y.T
 
     def predict(self, inputData, continuation=True, initial_data=None, update_processor=lambda x:x):
         if (not continuation):
@@ -90,4 +90,4 @@ class ESN(BaseESN):
             y = np.dot(self._W_out, np.vstack((self.output_bias, self.output_input_scaling*u, self._x)))
             Y[:,t] = update_processor(self.out_activation(y[:,0]))
 
-        return Y
+        return Y.T

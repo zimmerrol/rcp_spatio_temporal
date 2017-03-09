@@ -81,4 +81,4 @@ class FESN(BaseESN):
             Y[:,t] = update_processor(self.out_activation(y[:,0]))
             oldOutput = Y[:,t]
 
-        return Y
+        return Y.T
