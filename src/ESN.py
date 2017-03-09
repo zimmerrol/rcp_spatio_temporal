@@ -17,9 +17,10 @@ class ESN(BaseESN):
         if (inputData.shape[0] != outputData.shape[0]):
             raise ValueError("Amount of input and output datasets is not equal - {0} != {1}".format(inputData.shape[0], outputData.shape[0]))
 
-        trainLength = inputData.shape[0]-1
-        skipLength = int(trainLength*transient_quota)
+        trainLength = inputData.shape[0]
 
+        skipLength = int(trainLength*transient_quota)
+    
         #define states' matrix
         self._X = np.zeros((1+self.n_input+self.n_reservoir,trainLength-skipLength))
 
@@ -33,13 +34,19 @@ class ESN(BaseESN):
 
         #define the target values
         #                                  +1
-        Y_target = self.out_inverse_activation(outputData).T[:,skipLength+1:trainLength+1]
+        Y_target = self.out_inverse_activation(outputData).T[:,skipLength:]
 
         #W_out = Y_target.dot(X.T).dot(np.linalg.inv(X.dot(X.T) + regressionParameter*np.identity(1+reservoirInputCount+reservoirSize)) )
         if (regression_parameter is None):
             self._W_out = np.dot(Y_target, np.linalg.pinv(self._X))
         else:
             self._W_out = np.dot(np.dot(Y_target, self._X.T),np.linalg.inv(np.dot(self._X,self._X.T) + regression_parameter*np.identity(1+self.n_input+self.n_reservoir)))
+
+        #calculate the training error now
+        train_prediction = np.dot(self._W_out, self._X).T
+        training_error = np.sqrt(np.mean((train_prediction - outputData[skipLength:])**2))
+
+        return training_error
 
     def generate(self, n, initial_input, continuation=True, initial_data=None, update_processor=lambda x:x):
         if (self.n_input != self.n_output):

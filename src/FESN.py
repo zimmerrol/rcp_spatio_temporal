@@ -21,7 +21,7 @@ class FESN(BaseESN):
         else:
             inputData = np.empty((len(outputData), 0))
 
-        trainLength = outputData.shape[0]-1
+        trainLength = outputData.shape[0]
         skipLength = int(trainLength*transient_quota)
 
         #define states' matrix
@@ -39,14 +39,20 @@ class FESN(BaseESN):
             oldOutput = outputData[t]
 
         #define the target values
-        #                                  +1
-        Y_target = self.out_inverse_activation(outputData).T[:,skipLength+1:trainLength+1]
+        #                                                               +1
+        Y_target = self.out_inverse_activation(outputData).T[:,skipLength:trainLength]
 
         #W_out = Y_target.dot(X.T).dot(np.linalg.inv(X.dot(X.T) + regressionParameter*np.identity(1+reservoirInputCount+reservoirSize)) )
         if (regression_parameter is None):
             self._W_out = np.dot(Y_target, np.linalg.pinv(self._X))
         else:
             self._W_out = np.dot(np.dot(Y_target, self._X.T),np.linalg.inv(np.dot(self._X,self._X.T) + regression_parameter*np.identity(1+self.n_input+self.n_reservoir)))
+
+        #calculate the training error now
+        train_prediction = np.dot(self._W_out, self._X).T
+        training_error = np.sqrt(np.mean((train_prediction - outputData[skipLength:])**2))
+
+        return training_error
 
     def predict(self, inputData, n=None, continuation=True, initial_input_data=None, initial_output_data=None, start_output = None, update_processor=lambda x:x):
         if (self.n_input == 0):

@@ -48,13 +48,14 @@ data = data[:,:]
 
 #esn = ESN.load("dat.obj")
 
-mode = "pred"
+mode = "gen"
 
 if mode == "gen":
     print("set up")
-    esn = ESN(n_reservoir=2000, n_input=3, n_output=3, leak_rate=0.55, spectral_radius=0.90, random_seed=42, weight_generation='advanced')#0.4
+    esn = ESN(n_reservoir=2000, n_input=3, n_output=3, leak_rate=0.55, spectral_radius=0.60, random_seed=42, weight_generation='advanced')#0.4
     print("fitting...")
-    esn.fit(inputData=data[:trainLength,:], outputData=data[:trainLength,:])
+    train_error = esn.fit(inputData=data[:trainLength,:], outputData=data[1:trainLength+1,:])
+    print("train error: {0:4f}".format(train_error))
 
     testLength=5000
     print("generating...")
@@ -88,7 +89,7 @@ if mode == "pred50":
     print("set up")
     esn = ESN(n_reservoir=300, n_input=3, n_output=3, leak_rate=0.10, spectral_radius=0.40, random_seed=42, weight_generation='advanced')#0.4
     print("fitting...")
-    esn.fit(inputData=data[:trainLength,:], outputData=data[predDist:trainLength+predDist,:])
+    esn.fit(inputData=data[:trainLength,:], outputData=data[predDist+1:trainLength+predDist+1,:])
 
     testLength=5000
     print("generating...")
@@ -125,7 +126,7 @@ if mode == "pred100":
     print("set up")
     esn = ESN(n_reservoir=300, n_input=3, n_output=3, leak_rate=0.10, spectral_radius=0.40, random_seed=42, weight_generation='advanced')#0.4
     print("fitting...")
-    esn.fit(inputData=data[:trainLength,:], outputData=data[predDist:trainLength+predDist,:])
+    esn.fit(inputData=data[:trainLength,:], outputData=data[predDist+1:trainLength+predDist+1,:])
 
     testLength=5000
     print("generating...")
@@ -157,11 +158,11 @@ if mode == "pred100":
 
     plt.show()
 
-if mode == "pred":
+if mode == "cross":
     print("set up")
     esn = ESN(n_reservoir=500, n_input=1, n_output=1, leak_rate=0.20, spectral_radius=0.010, random_seed=42, weight_generation='advanced')#0.4
     print("fitting...")
-    esn.fit(inputData=data[:trainLength,0].reshape(trainLength, 1), outputData=data[:trainLength,1].reshape(trainLength, 1))
+    esn.fit(inputData=data[:trainLength,0].reshape(trainLength, 1), outputData=data[+1:trainLength+1,1].reshape(trainLength, 1))
 
     print("predicting...")
     Y = esn.predict(inputData=data[trainLength:trainLength+testLength,0])

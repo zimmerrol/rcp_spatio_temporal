@@ -20,7 +20,9 @@ def sineshit():
     y = (0*np.log(x)+np.sin(x)*np.cos(x)).reshape(20000,1)*2
 
     esn = ESN(n_input=1, n_output=1, n_reservoir=200, random_seed=42, noise_level=0.001, leak_rate=0.7, spectral_radius=1.35, sparseness=0.1)
-    esn.fit(inputData=y[:5000, :], outputData=y[:5000,:], transient_quota=0.4, regression_parameter=2e-4)
+    train_error = esn.fit(inputData=y[:5000, :], outputData=y[1:5001,:], transient_quota=0.4, regression_parameter=2e-4)
+    print("train error: {0:4f}".format(train_error))
+    print(np.mean(np.abs(esn._W_out)))
 
     Y = esn.generate(n=15000, continuation=True, initial_input=y[5000,:])
 
@@ -31,7 +33,7 @@ def sineshit():
     #plt.plot(x[5000:],Y[0,:]-y[5000:,0], linestyle=":")
     plt.show()
 
-#reset the reservoir after each series!
+sineshit()
 
 def read_data(path, sizeString):
     content = ""
@@ -75,7 +77,7 @@ def read_data(path, sizeString):
 trainX, trainY = read_data("ae.train", "30 30 30 30 30 30 30 30 30")
 testX, testY = read_data("ae.test", "31 35 88 44 29 24 40 50 29")
 
-esn = CESN(n_input=12, n_output=9, n_reservoir=1000, leak_rate=0.8, spectral_radius=0.2, random_seed=41, noise_level=0.01, sparseness=0.30)
+esn = CESN(n_input=12, n_output=9, n_reservoir=1000, leak_rate=0.8, spectral_radius=0.2, random_seed=41, noise_level=0.1, sparseness=0.30)
 esn.fit(inputList=trainX, outputList=trainY)
 
 err = 0.0

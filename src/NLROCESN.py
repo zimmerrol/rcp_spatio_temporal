@@ -8,7 +8,7 @@ class NLROCESN(BaseESN):
                 leak_rate=1.0, sparseness=0.2,
                 random_seed=None, weight_generation='naive', bias=1.0, output_bias=1.0, output_input_scaling=1.0):
 
-        super(NLROCESN, self).__init__(n_input, n_reservoir, n_output=None, spectral_radius, noise_level, input_scaling, leak_rate, sparseness, random_seed, lambda x:x,
+        super(NLROCESN, self).__init__(n_input, n_reservoir, None, spectral_radius, noise_level, input_scaling, leak_rate, sparseness, random_seed, lambda x:x,
                 lambda x:x, weight_generation, bias, output_bias, output_input_scaling)
 
     def fit(self, inputList, outputList, mode="SVC", readout_parameters={}):

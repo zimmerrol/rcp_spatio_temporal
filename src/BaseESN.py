@@ -82,14 +82,14 @@ class BaseESN:
         self._W_input = self._W_input.dot(self._expanded_input_scaling_matrix)
 
         if (feedback):
-            self._W_feedback = np.random.rand(self.n_reservoir, self.n_output) - 0.5
+            self._W_feedback = np.random.rand(self.n_reservoir, 1+self.n_output) - 0.5
 
     def update(self, inputData):
         """
         returns the UNSCALED but reshaped input of this step
         """
         u = inputData.reshape(self.n_input, 1)
-        self._x = (1.0-self.leak_rate)*self._x + self.leak_rate*np.arctan(np.dot(self._W_input, np.vstack((self.bias, u))) + np.dot(self._W, self._x)) + (np.random.rand()-0.5)*self.noise_level
+        self._x = (1.0-self.leak_rate)*self._x + self.leak_rate*np.arctan(np.dot(self._W_input, np.vstack((self.bias, u))) + np.dot(self._W, self._x) + (np.random.rand()-0.5)*self.noise_level)
 
         return u
 
@@ -97,18 +97,20 @@ class BaseESN:
         """
         returns the UNSCALED but reshaped input of this step
         """
-
         #the input is allowed to be "empty" (size=0)
         if (self.n_input != 0):
             u = inputData.reshape(self.n_input, 1)
             outputData = outputData.reshape(self.n_output, 1)
             #TODO: Fix the brackets arround the noise!
-            self._x = (1.0-self.leak_rate)*self._x + self.leak_rate*np.arctan(np.dot(self._W_input, np.vstack((self.bias, u))) + np.dot(self._W, self._x) + np.dot(self._W_feedback, outputData)) + (np.random.rand()-0.5)*self.noise_level
+            self._x = (1.0-self.leak_rate)*self._x + self.leak_rate*np.arctan(np.dot(self._W_input, np.vstack((self.bias, u))) + np.dot(self._W, self._x) +
+                np.dot(self._W_feedback, np.vstack((self.output_bias, outputData))) + (np.random.rand()-0.5)*self.noise_level)
 
             return u
         else:
             outputData = outputData.reshape(self.n_output, 1)
-            self._x = (1.0-self.leak_rate)*self._x + self.leak_rate*np.arctan(np.dot(self._W, self._x) + np.dot(self._W_feedback, outputData) + (np.random.rand()-0.5)*self.noise_level)
+            self._x = (1.0-self.leak_rate)*self._x + self.leak_rate*np.arctan(np.dot(self._W, self._x) + np.dot(self._W_feedback, np.vstack((self.output_bias, outputData))) +
+                (np.random.rand()-0.5)*self.noise_level)
+
             return np.empty((0,1))
 
     def save(self, path):
