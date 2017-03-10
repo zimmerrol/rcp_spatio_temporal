@@ -42,6 +42,24 @@ class ESN(BaseESN):
         else:
             self._W_out = np.dot(np.dot(Y_target, self._X.T),np.linalg.inv(np.dot(self._X,self._X.T) + regression_parameter*np.identity(1+self.n_input+self.n_reservoir)))
 
+            #from sklearn.linear_model import Ridge
+            #self._rr = Ridge(alpha=regression_parameter)
+            #self._rr.fit(self._X.T, Y_target.T)
+
+
+            """
+            #alternative represantation of the equation
+
+            Xt = self._X.T
+
+            A = np.dot(self._X, Y_target.T)
+
+            B = np.linalg.inv(np.dot(self._X, Xt)  + regression_parameter*np.identity(1+self.n_input+self.n_reservoir))
+
+            self._W_out = np.dot(B, A)
+            self._W_out = self._W_out.T
+            """
+
         #calculate the training error now
         train_prediction = np.dot(self._W_out, self._X).T
         training_error = np.sqrt(np.mean((train_prediction - outputData[skipLength:])**2))
@@ -88,6 +106,7 @@ class ESN(BaseESN):
         for t in range(predLength):
             u = super(ESN, self).update(inputData[t])
             y = np.dot(self._W_out, np.vstack((self.output_bias, self.output_input_scaling*u, self._x)))
+            #y = self._rr.predict(np.vstack((self.output_bias, self.output_input_scaling*u, self._x)).T)
             Y[:,t] = update_processor(self.out_activation(y[:,0]))
 
         return Y.T

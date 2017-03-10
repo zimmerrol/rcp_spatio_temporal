@@ -81,6 +81,7 @@ def GridSearchTestForPred48():
 #GridSearchTestForPred48()
 #pred48()
 
+from multiprocessing import Pool
 
 yres = []
 for i in range(1,100):
