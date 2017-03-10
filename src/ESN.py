@@ -2,18 +2,35 @@ import numpy as np
 import numpy.random as rnd
 from BaseESN import BaseESN
 
+from sklearn.linear_model import Ridge
+
+
 class ESN(BaseESN):
     def __init__(self, n_input, n_reservoir, n_output,
                 spectral_radius=1.0, noise_level=0.01, input_scaling=None,
                 leak_rate=1.0, sparseness=0.2, random_seed=None,
                 out_activation=lambda x:x, out_inverse_activation=lambda x:x,
-                weight_generation='naive', bias=1.0, output_bias=1.0, output_input_scaling=1.0):
+                weight_generation='naive', bias=1.0, output_bias=1.0,
+                output_input_scaling=1.0, solver='pinv'):
 
         super(ESN, self).__init__(n_input, n_reservoir, n_output, spectral_radius, noise_level, input_scaling, leak_rate, sparseness, random_seed, out_activation,
                 out_inverse_activation, weight_generation, bias, output_bias, output_input_scaling)
 
 
-    def fit(self, inputData, outputData, transient_quota=0.05, regression_parameter=None):
+        self._solver = solver
+        """
+        allowed values for the solver:
+            pinv
+            lsqr
+
+            sklearn_auto
+            sklearn_svd
+            sklearn_cholesky
+            sklearn_lsqr
+            sklearn_sag
+        """
+
+    def fit(self, inputData, outputData, transient_quota=0.05, regression_parameters={}):
         if (inputData.shape[0] != outputData.shape[0]):
             raise ValueError("Amount of input and output datasets is not equal - {0} != {1}".format(inputData.shape[0], outputData.shape[0]))
 
@@ -37,33 +54,40 @@ class ESN(BaseESN):
         Y_target = self.out_inverse_activation(outputData).T[:,skipLength:]
 
         #W_out = Y_target.dot(X.T).dot(np.linalg.inv(X.dot(X.T) + regressionParameter*np.identity(1+reservoirInputCount+reservoirSize)) )
-        if (regression_parameter is None):
+
+        if (self._solver == "pinv"):
             self._W_out = np.dot(Y_target, np.linalg.pinv(self._X))
-        else:
+
+            #calculate the training error now
+            train_prediction = np.dot(self._W_out, self._X).T
+
+        elif (self._solver == "lsqr"):
             self._W_out = np.dot(np.dot(Y_target, self._X.T),np.linalg.inv(np.dot(self._X,self._X.T) + regression_parameter*np.identity(1+self.n_input+self.n_reservoir)))
 
-            #from sklearn.linear_model import Ridge
-            #self._rr = Ridge(alpha=regression_parameter)
-            #self._rr.fit(self._X.T, Y_target.T)
+            #calculate the training error now
+            train_prediction = np.dot(self._W_out, self._X).T
 
+        elif (self._solver in ["sklearn_auto", "sklearn_lsqr", "sklearn_sag", "sklearn_svd"]):
+            mode = self._solver[8:]
+            self._ridgeSolver = Ridge(**regression_parameters, solver=mode)
 
-            """
-            #alternative represantation of the equation
+            self._ridgeSolver.fit(self._X.T, Y_target.T)
+            train_prediction = self._ridgeSolver.predict(self._X.T)
 
-            Xt = self._X.T
+        """
+        #alternative represantation of the equation
 
-            A = np.dot(self._X, Y_target.T)
+        Xt = self._X.T
 
-            B = np.linalg.inv(np.dot(self._X, Xt)  + regression_parameter*np.identity(1+self.n_input+self.n_reservoir))
+        A = np.dot(self._X, Y_target.T)
 
-            self._W_out = np.dot(B, A)
-            self._W_out = self._W_out.T
-            """
+        B = np.linalg.inv(np.dot(self._X, Xt)  + regression_parameter*np.identity(1+self.n_input+self.n_reservoir))
 
-        #calculate the training error now
-        train_prediction = np.dot(self._W_out, self._X).T
+        self._W_out = np.dot(B, A)
+        self._W_out = self._W_out.T
+        """
+
         training_error = np.sqrt(np.mean((train_prediction - outputData[skipLength:])**2))
-
         return training_error
 
     def generate(self, n, initial_input, continuation=True, initial_data=None, update_processor=lambda x:x):
@@ -105,8 +129,12 @@ class ESN(BaseESN):
 
         for t in range(predLength):
             u = super(ESN, self).update(inputData[t])
-            y = np.dot(self._W_out, np.vstack((self.output_bias, self.output_input_scaling*u, self._x)))
-            #y = self._rr.predict(np.vstack((self.output_bias, self.output_input_scaling*u, self._x)).T)
+
+            if (self._solver in ["sklearn_auto", "sklearn_lsqr", "sklearn_sag", "sklearn_svd"]):
+                y = self._ridgeSolver.predict(np.vstack((self.output_bias, self.output_input_scaling*u, self._x)).T)
+            else:
+                y = np.dot(self._W_out, np.vstack((self.output_bias, self.output_input_scaling*u, self._x)))
+
             Y[:,t] = update_processor(self.out_activation(y[:,0]))
 
         return Y.T
