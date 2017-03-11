@@ -1,0 +1,131 @@
+\NeedsTeXFormat{LaTeX2e}[2005/12/01]
+%%    2009/03/12 v1.0 GAUBM Vorlage fuer Aschlussarbeiten Physik
+%% Template fuer Bachelor- und Masterarbeiten
+%% an der Fakultaet fuer Physik (c) Thomas Pruschke der GA Universitaet
+%% Verbesserungsvorschlaege bitte an pruschke@theorie.physik.uni-goettingen.de
+%%
+%% Benoetigte Pakete: datenumber
+%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%% Bitte vor dem Veraendern diese Datei umbenennen! %%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% scrbook - Ersatz fuer LaTeX book Klasse aus dem KOMA Script
+%% Moegliche Optionen: diejenigen der Klasse scrbook ausser titlepage
+
+%% deutsche Arbeit:
+\documentclass[review,       %% Typ der Arbeit: bachelor oder master
+               twoside,        %% zweiseitiges Layout
+               BCOR10mm,       %% Bindekorrektur 10 mm
+%               liststotoc,nomtotoc,bibtotoc, %% Aufnahme der div. Verzeichnisse
+                                              %% ins Inhaltsverzeichnis
+               english,ngerman, %% Alternativspr. Englisch, Dokumentspr. Deutsch
+%               ngerman,english  %% Alternativspr. Deutsch, Dokumentspr. Englisch
+%               final,          %% Endversion; draft fuer schnelles Kompilieren
+               ]{GAUBM}
+
+\usepackage{setspace}  %% Zur Setzung des Zeilenabstandes
+\usepackage{babel}     %% Sprachen-Unterstuetzung
+\usepackage{calc}      %% ermoeglicht Rechnen mit Laengen und Zaehlern
+\usepackage[T1]{fontenc}       %% Unterstutzung von Umlauten etc.
+%\usepackage[latin1]{inputenc}  %% 
+%% in aktuellem Linux & MacOS X wird standardmaessig UTF8 kodiert!
+\usepackage[utf8]{inputenc}    %% Wenn latin1 nicht geht ...
+
+\usepackage{amsmath,amssymb} %% zusaetzliche Mathe-Symbole
+
+\usepackage{lmodern} %% type1-taugliche CM-Schrift als Variante zur
+                     %% "normalen" EC-Schrift
+%% Paket fuer bibtex-Datenbanken
+\usepackage[comma,numbers,sort&compress]{natbib}
+\bibliographystyle{plainnat}
+
+\newcommand{\tabheadfont}[1]{\textbf{#1}} %% Tabellenkopf in Fett
+\usepackage{booktabs}                      %% Befehle fuer besseres Tabellenlayout
+\usepackage{longtable}                     %% umbrechbare Tabellen
+\usepackage{array}                         %% zusaetzliche Spaltenoptionen
+
+%% umfangreiche Pakete fuer Symbole wie \micro, \ohm, \degree, \celsius etc.
+\usepackage{textcomp,gensymb}
+
+%\usepackage{SIunits} %% Korrektes Setzen von Einheiten
+\usepackage{units}   %% Variante fuer Einheiten
+
+%% Hyperlinks im Dokument; muss als eines der letzten Pakete geladen werden
+\usepackage[pdfstartview=FitH,      % Oeffnen mit fit width
+            breaklinks=true,        % Umbrueche in Links, nur bei pdflatex default
+            bookmarksopen=true,     % aufgeklappte Bookmarks
+            bookmarksnumbered=true  % Kapitelnummerierung in bookmarks
+            ]{hyperref}
+
+%% Weiter benoetigte Pakete: datenumber
+%% Falls dieses Paket nicht in der Installation vorhanden ist,
+%% kann es von der Seite mit diesem Template heruntergeladen werden
+%% und in einem LaTeX bekanntem Verzeichnis installiert werden (notfalls
+%% dem Verzeichnis mit der Arbeit).
+\begin{document}
+%%
+%%                   Ab hier muessen die Anpassungen geschehen
+%%
+%% Hier den eigenen Namen einsetzen
+\ThesisAuthor{Roland Simon}{Zimmermann}
+%% Hier den Geburtsort einsetzen
+\PlaceOfBirth{Recklinghausen}
+%% Titel Arbeit. Das erste Argument ist der deutsche, das zweite der
+%% englische Titel.
+\ThesisTitle{Spezialisierungspraktikum}{} % second brackets: english title
+%% Erst- und Zweitgutacher/in
+%% Ist der/die Betreuer/in nicht identisch mit dem/r Erstgutachter/in,
+%% muss diese/r als optionales Argument angegeben werden.
+\FirstReferee{Prof.\ Dr.\ Ulrich Parlitz}
+\Institute{Max-Planck-Institut für Dynamik und Selbstorganisation}
+\SecondReferee{nicht vorhanden}
+%% Beginn und Ende des Anfertigungszeitraumes
+\ThesisBegin{1}{4}{2009}
+\ThesisEnd{15}{7}{2009}
+%% DO NOT TOUCH THESE LINES!!!!
+\frontmatter
+\maketitle
+\cleardoublepage
+%% Zusammenfassung. Falls nicht gewuenscht, bitte auskommentieren.
+\input{content/abstract.tex}
+
+%% Ende des Vorspanns
+\cleardoublepage
+%% Ab hier 1 1/2 facher Zeilenabstand (durch setspace-Paket)
+\onehalfspacing
+%% Erzeugt Inhaltsverzeichnis
+\tableofcontents
+
+%% Hier kann man seine Bezeichnungsweisen erklaeren. Falls nicht
+%% benoetigt, bis einschliesslich \end{nomenclature} auskommentieren
+\input{content/nomenclature.tex}
+%% \listoftables und \listoffigures sollten nur bei genuegender Anzahl Tabellen
+%% verwendet werden
+%\listoffigures
+%\listoftables
+
+
+\mainmatter   %% Anfang Hauptteil
+
+\input{content/introduction.tex}
+\input{content/overview_rnn.tex}
+\input{content/esn.tex}
+\input{content/conclusion.tex}
+\input{content/outlook.tex}
+
+%\appendix
+
+\cleardoublepage
+%% Bibliographie. Das Argument muss der Name der BIBTeX-Datenbank stehen.
+%% Ein Beispiel fuer eine solche Datenbank finden Sie in bthesis_datenbank.bib
+\bibliography{review_datenbank} 
+
+%\chapter*{Danksagung}
+
+%% Dieser Befehl MUSS am Ende stehen und erzeugt die Erklaerung ueber die
+%% benutzten Mittel
+%\Declaration
+
+\end{document}

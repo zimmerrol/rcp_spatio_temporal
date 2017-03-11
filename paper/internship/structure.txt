@@ -1,0 +1,10 @@
+1) Einleitung
+2) Übersicht RNN
+3) ESNs
+	3.1) Überblick
+	3.2) Theorie ESN
+	3.3) Anwendungen von ESNs
+		3.3.1) Rössler Vorhersage/Kreuzkorrelations-Vorhersage
+		5.3.2) 
+4) Fazit (Fazit über die Thematik und Ausblick)
+5) Ausblick (Ausblick auf die Arbeitsweise)
