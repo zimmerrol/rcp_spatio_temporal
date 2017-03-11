@@ -2,6 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from BarkleySimulation import BarkleySimulation
+from matplotlib.widgets import Button
+from matplotlib.widgets import Slider
 
 def demo_chaotic():
     #for chaotic u^3 simulation
@@ -14,7 +16,6 @@ def demo_chaotic():
     b = 0.00006
 
     return BarkleySimulation(Nx, Ny, deltaT, epsilon, h, a, b)
-
 
 def demo_oscillating():
     #for oscillations
@@ -35,7 +36,7 @@ sim.initialize_two_spirals()
 def update_new(data):
     global sim
     for j in range(int(sskiprate.val)):
-        sim.explicit_step()
+        sim.explicit_step(chaotic=True)
     mat.set_data(sim._u)
     return [mat]
 
@@ -44,10 +45,6 @@ fig, ax = plt.subplots()
 mat = ax.matshow(sim._u, vmin=0, vmax=1, interpolation=None, origin="lower")
 plt.colorbar(mat)
 ani = animation.FuncAnimation(fig, update_new, interval=0, save_count=50)
-
-
-from matplotlib.widgets import Button
-from matplotlib.widgets import Slider
 
 class StorageCallback(object):
     def save(self, event):
@@ -65,7 +62,6 @@ class StorageCallback(object):
         sim._v = np.load("simulation_cache_v.cache.npy")
 
         print("Loaded!")
-
 
 callback = StorageCallback()
 axsave = plt.axes([0.15, 0.01, 0.1, 0.075])

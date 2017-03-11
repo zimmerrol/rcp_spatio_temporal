@@ -46,7 +46,7 @@ class BarkleySimulation:
                 field[0,:] = oldField[1,:]
                 field[-1,:] = oldField[-2,:]
 
-    def explicit_step(self):
+    def explicit_step(self, chaotic=False):
         uOld = self._u.copy()
         vOld = self._v.copy()
 
@@ -60,6 +60,10 @@ class BarkleySimulation:
         laplace += np.roll(self._u, -1, axis=1)
 
         self._u = self._u + self._deltaT * (f + self._h**2 * laplace)
-        self._v = self._v + self._deltaT * (np.power(uOld, 3) - self._v)
+
+        if (chaotic):
+            self._v = self._v + self._deltaT * (np.power(uOld, 3) - self._v)
+        else:
+            self._v = self._v + self._deltaT * (np.power(uOld, 1) - self._v)
 
         self._set_boundaries((uOld, vOld))
