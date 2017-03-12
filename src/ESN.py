@@ -11,13 +11,14 @@ class ESN(BaseESN):
                 leak_rate=1.0, sparseness=0.2, random_seed=None,
                 out_activation=lambda x:x, out_inverse_activation=lambda x:x,
                 weight_generation='naive', bias=1.0, output_bias=1.0,
-                output_input_scaling=1.0, solver='pinv'):
+                output_input_scaling=1.0, solver='pinv', regression_parameters={}):
 
         super(ESN, self).__init__(n_input, n_reservoir, n_output, spectral_radius, noise_level, input_scaling, leak_rate, sparseness, random_seed, out_activation,
                 out_inverse_activation, weight_generation, bias, output_bias, output_input_scaling)
 
 
         self._solver = solver
+        self._regression_parameters = regression_parameters
         """
         allowed values for the solver:
             pinv
@@ -30,7 +31,7 @@ class ESN(BaseESN):
             sklearn_sag
         """
 
-    def fit(self, inputData, outputData, transient_quota=0.05, regression_parameters={}):
+    def fit(self, inputData, outputData, transient_quota=0.05):
         if (inputData.shape[0] != outputData.shape[0]):
             raise ValueError("Amount of input and output datasets is not equal - {0} != {1}".format(inputData.shape[0], outputData.shape[0]))
 
@@ -55,6 +56,7 @@ class ESN(BaseESN):
 
         #W_out = Y_target.dot(X.T).dot(np.linalg.inv(X.dot(X.T) + regressionParameter*np.identity(1+reservoirInputCount+reservoirSize)) )
 
+        
         if (self._solver == "pinv"):
             self._W_out = np.dot(Y_target, np.linalg.pinv(self._X))
 
@@ -62,14 +64,14 @@ class ESN(BaseESN):
             train_prediction = self.out_activation(np.dot(self._W_out, self._X).T)
 
         elif (self._solver == "lsqr"):
-            self._W_out = np.dot(np.dot(Y_target, self._X.T),np.linalg.inv(np.dot(self._X,self._X.T) + regression_parameters[0]*np.identity(1+self.n_input+self.n_reservoir)))
+            self._W_out = np.dot(np.dot(Y_target, self._X.T),np.linalg.inv(np.dot(self._X,self._X.T) + self._regression_parameters[0]*np.identity(1+self.n_input+self.n_reservoir)))
 
             #calculate the training error now
             train_prediction = self.out_activation(np.dot(self._W_out, self._X).T)
 
         elif (self._solver in ["sklearn_auto", "sklearn_lsqr", "sklearn_sag", "sklearn_svd"]):
             mode = self._solver[8:]
-            self._ridgeSolver = Ridge(**regression_parameters, solver=mode)
+            self._ridgeSolver = Ridge(**self._regression_parameters, solver=mode)
 
             self._ridgeSolver.fit(self._X.T, Y_target.T)
             train_prediction = self.out_activation(self._ridgeSolver.predict(self._X.T))
