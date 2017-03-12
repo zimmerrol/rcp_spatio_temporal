@@ -35,10 +35,18 @@
 
 \usepackage{amsmath,amssymb} %% zusaetzliche Mathe-Symbole
 
+%added for proofs, theorems etc.
+\usepackage{amsthm}
+\newtheorem{definition}{Definition}
+
 \usepackage{lmodern} %% type1-taugliche CM-Schrift als Variante zur
                      %% "normalen" EC-Schrift
+                     
 %% Paket fuer bibtex-Datenbanken
 \usepackage[comma,numbers,sort&compress]{natbib}
+%for years etc. in the citations use this line:
+%\usepackage[sort&compress,square,comma,authoryear, numbers]{natbib}
+
 \bibliographystyle{plainnat}
 
 \newcommand{\tabheadfont}[1]{\textbf{#1}} %% Tabellenkopf in Fett
@@ -115,6 +123,15 @@
 \input{content/conclusion.tex}
 \input{content/outlook.tex}
 
+\nocite{*}
+
+\begin{align*}
+a = 3
+\end{align*}
+
+\begin{align}
+c = 5
+\end{align}
 %\appendix
 
 \cleardoublepage

@@ -278,9 +278,12 @@
         \bfseries Erstgutachter/in:&
         \begin{minipage}[t]{0.76\textwidth-4\tabcolsep}%
           \@FirstReferee\end{minipage}\\&\\
+        \if@review
+        \else
         \bfseries Zweitgutachter/in:&
         \begin{minipage}[t]{0.76\textwidth-4\tabcolsep}%
           \@SecondReferee\end{minipage}\\
+        \fi%
       \end{tabular}
     }
     \fi
