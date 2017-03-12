@@ -86,10 +86,14 @@ print(results)
 print("best parameters: " + str(grid._best_params))
 print("best mse: {0}".format(grid._best_mse))
 
+#for the centre
+#best parameters: {'sparseness': 0.1, 'leak_rate': 0.95, 'spectral_radius': 1.5, 'n_reservoir': 500}
+#best mse: 0.028543328874922003
 
 import sys
 sys.exit()
 """
+
 
 #for the lower left corner
 #best parameters: {'leak_rate': 0.99, 'sparseness': 0.1, 'spectral_radius': 2.1, 'solver': 'lsqr', 'n_reservoir': 1000, 'regression_parameters': [0.0002]}
@@ -98,6 +102,7 @@ sys.exit()
 esn = ESN(n_input = (30-3)**2, n_output = 3**2, n_reservoir = 1000,
         weight_generation = "advanced", leak_rate = 0.99, spectral_radius = 2.1,
         random_seed=42, noise_level=0.000, sparseness=.1, solver = "lsqr", regression_parameters=[2e-3], out_activation = lambda x: 0.5*(1+np.tanh(x/2)), out_inverse_activation = lambda x:2*np.arctanh(2*x-1))
+
 print("fitting...")
 train_error = esn.fit(training_data_in, training_data_out,)
 print("train error: {0}".format(train_error))
