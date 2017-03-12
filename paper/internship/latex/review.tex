@@ -67,6 +67,9 @@
             bookmarksnumbered=true  % Kapitelnummerierung in bookmarks
             ]{hyperref}
 
+%to disable the paragraph indention
+\setlength\parindent{0pt}
+
 %% Weiter benoetigte Pakete: datenumber
 %% Falls dieses Paket nicht in der Installation vorhanden ist,
 %% kann es von der Seite mit diesem Template heruntergeladen werden
@@ -117,6 +120,7 @@
 
 \mainmatter   %% Anfang Hauptteil
 
+
 \input{content/introduction.tex}
 \input{content/overview_rnn.tex}
 \input{content/esn.tex}
@@ -125,13 +129,6 @@
 
 \nocite{*}
 
-\begin{align*}
-a = 3
-\end{align*}
-
-\begin{align}
-c = 5
-\end{align}
 %\appendix
 
 \cleardoublepage

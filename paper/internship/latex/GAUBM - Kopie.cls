@@ -55,7 +55,7 @@
   \MessageBreak muss angegeben werden. Nehme bachelor.%
 }%
 \fi
-\LoadClass[12pt,a4paper,pagesize, openany]{scrbook}
+\LoadClass[12pt,a4paper,pagesize]{scrbook}
 \AtBeginDocument{\RequirePackage{graphicx}\RequirePackage{datenumber}}
 \RequirePackage{calc}
 \def\nomname{Nomenclature}
