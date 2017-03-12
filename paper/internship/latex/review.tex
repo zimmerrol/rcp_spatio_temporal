@@ -25,6 +25,9 @@
 %               final,          %% Endversion; draft fuer schnelles Kompilieren
                ]{GAUBM}
 
+%für bessere platzierung von bildern etc.
+\usepackage{float}
+
 \usepackage{setspace}  %% Zur Setzung des Zeilenabstandes
 \usepackage{babel}     %% Sprachen-Unterstuetzung
 \usepackage{calc}      %% ermoeglicht Rechnen mit Laengen und Zaehlern
@@ -69,6 +72,13 @@
 
 %to disable the paragraph indention
 \setlength\parindent{0pt}
+
+%reduce the margin after a caption
+\setlength{\belowcaptionskip}{-10pt}
+%\usepackage[]{geometry}
+
+%use this to show margins of elements
+%\usepackage[showframe]{geometry}
 
 %% Weiter benoetigte Pakete: datenumber
 %% Falls dieses Paket nicht in der Installation vorhanden ist,
@@ -124,6 +134,7 @@
 \input{content/introduction.tex}
 \input{content/overview_rnn.tex}
 \input{content/esn.tex}
+\input{content/applications.tex}
 \input{content/conclusion.tex}
 \input{content/outlook.tex}
 

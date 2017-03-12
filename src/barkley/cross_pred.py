@@ -80,7 +80,7 @@ test_data_out =  test_data[:, out_ind_y][:,:, out_ind_x].reshape(-1, 3**2)
 
 print("setting up...")
 
-
+"""
 print("starting grid search...")
 from GridSearch import GridSearch
 grid = GridSearch(param_grid={"n_reservoir": [500, 700, 1000], "spectral_radius": [1.5, 1.7, 1.8, 1.9, 2.0, 2.1], "leak_rate": [.8, .95, .99], "sparseness": [0.05, 0.1, 0.2],
@@ -102,15 +102,18 @@ print("best mse: {0}".format(grid._best_mse))
 import sys
 sys.exit()
 
+#best parameters: {'solver': 'lsqr', 'spectral_radius': 1.5, 'n_reservoir': 500, 'sparseness': 0.1, 'leak_rate': 0.8, 'regression_parameters': [0.02]}
+#best mse: 0.03164276788179946
+"""
 
 
 #for the lower left corner
 #best parameters: {'leak_rate': 0.99, 'sparseness': 0.1, 'spectral_radius': 2.1, 'solver': 'lsqr', 'n_reservoir': 1000, 'regression_parameters': [0.0002]}
 #best mse: 0.012300204613490656
 
-esn = ESN(n_input = (30-3)**2, n_output = 3**2, n_reservoir = 700,
-        weight_generation = "advanced", leak_rate = 0.95, spectral_radius = 2.3,
-        random_seed=42, noise_level=0.001, sparseness=.1, solver = "lsqr", regression_parameters=[2e-3],
+esn = ESN(n_input = (30-3)**2, n_output = 3**2, n_reservoir = 500,
+        weight_generation = "advanced", leak_rate = 0.8, spectral_radius = 1.5,
+        random_seed=42, noise_level=0.001, sparseness=.1, solver = "lsqr", regression_parameters=[2e-2],
         out_activation = lambda x: 0.5*(1+np.tanh(x/2)), out_inverse_activation = lambda x:2*np.arctanh(2*x-1))
 
 print("fitting...")
