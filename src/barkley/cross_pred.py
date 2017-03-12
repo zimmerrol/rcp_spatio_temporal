@@ -71,7 +71,7 @@ test_data_out =  test_data[:, out_ind][:,:, out_ind].reshape(-1, 3**2)
 
 print("setting up...")
 
-
+""""
 print("starting grid search...")
 from GridSearch import GridSearch
 grid = GridSearch(param_grid={"n_reservoir": [500, 700, 1000, 1500, 2000], "spectral_radius": [0.3, 0.4, .6, .8, 1.0, 1.2, 1.3, 1.4, 1.5], "leak_rate": [0.05 , 0.1 , .2, .4, .6, .8, .95], "sparseness": [0.05, 0.1, 0.2]},
@@ -84,13 +84,16 @@ print(results)
 print("best parameters: " + str(grid._best_params))
 print("best mse: {0}".format(grid._best_mse))
 
+best parameters: {'sparseness': 0.1, 'leak_rate': 0.95, 'spectral_radius': 1.5, 'n_reservoir': 500}
+best mse: 0.028543328874922003
 
 import sys
 sys.exit()
+"""
 
-esn = ESN(n_input = (30-3)**2, n_output = 3**2, n_reservoir = 700,
-        weight_generation = "advanced", leak_rate = 0.95, spectral_radius = 0.8,
-        random_seed=42, noise_level=0.001, sparseness=.2)
+esn = ESN(n_input = (30-3)**2, n_output = 3**2, n_reservoir = 500,
+        weight_generation = "advanced", leak_rate = 0.95, spectral_radius = 1.5,
+        random_seed=42, noise_level=0.001, sparseness=.1)
 print("fitting...")
 train_error = esn.fit(training_data_in, training_data_out)
 print("train error: {0}".format(train_error))
@@ -125,7 +128,7 @@ fig, ax = plt.subplots()
 #mat = plt.imshow(diff[0], origin="lower", vmin=np.min(diff), vmax=np.max(diff), interpolation="none", cmap=plt.get_cmap('gray'))
 mat = plt.imshow(merged_prediction[0], origin="lower", vmin=0, vmax=1, interpolation="none")
 plt.colorbar(mat)
-ani = animation.FuncAnimation(fig, update_new, interval=0, save_count=50)
+ani = animation.FuncAnimation(fig, update_new, interval=100, save_count=50)
 plt.show()
 
 print("done.")
