@@ -34,7 +34,7 @@ def generate_data(N, trans, sample_rate=1):
 
 print("generating data...")
 
-data = generate_data(5000, 50000, 25)
+data = generate_data(5000, 50000, 5)
 
 """
 i = 0
@@ -59,7 +59,7 @@ plt.show()
 training_data = data[:4000]
 test_data = data[4000:]
 
-out_ind = [14,15,16]
+out_ind = [8,9,10]#[14,15,16]
 in_ind = list(range(14))
 in_ind.extend(list(range(17,30)))
 
@@ -71,10 +71,10 @@ test_data_out =  test_data[:, out_ind][:,:, out_ind].reshape(-1, 3**2)
 
 print("setting up...")
 
-""""
+"""
 print("starting grid search...")
 from GridSearch import GridSearch
-grid = GridSearch(param_grid={"n_reservoir": [500, 700, 1000, 1500, 2000], "spectral_radius": [0.3, 0.4, .6, .8, 1.0, 1.2, 1.3, 1.4, 1.5], "leak_rate": [0.05 , 0.1 , .2, .4, .6, .8, .95], "sparseness": [0.05, 0.1, 0.2]},
+grid = GridSearch(param_grid={"n_reservoir": [700, 1000], "spectral_radius": [1.5, 1.6, 1.7, 1.8, 1.9], "leak_rate": [.8, .95, .98, .99], "sparseness": [0.05, 0.1, 0.2]},
     fixed_params={"n_output": 3**2, "n_input": (30-3)**2, "noise_level": 0.001, "random_seed": 42, "weight_generation": "advanced"},
     esnType=ESN)
 print("start fitting...")
@@ -91,11 +91,12 @@ import sys
 sys.exit()
 """
 
-esn = ESN(n_input = (30-3)**2, n_output = 3**2, n_reservoir = 500,
-        weight_generation = "advanced", leak_rate = 0.95, spectral_radius = 1.5,
-        random_seed=42, noise_level=0.001, sparseness=.1)
+esn = ESN(n_input = (30-3)**2, n_output = 3**2, n_reservoir = 700,
+        weight_generation = "advanced", leak_rate = 0.99, spectral_radius = 1.9,
+        random_seed=42, noise_level=0.000, sparseness=.1, solver = "lsqr", out_activation = lambda x: 0.5*(1+np.tanh(x/2)), out_inverse_activation = lambda x:2*np.arctanh(2*x-1))
+
 print("fitting...")
-train_error = esn.fit(training_data_in, training_data_out)
+train_error = esn.fit(training_data_in, training_data_out, regression_parameters=[2e-2])
 print("train error: {0}".format(train_error))
 print("predicting...")
 pred = esn.predict(test_data_in)

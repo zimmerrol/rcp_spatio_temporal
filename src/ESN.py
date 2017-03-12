@@ -59,20 +59,20 @@ class ESN(BaseESN):
             self._W_out = np.dot(Y_target, np.linalg.pinv(self._X))
 
             #calculate the training error now
-            train_prediction = np.dot(self._W_out, self._X).T
+            train_prediction = self.out_activation(np.dot(self._W_out, self._X).T)
 
         elif (self._solver == "lsqr"):
-            self._W_out = np.dot(np.dot(Y_target, self._X.T),np.linalg.inv(np.dot(self._X,self._X.T) + regression_parameter*np.identity(1+self.n_input+self.n_reservoir)))
+            self._W_out = np.dot(np.dot(Y_target, self._X.T),np.linalg.inv(np.dot(self._X,self._X.T) + regression_parameters[0]*np.identity(1+self.n_input+self.n_reservoir)))
 
             #calculate the training error now
-            train_prediction = np.dot(self._W_out, self._X).T
+            train_prediction = self.out_activation(np.dot(self._W_out, self._X).T)
 
         elif (self._solver in ["sklearn_auto", "sklearn_lsqr", "sklearn_sag", "sklearn_svd"]):
             mode = self._solver[8:]
             self._ridgeSolver = Ridge(**regression_parameters, solver=mode)
 
             self._ridgeSolver.fit(self._X.T, Y_target.T)
-            train_prediction = self._ridgeSolver.predict(self._X.T)
+            train_prediction = self.out_activation(self._ridgeSolver.predict(self._X.T))
 
         """
         #alternative represantation of the equation

@@ -18,6 +18,9 @@ class GridSearch:
 
         results = []
 
+        length = sum(1 for x in enumerate_params())
+
+        suc = 0
         for params in enumerate_params():
             esn = self.esnType(**params, **self.fixed_params)
             training_acc = esn.fit(trainingInput, trainingOutput)
@@ -33,6 +36,9 @@ class GridSearch:
             test_mse = np.mean(test_mse)
 
             results.append((test_mse, params))
+
+            suc += 1
+            print("{0}/{1}".format(suc, length))
 
         res = min(results, key=operator.itemgetter(0))
 
