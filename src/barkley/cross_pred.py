@@ -59,22 +59,31 @@ plt.show()
 training_data = data[:4000]
 test_data = data[4000:]
 
-out_ind = [8,9,10]#[14,15,16]
-in_ind = list(range(14))
-in_ind.extend(list(range(17,30)))
+#out_ind = [14,15,16]
+out_ind_x = [8,9,10]
+out_ind_y = [8,9,10]
+#in_ind = list(range(14))
+#in_ind.extend(list(range(17,30)))
+in_ind_x = list(range(30))
+in_ind_y = list(range(30))
+for i in out_ind_x:
+    in_ind_x.remove(i)
+for i in out_ind_y:
+    in_ind_y.remove(i)
 
-training_data_in =  training_data[:, in_ind][:,:, in_ind].reshape(-1, (30-3)**2)
-training_data_out =  training_data[:, out_ind][:,:, out_ind].reshape(-1, 3**2)
 
-test_data_in =  test_data[:, in_ind][:,:, in_ind].reshape(-1, (30-3)**2)
-test_data_out =  test_data[:, out_ind][:,:, out_ind].reshape(-1, 3**2)
+training_data_in =  training_data[:, in_ind_y][:,:, in_ind_x].reshape(-1, (30-3)**2)
+training_data_out =  training_data[:, out_ind_y][:,:, out_ind_x].reshape(-1, 3**2)
+
+test_data_in =  test_data[:, in_ind_y][:,:, in_ind_x].reshape(-1, (30-3)**2)
+test_data_out =  test_data[:, out_ind_y][:,:, out_ind_x].reshape(-1, 3**2)
 
 print("setting up...")
 
-"""
+
 print("starting grid search...")
 from GridSearch import GridSearch
-grid = GridSearch(param_grid={"n_reservoir": [700, 1000], "spectral_radius": [1.8, 1.9, 2.0, 2.1], "leak_rate": [.8, .95, .99], "sparseness": [0.05, 0.1, 0.2],
+grid = GridSearch(param_grid={"n_reservoir": [500, 700, 1000], "spectral_radius": [1.5, 1.7, 1.8, 1.9, 2.0, 2.1], "leak_rate": [.8, .95, .99], "sparseness": [0.05, 0.1, 0.2],
                  "solver" : ["pinv", "lsqr"], "regression_parameters": [[2e-2], [2e-3], [2e-4]]},
                 fixed_params={"n_output": 3**2, "n_input": (30-3)**2, "noise_level": 0.001, "random_seed": 42, "weight_generation": "advanced",
                 "out_activation" : lambda x: 0.5*(1+np.tanh(x/2)), "out_inverse_activation" : lambda x:2*np.arctanh(2*x-1)},
@@ -92,16 +101,17 @@ print("best mse: {0}".format(grid._best_mse))
 
 import sys
 sys.exit()
-"""
+
 
 
 #for the lower left corner
 #best parameters: {'leak_rate': 0.99, 'sparseness': 0.1, 'spectral_radius': 2.1, 'solver': 'lsqr', 'n_reservoir': 1000, 'regression_parameters': [0.0002]}
 #best mse: 0.012300204613490656
 
-esn = ESN(n_input = (30-3)**2, n_output = 3**2, n_reservoir = 1000,
-        weight_generation = "advanced", leak_rate = 0.99, spectral_radius = 2.1,
-        random_seed=42, noise_level=0.000, sparseness=.1, solver = "lsqr", regression_parameters=[2e-3], out_activation = lambda x: 0.5*(1+np.tanh(x/2)), out_inverse_activation = lambda x:2*np.arctanh(2*x-1))
+esn = ESN(n_input = (30-3)**2, n_output = 3**2, n_reservoir = 700,
+        weight_generation = "advanced", leak_rate = 0.95, spectral_radius = 2.3,
+        random_seed=42, noise_level=0.001, sparseness=.1, solver = "lsqr", regression_parameters=[2e-3],
+        out_activation = lambda x: 0.5*(1+np.tanh(x/2)), out_inverse_activation = lambda x:2*np.arctanh(2*x-1))
 
 print("fitting...")
 train_error = esn.fit(training_data_in, training_data_out,)
@@ -111,7 +121,7 @@ pred = esn.predict(test_data_in)
 pred = pred.reshape(-1, 3, 3)
 
 merged_prediction = test_data.copy()
-merged_prediction[np.ix_(list(range(len(test_data))), out_ind, out_ind)] = pred
+merged_prediction[np.ix_(list(range(len(test_data))), out_ind_x, out_ind_y)] = pred
 
 diff = pred.reshape((-1, 9))-test_data_out
 mse = np.mean(diff.reshape(-1, 3*3)**2)
