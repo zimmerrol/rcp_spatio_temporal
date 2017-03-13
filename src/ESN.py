@@ -56,7 +56,7 @@ class ESN(BaseESN):
 
         #W_out = Y_target.dot(X.T).dot(np.linalg.inv(X.dot(X.T) + regressionParameter*np.identity(1+reservoirInputCount+reservoirSize)) )
 
-        
+
         if (self._solver == "pinv"):
             self._W_out = np.dot(Y_target, np.linalg.pinv(self._X))
 
@@ -110,7 +110,13 @@ class ESN(BaseESN):
         inputData = initial_input
         for t in range(predLength):
             u = super(ESN, self).update(inputData)
-            y = np.dot(self._W_out, np.vstack((self.output_bias, self.output_input_scaling*u, self._x)))
+
+            if (self._solver in ["sklearn_auto", "sklearn_lsqr", "sklearn_sag", "sklearn_svd"]):
+                y = self._ridgeSolver.predict(np.vstack((self.output_bias, self.output_input_scaling*u, self._x)).T)
+            else:
+                y = np.dot(self._W_out, np.vstack((self.output_bias, self.output_input_scaling*u, self._x)))
+
+            #y = np.dot(self._W_out, np.vstack((self.output_bias, self.output_input_scaling*u, self._x)))
             y = self.out_activation(y[:,0])
             Y[:,t] = update_processor(y)
             inputData = y

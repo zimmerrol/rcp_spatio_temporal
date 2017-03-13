@@ -9,7 +9,7 @@ Eine erste Anwendung um die Möglichkeiten eines \textsc{ESN} zu demonstrieren b
 \dot{x} &= -(y+z)\\
 \dot{y} &= x + 0.25 \cdot  y\\
 \dot{z} &= 0.4 + (x - 8.5)\cdot z.
-\end{split} 
+\end{split}
 \end{align}
 
 Hierbei werden zwei verschiedene Aufgaben betrachtet: (a) die Vorhersage von $x(n+50)$ durch die Kenntnis von $x(n)$ und (b) die Kreuz-Vorhersage $y(n)$ durch $x(n)$. Für beide Aufgaben wurde das System für jeweils $10000$ Schritte mit einer Abtastrate $\Delta t = 0.05$ simuliert, wobei die Hälfte der Daten für das Training und der Rest für die Testergebnisse verwendet worden ist.
@@ -26,7 +26,9 @@ Hierfür ist durch eine \textsc{GridSearch} ein geeignetes System gefunden werde
 		\hline 
 		\rule[-1ex]{0pt}{4.5ex} $\alpha$ & $0.10$ \\ 
 		\hline 
-		\rule[-1ex]{0pt}{4.5ex} $\rho$ & $0.035$ \\ 
+		\rule[-1ex]{0pt}{4.5ex} $\rho(|\mathbf{W}|)$ & $0.035$ \\ 
+		\hline 
+		\rule[-1ex]{0pt}{4.5ex} $\nu_{max}$ & $0.01$ \\ 
 		\hline 
 	\end{tabular} 
 	\caption{Auflistung der für (a) benutzten Parameter des \textsc{ESN}.}
@@ -53,7 +55,9 @@ Auch hierfür konnte sehr schnell durch eine \textsc{GridSearch} ein geeignetes 
 		\hline 
 		\rule[-1ex]{0pt}{4.5ex} $\alpha$ & $0.20$ \\ 
 		\hline 
-		\rule[-1ex]{0pt}{4.5ex} $\rho$ & $0.01$ \\ 
+		\rule[-1ex]{0pt}{4.5ex} $\rho(|\mathbf{W}|)$ & $0.01$ \\
+		\hline 
+		\rule[-1ex]{0pt}{4.5ex} $\nu_{max}$ & $0.01$ \\ 
 		\hline 
 	\end{tabular} 
 	\caption{Auflistung der für (b) benutzten Parameter des \textsc{ESN}.}
@@ -69,7 +73,7 @@ Für das Auslesen wurde eine Linearkombination genutzt, für die die Lösung $\m
     \label{fig:application_roessler_b1}
 \end{figure}
 
-Hierbei wurde für den Trainingsvorgang ein Fehler $MSE = 0.011$ und für den Testvorgang von $MSE = 0.091$ bestimmt. Die grafische Darstellung der Vorhersage $v(n)$ und des ermittelten Fehlers sind in Abbildungen \ref{fig:application_roessler_b1}, \ref{fig:application_roessler_b2} zu finden.
+Hierbei wurde für den Trainingsvorgang ein Fehler $MSE = 0.011$ und für den Testvorgang von $MSE = 0.091$ bestimmt. Die grafische Darstellung der Vorhersage $v(n)$ und des ermittelten Fehlers sind in Abbildungen \ref{fig:application_roessler_b1}, \ref{fig:application_roessler_b2} zu finden. Im Vergleich zu anderen Publikationen \cite{parlitz2005} ergibt sich ein ähnlicher Fehler. Leider kann hierbei nur mit den Graphen verglichen werden, da keine Fehler angegeben sind.
 
 \begin{figure}[H]
     \centering
@@ -79,4 +83,31 @@ Hierbei wurde für den Trainingsvorgang ein Fehler $MSE = 0.011$ und für den Te
 \end{figure}
 
 \section{Vorhersage eines Mackey-Glass-Systems}
-asdasd
+Als nächste Anwendung wird ein \textit{Mackey-Glass-System}
+\begin{align}
+\label{eq:application_roessler_pde}
+\begin{split}
+\dot{x} &= \beta \frac{x_\tau}{1+x_\tau^n}-\gamma x\\
+\end{split}
+\end{align}
+betrachtet, wobei $\tau = 17, n=10, \beta = 0.2$ gewählt wurden. Dies ist eine beliebte Aufgabe im Bereich der Vorhersagen chaotischer Zeitreihen.
+
+\begin{table}[H]
+	\centering
+		\begin{tabular}{|c|c|}
+		\rule[-1ex]{0pt}{4.5ex} Variable & \hspace{4ex} Wert \rule[-1ex]{4ex}{0pt}\\ 
+		\hline \hline 
+		\rule[-1ex]{0pt}{4.5ex} $N$ & $1000$ \\ 
+		\hline 
+		\rule[-1ex]{0pt}{4.5ex} $\alpha$ & $0.20$ \\ 
+		\hline 
+		\rule[-1ex]{0pt}{4.5ex} $\rho(\mathbf{W})$ & $0.35$ \\ 
+		\hline 
+		\rule[-1ex]{0pt}{4.5ex} $\nu_{max}$ & $0.001$ \\ 
+		\hline 
+	\end{tabular} 
+	\caption{Auflistung der benutzten Parameter des \textsc{ESN}.}
+\label{tab:application_mackeyglass}
+\end{table}
+
+Für dieses System wurde nun die Vorhersage $x(n) \rightarrow x(n+48)$ betrachtet, wobei die Parameter aus Tabelle \ref{tab:application_mackeyglass} genutzt wurden.

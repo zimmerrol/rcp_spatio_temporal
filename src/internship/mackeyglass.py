@@ -7,14 +7,31 @@ from ESN import ESN
 import numpy as np
 import matplotlib.pyplot as plt
 
-y = np.loadtxt("MackeyGlass_t17.txt").reshape(-1,1)
+#y = np.loadtxt("MackeyGlass_t17.txt").reshape(-1,1)
+
+
+def mackeyglass(n_max, seed=42):
+    np.random.seed(seed)
+
+    dat = np.zeros(n_max)
+    dat[:17] = np.random.rand(17)
+    tau = 17
+    beta = 0.2
+    gamma = 0.1
+    npow = 10
+    for i in range(tau, n_max-1):
+        dat[i+1] = dat[i] + beta*dat[i-tau]/(1+pow(dat[i-tau], npow))-gamma*dat[i]
+
+    return dat
+
+y = mackeyglass(10017)[17:].reshape((-1,1))
+
 
 def generation():
     y_train = y[:2000]
     y_test = y[2000:4000]
 
-    esn = ESN(n_input=1, n_output=1, n_reservoir=1000, noise_level=0.0001, spectral_radius=1.25, leak_rate=0.7, random_seed=42,
-                solver="lsqr", regression_parameters=[4e-7])
+    esn = ESN(n_input=1, n_output=1, n_reservoir=500, noise_level=0.001, spectral_radius=0.47, leak_rate=0.20, random_seed=42, sparseness=0.2)
     train_acc = esn.fit(inputData=y_train[:-1], outputData=y_train[1:])
     print("training acc: {0:4f}\r\n".format(train_acc))
 
@@ -54,10 +71,10 @@ def pred(predictionHorizon):
     print("testing rmse: {0:4f}".format(rmse))
     print("testing nrmse: {0:4f}".format(nrmse))
 
-    #plt.plot(y_test_pred, "g", label="prediction")
-    #plt.plot(y_test[predictionHorizon:], "b", label="target")
-    #plt.legend()
-    #plt.show()
+    plt.plot(y_test_pred, "g", label="prediction")
+    plt.plot(y_test[predictionHorizon:], "b", label="target")
+    plt.legend()
+    plt.show()
 
     return mse
 
@@ -80,14 +97,4 @@ def GridSearchTestForPred48():
     print(aa._best_params)
 
 generation()
-#GridSearchTestForPred48()
-#pred48()
-
-from multiprocessing import Pool
-
-yres = []
-for i in range(1,100):
-    yres.append(pred(i))
-
-plt.plot(range(1,100), yres)
-plt.show()
+#pred(48)
