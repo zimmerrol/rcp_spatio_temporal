@@ -71,9 +71,21 @@ def pred(predictionHorizon):
     print("testing rmse: {0:4f}".format(rmse))
     print("testing nrmse: {0:4f}".format(nrmse))
 
-    plt.plot(y_test_pred, "g", label="prediction")
-    plt.plot(y_test[predictionHorizon:], "b", label="target")
-    plt.legend()
+    import matplotlib
+    plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern'], 'size': 13})
+    plt.rc('text', usetex=True)
+
+    plt.figure(figsize=(8,5))
+    plt.plot(y_test[predictionHorizon:], 'r', linestyle=":" )
+    plt.plot(y_test_pred, 'b' , linestyle="--")
+    plt.ylim([0.3, 1.6])
+    plt.legend(['Signal $x(n)$', 'Vorhergesagtes Signal $x(n+50)$'],
+          fancybox=True, shadow=True, ncol=2, loc="upper center")
+    plt.xlabel("Zeitschritt n")
+    plt.ylabel("Signal")
+
+    plt.savefig("mackeyglass_pred.pdf")
+
     plt.show()
 
     return mse
@@ -96,5 +108,5 @@ def GridSearchTestForPred48():
     print("\r\nBest result (mse =  {0}):\r\n".format(aa._best_mse))
     print(aa._best_params)
 
-generation()
-#pred(48)
+#generation()
+pred(48)

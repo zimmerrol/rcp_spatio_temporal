@@ -20,15 +20,15 @@ Hierfür ist durch eine \textsc{GridSearch} ein geeignetes System gefunden werde
 \begin{table}[H]
 	\centering
 		\begin{tabular}{|c|c|}
-		\rule[-1ex]{0pt}{4.5ex} Variable & \hspace{4ex} Wert \rule[-1ex]{4ex}{0pt}\\ 
+		\rule[-1ex]{0pt}{3.5ex} Variable & \hspace{4ex} Wert \rule[-1ex]{4ex}{0pt}\\ 
 		\hline \hline 
-		\rule[-1ex]{0pt}{4.5ex} $N$ & $300$ \\ 
+		\rule[-1ex]{0pt}{3.5ex} $N$ & $300$ \\ 
 		\hline 
-		\rule[-1ex]{0pt}{4.5ex} $\alpha$ & $0.10$ \\ 
+		\rule[-1ex]{0pt}{3.5ex} $\alpha$ & $0.10$ \\ 
 		\hline 
-		\rule[-1ex]{0pt}{4.5ex} $\rho(|\mathbf{W}|)$ & $0.035$ \\ 
+		\rule[-1ex]{0pt}{3.5ex} $\rho(|\mathbf{W}|)$ & $0.035$ \\ 
 		\hline 
-		\rule[-1ex]{0pt}{4.5ex} $\nu_{max}$ & $0.01$ \\ 
+		\rule[-1ex]{0pt}{3.5ex} $\nu_{max}$ & $0.01$ \\ 
 		\hline 
 	\end{tabular} 
 	\caption{Auflistung der für (a) benutzten Parameter des \textsc{ESN}.}
@@ -49,15 +49,15 @@ Auch hierfür konnte sehr schnell durch eine \textsc{GridSearch} ein geeignetes 
 \begin{table}[H]
 	\centering
 		\begin{tabular}{|c|c|}
-		\rule[-1ex]{0pt}{4.5ex} Variable & \hspace{4ex} Wert \rule[-1ex]{4ex}{0pt}\\ 
+		\rule[-1ex]{0pt}{3.5ex} Variable & \hspace{4ex} Wert \rule[-1ex]{4ex}{0pt}\\ 
 		\hline \hline 
-		\rule[-1ex]{0pt}{4.5ex} $N$ & $500$ \\ 
+		\rule[-1ex]{0pt}{3.5ex} $N$ & $500$ \\ 
 		\hline 
-		\rule[-1ex]{0pt}{4.5ex} $\alpha$ & $0.20$ \\ 
+		\rule[-1ex]{0pt}{3.5ex} $\alpha$ & $0.20$ \\ 
 		\hline 
-		\rule[-1ex]{0pt}{4.5ex} $\rho(|\mathbf{W}|)$ & $0.01$ \\
+		\rule[-1ex]{0pt}{3.5ex} $\rho(|\mathbf{W}|)$ & $0.01$ \\
 		\hline 
-		\rule[-1ex]{0pt}{4.5ex} $\nu_{max}$ & $0.01$ \\ 
+		\rule[-1ex]{0pt}{3.5ex} $\nu_{max}$ & $0.01$ \\ 
 		\hline 
 	\end{tabular} 
 	\caption{Auflistung der für (b) benutzten Parameter des \textsc{ESN}.}
@@ -73,7 +73,7 @@ Für das Auslesen wurde eine Linearkombination genutzt, für die die Lösung $\m
     \label{fig:application_roessler_b1}
 \end{figure}
 
-Hierbei wurde für den Trainingsvorgang ein Fehler $MSE = 0.011$ und für den Testvorgang von $MSE = 0.091$ bestimmt. Die grafische Darstellung der Vorhersage $v(n)$ und des ermittelten Fehlers sind in Abbildungen \ref{fig:application_roessler_b1}, \ref{fig:application_roessler_b2} zu finden. Im Vergleich zu anderen Publikationen \cite{parlitz2005} ergibt sich ein ähnlicher Fehler. Leider kann hierbei nur mit den Graphen verglichen werden, da keine Fehler angegeben sind.
+Hierbei wurde für den Trainingsvorgang ein Fehler $MSE_{train} = 0.011$ und für den Testvorgang von $MSE_{test} = 0.091$ bestimmt. Die grafische Darstellung der Vorhersage $v(n)$ und des ermittelten Fehlers sind in Abbildungen \ref{fig:application_roessler_b1}, \ref{fig:application_roessler_b2} zu finden. Im Vergleich zu anderen Publikationen \cite{parlitz2005} ergibt sich ein ähnlicher Fehler. Leider kann hierbei nur mit den Graphen verglichen werden, da keine Fehler angegeben sind.
 
 \begin{figure}[H]
     \centering
@@ -95,19 +95,26 @@ betrachtet, wobei $\tau = 17, n=10, \beta = 0.2$ gewählt wurden. Dies ist eine 
 \begin{table}[H]
 	\centering
 		\begin{tabular}{|c|c|}
-		\rule[-1ex]{0pt}{4.5ex} Variable & \hspace{4ex} Wert \rule[-1ex]{4ex}{0pt}\\ 
+		\rule[-1ex]{0pt}{3.5ex} Variable & \hspace{4ex} Wert \rule[-1ex]{4ex}{0pt}\\ 
 		\hline \hline 
-		\rule[-1ex]{0pt}{4.5ex} $N$ & $1000$ \\ 
+		\rule[-1ex]{0pt}{3.5ex} $N$ & $1000$ \\ 
 		\hline 
-		\rule[-1ex]{0pt}{4.5ex} $\alpha$ & $0.20$ \\ 
+		\rule[-1ex]{0pt}{3.5ex} $\alpha$ & $0.20$ \\ 
 		\hline 
-		\rule[-1ex]{0pt}{4.5ex} $\rho(\mathbf{W})$ & $0.35$ \\ 
+		\rule[-1ex]{0pt}{3.5ex} $\rho(\mathbf{W})$ & $0.35$ \\ 
 		\hline 
-		\rule[-1ex]{0pt}{4.5ex} $\nu_{max}$ & $0.001$ \\ 
+		\rule[-1ex]{0pt}{3.5ex} $\nu_{max}$ & $0.001$ \\ 
 		\hline 
 	\end{tabular} 
 	\caption{Auflistung der benutzten Parameter des \textsc{ESN}.}
 \label{tab:application_mackeyglass}
 \end{table}
 
-Für dieses System wurde nun die Vorhersage $x(n) \rightarrow x(n+48)$ betrachtet, wobei die Parameter aus Tabelle \ref{tab:application_mackeyglass} genutzt wurden.
+Für dieses System wurde nun die Vorhersage $x(n) \rightarrow x(n+48)$ betrachtet, wobei die Parameter aus Tabelle \ref{tab:application_mackeyglass} genutzt wurden. Eine Darstellung der Ergebnisse ist in Abbildung \ref{fig:application_mackeyglass} zu sehen. Hierbei wurde der \textit{MSE} für die gesamte Trainingsphase und die ersten 1000 Zeitpunkte der Testphase zu $MSE_{train} = 0.0046$ und $MSE_{test} = 0.0002$.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width = 0.9 \textwidth]{figures/mackeyglass_pred.pdf}
+    \caption{Graphische Darstellung des des Fehlers $y(n)-v(n)$.}
+    \label{fig:application_mackeyglass}
+\end{figure}

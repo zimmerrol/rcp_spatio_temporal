@@ -42,7 +42,7 @@ def integrate(z0, steps, delta_t):
 data = roessler(20000)
 data = data[:,:]
 
-mode = "pred50"
+mode = "cross"
 if mode == "gen":
     print("set up")
     esn = ESN(n_reservoir=2000, n_input=3, n_output=3, leak_rate=0.55, spectral_radius=0.60, random_seed=42, weight_generation='advanced')#0.4
@@ -99,15 +99,15 @@ if mode == "pred50":
     print ('NRMSE = ' + str( nrmse ))
 
     import matplotlib
-    plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern'], 'size': 15})
+    plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern'], 'size': 13})
     plt.rc('text', usetex=True)
 
-    plt.figure()
+    plt.figure(figsize=(8,5))
     plt.plot( data[trainLength+predDist:trainLength+testLength+predDist, 0], 'r', linestyle=":" )
     plt.plot(Y[:, 0], 'b' , linestyle="--")
     #plt.title('Target and generated signals $y(n)$ starting at $n=0$')
-    plt.ylim([-20,20])
-    plt.legend(['Signal $y(n)$', 'Vorhergesagtes Signal $y(n+50)$'])
+    plt.ylim([-17,23])
+    plt.legend(['Signal $y(n)$', 'Vorhergesagtes Signal $y(n+50)$'], loc="upper center", fancybox=True, shadow=True, ncol=2)
     plt.xlabel("Zeitschritt n")
     plt.ylabel("Signal")
 
@@ -181,29 +181,27 @@ if mode == "cross":
     print ('NRMSE = ' + str( nrmse ))
 
     import matplotlib
-    plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern'], 'size': 15})
+    plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern'], 'size': 13})
     plt.rc('text', usetex=True)
 
-    f = plt.figure()
+    plt.figure(figsize=(8,5))
     plt.plot( data[trainLength:trainLength+testLength,1], 'r', linestyle=":" )
     plt.plot(Y[:,0], 'b' , linestyle="--")
     #plt.title('Signal $y(n)$ und vorhergesagtes Signal $v(n)$ beginndend ab $n=0$')
     plt.ylim([-20,20])
-    plt.legend(['Signal $y(n)$', 'Vorhergesagtes Signal $v(n)$'])
+    plt.legend(['Signal $y(n)$', 'Vorhergesagtes Signal $v(n)$'], loc="upper center", fancybox=True, shadow=True, ncol=2)
     plt.xlabel("Zeitschritt n")
     plt.ylabel("Signal")
     plt.savefig("roessler_cross_pred.pdf")
 
-    plt.figure(figsize=(8,4))
+    plt.figure(figsize=(8,3))
     plt.plot( data[trainLength+1:trainLength+testLength+1,1]-Y[:,0], 'g', linestyle=":" )
     #plt.title('Fehler von $y(n)$ und $v(n)$ beginndend ab $n=0$')
     plt.ylim([-10,10])
-    plt.legend(['Fehler des vorhergesagten Signals'])
+    plt.legend(['Fehler des vorhergesagten Signals'], loc="upper center", fancybox=True, shadow=True, ncol=2)
     plt.xlabel("Zeitschritt n")
     plt.ylabel("Differenz $y(n) - v(n)$")
-    plt.gcf().subplots_adjust(bottom=0.15)
-
-
+    plt.gcf().subplots_adjust(bottom=0.16)
 
     plt.savefig("roessler_cross_err.pdf")
 
