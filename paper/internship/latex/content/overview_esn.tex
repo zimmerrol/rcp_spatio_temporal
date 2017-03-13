@@ -10,6 +10,7 @@ Die Verbindungen der inneren Einheiten untereinander wird durch die Gewichtsmatr
 
 Die zeitliche Entwicklung der inneren Zustände berechnet sich nach der Vorschrift
 \begin{align}
+\label{eq:esn_stateeq}
 \vec{s}(n) = (1 - \alpha) \cdot \vec{x}(n-1)  \alpha \cdot f_{in}\left( \mathbf{W}_{in} [b_{in}; \vec{u}(n)] + \mathbf{W} \vec{x}(n-1) \right),
 \end{align}
 wobei $f_{in}$ eine beliebige (meistens \textit{sigmoid}-förmige) Transferfunktion ist, und $[\cdot\,;\,\cdot]$ das vertikale Aneinanderfügen von Vektoren beziehungsweise Matrizen bezeichnet. Für diese Zustandsgleichung wurde das Modell eines \textit{Leaky Integrator Neurons} genutzt, wobei $\alpha \in (0,1]$ die Verlustrate beschreibt. Für $\alpha=1$ ergibt als Spezialfall ein gewöhnliches Neuron.
@@ -17,6 +18,7 @@ wobei $f_{in}$ eine beliebige (meistens \textit{sigmoid}-förmige) Transferfunkt
 Da für manche Anwendungsfälle auch eine direkte Rückkopplung wünschenswert sein kann, kann man das System noch um eine Ausgabe-Rückkopplung erweitert werden. Diese verbindet die Ausgabe erneut mit den inneren Einheiten durch die Matrix $\mathbf{W}_{fb} \in \mathbb{R}^{N \times N_y}$.
 Somit ergibt sich 
 \begin{align}
+\label{eq:esn_stateeq_feedback}
 \vec{s}(n) = (1 - \alpha) \cdot \vec{x}(n-1)  \alpha \cdot f_{in}\left( \mathbf{W}_{in} [b_{in}; \vec{u}(n)] + \mathbf{W} \vec{x}(n-1) + \mathbf{W}_{fb} \vec{y}(n) \right)
 \end{align}
 als Zustandsgleichung.\\
@@ -30,7 +32,7 @@ Hierdurch erhält man die Ausgabe
 \end{align}
 wobei $f_{out}$ nun die Transferfunktion der Ausgabe steht.\\
 
-Während die Matrix $\mathbf{W}_{out}$ durch den Trainingsvorgang bestimmt wird, werden die Matrizen $\mathbf{W}_{in}$ und $\mathbf{W}$ a priori generiert und festgelegt. Hierbei hat sich für das Generieren der Eingangsmatrix eine Zufallswahl zwischen $-1$ und $1$ als geschickt herausgestellt. Falls ein Feedback gewünscht ist, also Gleichung ??? genutzt wird, wird $\mathbf{W}_{fb}$ gleichartig konstruiert. Auf das Generieren der inneren Matrix $\mathbf{W}$ wird später genauer eingegangen.
+Während die Matrix $\mathbf{W}_{out}$ durch den Trainingsvorgang bestimmt wird, werden die Matrizen $\mathbf{W}_{in}$ und $\mathbf{W}$ a priori generiert und festgelegt. Hierbei hat sich für das Generieren der Eingangsmatrix eine Zufallswahl zwischen $-1$ und $1$ als geschickt herausgestellt. Falls ein Feedback gewünscht ist, also Gleichung \ref{eq:esn_stateeq_feedback} genutzt wird, wird $\mathbf{W}_{fb}$ gleichartig konstruiert. Auf das Generieren der inneren Matrix $\mathbf{W}$ wird später genauer eingegangen.
 
 \subsection{Training}
 Nachdem der Aufbau des Netzwerkes definiert ist, ergibt sich nun die Frage, wie man den Trainingsvorgang durchführt.
@@ -46,21 +48,22 @@ Zum einen kann die Lösung durch eine \textit{Tikhonov Regularisierung} mit der 
 \begin{align}
 \mathbf{W}_{out} = \mathbf{Y} \mathbf{X}^T \left(\mathbf{X} \mathbf{X}T + \beta I \right)^{-1}
 \end{align}
-ist sehr leistungsstark, aber auch teilweise numerisch instabil. Das Verfahren kann allerdings bei geeigneter Wahl von $\beta$ die besten Ergebnisse erzielen.\\
+ist sehr leistungsstark, aber auch teilweise numerisch instabil. Das Verfahren kann allerdings bei geeigneter Wahl von $\beta$ die besten Ergebnisse erzielen \cite{lukoseviciusa2009}.\\
 
 Zum anderen kann zur Lösung die \textit{Moore-Penrose-Pseudoinverse} $\mathbf{X}'$ genutzt werden, sodass
 \begin{align}
 \mathbf{W}_{out} = \mathbf{Y} \mathbf{X}'
 \end{align}
-folgt. Dieses Verfahren ist zwar sehr rechenaufwendig aber dafür numerisch stabil. Nichts desto trotz, kann allerdings auf Grund des Fehlens einer Regularisierung leicht der Effekt des \textsc{Overfittings} auftreten. Dieser kann umgangen werden, wenn in der Zustandsgleichung ??? eine leichte normalverteilte Störung $\vec{\nu}(n)$ der Größenordnung $0.01$ bis $0.0001$ addiert wird. Dieser Ansatz beruht auf Empirie, da eine mathematische Begründung hierfür noch nicht vollständig gelungen ist.\\
+folgt. Dieses Verfahren ist zwar sehr rechenaufwendig aber dafür numerisch stabil \cite{lukoseviciusa2009, jaeger2012}. Nichts desto trotz, kann allerdings auf Grund des Fehlens einer Regularisierung leicht der Effekt des \textsc{Overfittings} auftreten. Dieser kann umgangen werden, wenn in der Zustandsgleichung \ref{eq:esn_stateeq}/\ref{eq:esn_stateeq_feedback} eine leichte normalverteilte Störung $\vec{\nu}(n)$ der Größenordnung $0.01$ bis $0.0001$ addiert wird. Dieser Ansatz beruht auf Empirie, da eine mathematische Begründung hierfür noch nicht vollständig gelungen ist \citep{jaeger2010, lukoseviciusa2009}.\\
 
+\newpage
 Nachdem das Training beschrieben wurde, ergibt sich somit der Folgende Funktionsablauf für das Betreiben eines \textsc{ESN}:
 
 \singlespacing
 \begin{enumerate}
-\item Zufälliges Generieren der Matrizen $\mathbf{W}_{in}, \mathbf{W}_{fb}$ und Konstruktion der Matrix $\mathbf{W}$ 
-\item Einspeisen des Signals $u(n)$ und Konstruktion der Zustandsmatrix $\mathbf{X}$ und der Ausgabematrix $\mathbf{Y}$ 
-\item Berechnung der Ausgabematrix $\mathbf{W}_{out}$
-\item Einspeisen des Signals $u(n)$ für Vorhersagen des Signales $y(n)$ für $n > T$
+	\item Zufälliges Generieren der Matrizen $\mathbf{W}_{in}, \mathbf{W}_{fb}$ und Konstruktion der Matrix $\mathbf{W}$ 
+	\item Einspeisen des Signals $u(n)$ und Konstruktion der Zustandsmatrix $\mathbf{X}$ und der Ausgabematrix $\mathbf{Y}$ 
+	\item Berechnung der Ausgabematrix $\mathbf{W}_{out}$
+	\item Einspeisen des Signals $u(n)$ für Vorhersagen des Signales $y(n)$ für $n > T$
 \end{enumerate}
 \onehalfspacing
