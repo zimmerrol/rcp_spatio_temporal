@@ -60,22 +60,24 @@ training_data = data[:4000]
 test_data = data[4000:]
 
 #out_ind = [14,15,16]
-out_ind_x = [8,9,10]
-out_ind_y = [8,9,10]
+out_ind_x = [8,9,10]#[14,15,16]#[8,9,10]
+out_ind_y = [8,9,10]#[14,15,16]#[8,9,10]
 #in_ind = list(range(14))
 #in_ind.extend(list(range(17,30)))
-in_ind_x = list(range(30))
-in_ind_y = list(range(30))
+in_ind_x = list(range(0, 30))
+in_ind_y = list(range(0, 30))
 for i in out_ind_x:
     in_ind_x.remove(i)
 for i in out_ind_y:
     in_ind_y.remove(i)
 
+print(in_ind_x)
 
-training_data_in =  training_data[:, in_ind_y][:,:, in_ind_x].reshape(-1, (30-3)**2)
+
+training_data_in =  training_data[:, in_ind_y][:,:, in_ind_x].reshape(-1, len(in_ind_x)*len(in_ind_y))
 training_data_out =  training_data[:, out_ind_y][:,:, out_ind_x].reshape(-1, 3**2)
 
-test_data_in =  test_data[:, in_ind_y][:,:, in_ind_x].reshape(-1, (30-3)**2)
+test_data_in =  test_data[:, in_ind_y][:,:, in_ind_x].reshape(-1, len(in_ind_x)*len(in_ind_y))
 test_data_out =  test_data[:, out_ind_y][:,:, out_ind_x].reshape(-1, 3**2)
 
 print("setting up...")
@@ -111,9 +113,9 @@ sys.exit()
 #best parameters: {'leak_rate': 0.99, 'sparseness': 0.1, 'spectral_radius': 2.1, 'solver': 'lsqr', 'n_reservoir': 1000, 'regression_parameters': [0.0002]}
 #best mse: 0.012300204613490656
 
-esn = ESN(n_input = (30-3)**2, n_output = 3**2, n_reservoir = 500,
-        weight_generation = "advanced", leak_rate = 0.8, spectral_radius = 1.5,
-        random_seed=42, noise_level=0.001, sparseness=.1, solver = "lsqr", regression_parameters=[2e-2],
+esn = ESN(n_input = len(in_ind_x)*len(in_ind_y), n_output = 3**2, n_reservoir = 4700,
+        weight_generation = "advanced", leak_rate = 0.8, spectral_radius = 0.8,
+        random_seed=42, noise_level=0.001, sparseness=.1, regression_parameters=[2e-2],
         out_activation = lambda x: 0.5*(1+np.tanh(x/2)), out_inverse_activation = lambda x:2*np.arctanh(2*x-1))
 
 print("fitting...")
