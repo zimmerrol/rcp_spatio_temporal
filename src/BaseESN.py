@@ -1,6 +1,7 @@
 import numpy as np
 import numpy.random as rnd
-import pickle
+#import pickle
+import dill as pickle
 
 class BaseESN:
     def __init__(self, n_input, n_reservoir, n_output,

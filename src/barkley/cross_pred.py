@@ -33,8 +33,9 @@ def generate_data(N, trans, sample_rate=1):
     return data
 
 print("generating data...")
-
-data = generate_data(5000, 50000, 5)
+data = generate_data(10000, 50000, 5)
+np.save("10000.dat", data)
+data = np.load("10000.dat.npy")
 
 """
 i = 0
@@ -60,8 +61,8 @@ training_data = data[:4000]
 test_data = data[4000:]
 
 #out_ind = [14,15,16]
-out_ind_x = [8,9,10]#[14,15,16]#[8,9,10]
-out_ind_y = [8,9,10]#[14,15,16]#[8,9,10]
+out_ind_x = [8,9,10,11,12,13]#[14,15,16]#[8,9,10]
+out_ind_y = [8,9,10,11,12,13]#[14,15,16]#[8,9,10]
 #in_ind = list(range(14))
 #in_ind.extend(list(range(17,30)))
 in_ind_x = list(range(0, 30))
@@ -71,14 +72,11 @@ for i in out_ind_x:
 for i in out_ind_y:
     in_ind_y.remove(i)
 
-print(in_ind_x)
-
-
 training_data_in =  training_data[:, in_ind_y][:,:, in_ind_x].reshape(-1, len(in_ind_x)*len(in_ind_y))
-training_data_out =  training_data[:, out_ind_y][:,:, out_ind_x].reshape(-1, 3**2)
+training_data_out =  training_data[:, out_ind_y][:,:, out_ind_x].reshape(-1, len(out_ind_x)*len(out_ind_y))
 
 test_data_in =  test_data[:, in_ind_y][:,:, in_ind_x].reshape(-1, len(in_ind_x)*len(in_ind_y))
-test_data_out =  test_data[:, out_ind_y][:,:, out_ind_x].reshape(-1, 3**2)
+test_data_out =  test_data[:, out_ind_y][:,:, out_ind_x].reshape(-1, len(out_ind_x)*len(out_ind_y))
 
 print("setting up...")
 
@@ -113,23 +111,30 @@ sys.exit()
 #best parameters: {'leak_rate': 0.99, 'sparseness': 0.1, 'spectral_radius': 2.1, 'solver': 'lsqr', 'n_reservoir': 1000, 'regression_parameters': [0.0002]}
 #best mse: 0.012300204613490656
 
-esn = ESN(n_input = len(in_ind_x)*len(in_ind_y), n_output = 3**2, n_reservoir = 4700,
-        weight_generation = "advanced", leak_rate = 0.8, spectral_radius = 0.8,
-        random_seed=42, noise_level=0.001, sparseness=.1, regression_parameters=[2e-2],
+esn = ESN(n_input = len(in_ind_x)*len(in_ind_y), n_output = len(out_ind_x)*len(out_ind_y), n_reservoir = 2700,
+        weight_generation = "advanced", leak_rate = 0.7, spectral_radius = 0.8,
+        random_seed=42, noise_level=0.001, sparseness=.2, regression_parameters=[2e-2],
         out_activation = lambda x: 0.5*(1+np.tanh(x/2)), out_inverse_activation = lambda x:2*np.arctanh(2*x-1))
+
+esn.save("esn.dat")
+
+#esn = ESN.load("esn.dat")
+esn.solver= "pinv"
+#esn._solver = "lsqr"
+#esn._regression_parameters = [2e-2]
 
 print("fitting...")
 train_error = esn.fit(training_data_in, training_data_out,)
 print("train error: {0}".format(train_error))
 print("predicting...")
 pred = esn.predict(test_data_in)
-pred = pred.reshape(-1, 3, 3)
+pred = pred.reshape(-1, len(out_ind_x),len(out_ind_y))
 
 merged_prediction = test_data.copy()
 merged_prediction[np.ix_(list(range(len(test_data))), out_ind_x, out_ind_y)] = pred
 
-diff = pred.reshape((-1, 9))-test_data_out
-mse = np.mean(diff.reshape(-1, 3*3)**2)
+diff = pred.reshape((-1, len(out_ind_x)*len(out_ind_y)))-test_data_out
+mse = np.mean(diff.reshape(-1, len(out_ind_x)*len(out_ind_y))**2)
 print(mse)
 
 diff = np.abs(diff)

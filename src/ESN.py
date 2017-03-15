@@ -58,10 +58,26 @@ class ESN(BaseESN):
 
 
         if (self._solver == "pinv"):
+            """print("pinv")
+            import pycuda.autoinit
+            import pycuda.driver as drv
+            import pycuda.gpuarray as gpuarray
+            import skcuda.linalg as culinalg
+            import skcuda.misc as cumisc
+            culinalg.init()
+
+            X_gpu = gpuarray.to_gpu(self._X)
+            X_inv_gpu = culinalg.pinv(X_gpu)
+            Y_gpu = gpuarray.to_gpu(Y_target)
+            W_out_gpu = Y_gpu * W_out_gpu
+            pred_gpu = W_out_gpu * X_gpu
+
+            self._W_out = gpuarray.from_gpu(W_out_gpu)
+            """
             self._W_out = np.dot(Y_target, np.linalg.pinv(self._X))
 
             #calculate the training error now
-            train_prediction = self.out_activation(np.dot(self._W_out, self._X).T)
+            train_prediction = self.out_activation((np.dot(self._W_out, self._X)).T)
 
         elif (self._solver == "lsqr"):
             self._W_out = np.dot(np.dot(Y_target, self._X.T),np.linalg.inv(np.dot(self._X,self._X.T) + self._regression_parameters[0]*np.identity(1+self.n_input+self.n_reservoir)))
