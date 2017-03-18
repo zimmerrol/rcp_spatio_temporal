@@ -32,38 +32,15 @@ def generate_data(N, trans, sample_rate=1):
 
     return data
 
-def create_patch_indices(outer_range_x, outer_range_y, inner_range_x, inner_range_y):
-    outer_ind_x = np.tile(range(outer_range_x[0], outer_range_x[1]+1), outer_range_y[1])
-    outer_ind_y = np.repeat(range(outer_range_y[0], outer_range_y[1]+1), outer_range_x[1])
+def create_square(range_x, range_y):
+    ind_x = np.tile(range(range_x[0], range_x[1]+1), range_y[1]-range_y[0]+1)
+    ind_y = np.repeat(range(range_y[0], range_y[1]+1), range_x[1]-range_x[0]+1)
 
-    inner_ind_x = np.tile(range(inner_range_x[0], inner_range_x[1]+1), inner_range_y[1]-1)
-    inner_ind_y = np.repeat(range(inner_range_y[0], inner_range_y[1]+1), inner_range_x[1]-1)
+    index_list = [c for c in zip(ind_y, ind_x)]
 
-    outer_list = [c for c in zip(outer_ind_y, outer_ind_x)]
-    inner_list = [c for c in zip(inner_ind_y, inner_ind_x)]
+    index_list = np.array(index_list)
 
-    real_list = np.array([x for x in outer_list if x not in inner_list])
-    inner_list = np.array(inner_list)
-
-    return real_list[:,0], real_list[:,1], inner_list[:, 0], inner_list[:, 1]
-
-def print_field(input_y, input_x, output_y, output_x):
-    print_matrix = np.zeros((30,30))
-    print_matrix[input_y, input_x] = 1.0
-    print_matrix[output_y, output_x] = -1.0
-    for y in range(30):
-        string = "|"
-        for x in range(30):
-            if (print_matrix[y,x] == 1.0):
-                string += "x"
-            elif (print_matrix[y,x] == -1.0):
-                string += "0"
-            else:
-                string += "."
-
-        string += "|"
-        print(string)
-
+    return index_list[:, 0], index_list[:, 1]
 
 
 print("generating data...")
@@ -71,59 +48,75 @@ print("generating data...")
 #np.save("10000.dat", data)
 data = np.load("10000.dat.npy")
 
-training_data = data[:4000]
-test_data = data[4000:]
 
-input_y, input_x, output_y, output_x = create_patch_indices((12,17), (12,17), (13,16), (13,16)) # -> yields MSE=0.0115 with leak_rate = 0.8
+
+data = data[2000:]
+
+T = 10
+training_data = data[:6000]
+test_data = data[6000-T:]
+
+#input_y, input_x, output_y, output_x = create_patch_indices((12,17), (12,17), (13,16), (13,16)) # -> yields MSE=0.0115 with leak_rate = 0.8
 #input_y, input_x, output_y, output_x = create_patch_indices((4,23), (4,23), (7,20), (7,20)) # -> yields MSE=0.0873 with leak_rate = 0.3
+index_y, index_x =  create_square((7,9),(7,9))
 
-training_data_in =  training_data[:, input_y, input_x].reshape(-1, len(input_y))
-training_data_out =  training_data[:, output_y, output_x].reshape(-1, len(output_y))
+training_data_in_flat = training_data[:, index_y, index_x].reshape(-1, len(index_y))
+training_data_out = training_data[:, 8, 8].reshape(-1, 1)
+test_data_in_square   = test_data[:, index_y, index_x].reshape((-1, 3, 3))
+test_data_in_flat     = test_data_in_square.reshape(-1, len(index_y))
 
-test_data_in =  test_data[:, input_y, input_x].reshape(-1, len(input_y))
-test_data_out =  test_data[:, output_y, output_x].reshape(-1, len(output_y))
+test_data_out   = test_data[:, 8, 8].reshape(-1, 1)
+test_data_out_square   = test_data_out.reshape((-1, 1, 1))
 
-
-generate_new = False
+generate_new = True
 
 print("setting up...")
 if (generate_new):
-    esn = ESN(n_input = len(input_y), n_output = len(output_y), n_reservoir = 1700,
-            weight_generation = "advanced", leak_rate = 0.8, spectral_radius = 0.8,
-            random_seed=42, noise_level=0.0001, sparseness=.1, regression_parameters=[6e-1], solver = "lsqr",
-            out_activation = lambda x: 0.5*(1+np.tanh(x/2)), out_inverse_activation = lambda x:2*np.arctanh(2*x-1))
+    esn = ESN(n_input = len(index_y), n_output = 1, n_reservoir = 1000,
+            weight_generation = "naive", leak_rate = 0.98, spectral_radius = 0.65,
+            random_seed=42, noise_level=0.001, sparseness=.1, regression_parameters=[3e-6], solver = "lsqr")
+            #out_activation = lambda x: 0.5*(1+np.tanh(x/2)), out_inverse_activation = lambda x:2*np.arctanh(2*x-1))
 
     print("fitting...")
 
-    train_error = esn.fit(training_data_in, training_data_out,)
-    esn.save("esn" + str(len(input_y)) + ".dat")
+    train_error = esn.fit(training_data_in_flat[:-T], training_data_out[T:], transient_quota=0.15)
+    esn.save("esn" + str(len(index_y)) + ".dat")
     print("train error: {0}".format(train_error))
 
 else:
-    esn = ESN.load("esn" + str(len(input_y)) + ".dat")
+    esn = ESN.load("esn" + str(len(index_y)) + ".dat")
 
 print("predicting...")
-pred = esn.predict(test_data_in)
+pred = esn.predict(test_data_in_flat[:-T])
+pred[pred > 1] = 1
+pred[pred < 0] = 0
 
-merged_prediction = test_data.copy()
-merged_prediction[:, output_y, output_x] = pred
+plt.plot(test_data_out[T:], "b", linestyle="--")
+plt.plot(pred, "r", linestyle=":")
 
-diff = pred.reshape((-1, len(output_y))) - test_data_out
+
+diff = pred - test_data_out[T:]
 mse = np.mean((diff)**2)
 print("test error: {0}".format(mse))
 
-difference = np.abs(test_data - merged_prediction)
+plt.show()
+exit()
+
+pred = pred.reshape((-1, 1, 1))
+
+difference = np.abs(diff).reshape((-1, 1, 1))
 
 i = 0
 def update_new(data):
     global i
+    i = i % len(diff)
     if (not pause):
         if (image_mode == 0):
-            mat.set_data(merged_prediction[i])
+            mat.set_data(pred[i])
             clb.set_clim(vmin=0, vmax=1)
             clb.draw_all()
         elif (image_mode == 1):
-            mat.set_data(test_data[i])
+            mat.set_data(test_data_out_square[i+T])
             clb.set_clim(vmin=0, vmax=1)
             clb.draw_all()
         else:
@@ -137,10 +130,9 @@ def update_new(data):
 
 
 fig, ax = plt.subplots()
-mat = plt.imshow(merged_prediction[0], origin="lower", interpolation="none")
+mat = plt.imshow(pred[0], origin="lower", interpolation="none")
 clb = plt.colorbar(mat)
 clb.set_clim(vmin=0, vmax=1)
-clb.draw_all()
 pause = False
 image_mode = 0
 ani = animation.FuncAnimation(fig, update_new, interval=1, save_count=50)

@@ -1,4 +1,5 @@
 \chapter{Anwendungen}
+\label{chp:applications}
 Um den Aufwand für die spätere Benutzung zu reduzieren ist zuerst eine allgemeine Implementation des \textsc{ESN}s geschrieben worden. 
 
 \section{Vorhersage eines Rössler-Systems}
@@ -17,7 +18,7 @@ Hierbei werden zwei verschiedene Aufgaben betrachtet: \textit{(a)} die Vorhersag
 \subsection{Vorhersage $x(n) \rightarrow x(n+48)$}
 Hierfür ist durch eine \textsc{GridSearch} ein geeignetes System gefunden werden, Parameter in der Tabelle \ref{tab:application_roessler} dargestellt sind. Als Maß für die Optimierung wurde der \textit{Mean Square Error (MSE)} benutzt.
 
-Hierbei wurde für den Trainingsvorgang ein Fehler $MSE = 0.575$ und für den Testvorgang von $MSE = 0.270$ bestimmt. Die grafische Darstellung der Vorhersage $v(n)$ und des ermittelten Fehlers sind in Abbildung \ref{fig:application_roessler} zu finden.
+Hierbei wurde für den Trainingsvorgang ein Fehler $MSE = 0.575$ und für den Testvorgang von $MSE = 0.270$ bestimmt. Ein grafischer Vergleich zwischen der dem Signal $y(t)$ und der Vorhersage $v(n)$ ist in Abbildung \ref{fig:application_roessler_a} zu finden.
 
 \begin{table}[H]
 	\centering
@@ -67,11 +68,11 @@ Als nächste Anwendung wird ein \textit{Mackey-Glass-System}
 \begin{align}
 \label{eq:application_roessler_pde}
 \begin{split}
-\dot{x} &= \beta \frac{x_\tau}{1+x_\tau^n}-\gamma x\\
+\dot{x}(t) &= \beta \frac{x(t-\tau)}{1+x(t-\tau)^n}-\gamma x(t)\\
 \end{split}
 \end{align}
 betrachtet, wobei $\tau = 17, n=10, \beta = 0.2$ gewählt wurden. Dies ist eine beliebte Aufgabe im Bereich der Vorhersagen chaotischer Zeitreihen.\\
-Für dieses System wurde nun die Vorhersage $x(n) \rightarrow x(n+48)$ betrachtet, wobei die Parameter aus Tabelle \ref{tab:application_mackeyglass} genutzt wurden.
+Für dieses System wurde in Analogie zu  \citep{caraballo2014} die Vorhersage $x(n) \rightarrow x(n+84)$ betrachtet, wobei die Parameter aus Tabelle \ref{tab:application_mackeyglass} genutzt wurden. Hierfür wurden mittels der \textit{Euler-Diskretisierung} Werte für $0 \leq t \leq 4000$ simuliert, wobei die ersten $2000$ Werte für den Trainings und die anderen für den Test-Vorgang genutzt wurden. Es wurde zur Lösung die \textit{Tikhonov Regularisierung} benutzt.
 
 \begin{table}[H]
 	\centering
@@ -82,20 +83,25 @@ Für dieses System wurde nun die Vorhersage $x(n) \rightarrow x(n+48)$ betrachte
 		\hline 
 		\rule[-1ex]{0pt}{3.5ex} $\alpha$ & $0.20$ \\ 
 		\hline 
-		\rule[-1ex]{0pt}{3.5ex} $\rho(\mathbf{W})$ & $0.35$ \\ 
+		\rule[-1ex]{0pt}{3.5ex} $\rho(\mathbf{W})$ & $1.25$ \\ 
 		\hline 
-		\rule[-1ex]{0pt}{3.5ex} $\nu_{max}$ & $0.001$ \\ 
+		\rule[-1ex]{0pt}{3.5ex} $\nu_{max}$ & $\num{1e-4}$ \\ 
+		\hline 
+		\rule[-1ex]{0pt}{3.5ex} $\beta$ & $\num{1e-8}$ \\ 
 		\hline 
 	\end{tabular} 
 	\caption{Auflistung der benutzten Parameter des \textsc{ESN}.}
 \label{tab:application_mackeyglass}
 \end{table}
 
-Eine Darstellung der Ergebnisse ist in Abbildung \ref{fig:application_mackeyglass} zu sehen. Hierbei wurde der \textit{MSE} für die gesamte Trainingsphase und die ersten 1000 Zeitpunkte der Testphase zu $MSE_{train} = 0.0046$ und $MSE_{test} = 0.0002$.
+Interessant ist, dass der Spektralradius größer $1.0$ ist - dies ist möglich, da ein konstanter \textit{Bias} von $1.0$ als weiteres Eingangssignal genutzt wurde.\\
+Eine Darstellung der Ergebnisse ist in Abbildung \ref{fig:application_mackeyglass} zu sehen. Hierbei wurde der \textit{MSE} für die gesamte Trainingsphase als $MSE_{train} = 0.0042$ und der der Testphase als $MSE_{test} = \num{9e-5}$ bestimmt.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width = 0.9 \textwidth]{figures/mackeyglass_pred.pdf}
-    \caption{Graphische Darstellung des des Fehlers $y(n)-v(n)$.}
+    \caption{Graphische Darstellung des Signals $x(t)$ und der Vorhersage $x(t+84)$.}
     \label{fig:application_mackeyglass}
 \end{figure}
+
+Dies ist eine starke Verbesserung im Vergleich zu dem besten Ergebnis aus \citep{caraballo2014} mit $MSE = 0.0014$, wobei anzumerken ist, dass dort eine kleinere Trainings- und Testphase gewählt worden ist.
