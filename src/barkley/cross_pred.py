@@ -33,11 +33,11 @@ def generate_data(N, trans, sample_rate=1):
     return data
 
 def create_patch_indices(outer_range_x, outer_range_y, inner_range_x, inner_range_y):
-    outer_ind_x = np.tile(range(outer_range_x[0], outer_range_x[1]+1), outer_range_y[1])
-    outer_ind_y = np.repeat(range(outer_range_y[0], outer_range_y[1]+1), outer_range_x[1])
+    outer_ind_x = np.tile(range(outer_range_x[0], outer_range_x[1]+1), outer_range_y[1]-outer_range_y[0])
+    outer_ind_y = np.repeat(range(outer_range_y[0], outer_range_y[1]+1), outer_range_x[1]-outer_range_x[0])
 
-    inner_ind_x = np.tile(range(inner_range_x[0], inner_range_x[1]+1), inner_range_y[1]-1)
-    inner_ind_y = np.repeat(range(inner_range_y[0], inner_range_y[1]+1), inner_range_x[1]-1)
+    inner_ind_x = np.tile(range(inner_range_x[0], inner_range_x[1]+1), inner_range_y[1] - inner_range_y[0])
+    inner_ind_y = np.repeat(range(inner_range_y[0], inner_range_y[1]+1), inner_range_x[1] - inner_range_x[0])
 
     outer_list = [c for c in zip(outer_ind_y, outer_ind_x)]
     inner_list = [c for c in zip(inner_ind_y, inner_ind_x)]
@@ -84,7 +84,7 @@ test_data_in =  test_data[:, input_y, input_x].reshape(-1, len(input_y))
 test_data_out =  test_data[:, output_y, output_x].reshape(-1, len(output_y))
 
 
-generate_new = False
+generate_new = True
 
 print("setting up...")
 if (generate_new):
@@ -128,7 +128,7 @@ def update_new(data):
             clb.draw_all()
         else:
             mat.set_data(difference[i])
-            clb.set_clim(vmin=0, vmax=np.max(difference))
+            clb.set_clim(vmin=0, vmax=np.max(difference[i-50:i+50]))
             clb.draw_all()
 
         i = (i+1) % len(diff)
