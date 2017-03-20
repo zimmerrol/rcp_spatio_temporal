@@ -10,7 +10,7 @@ class GridSearch:
         self.fixed_params = fixed_params
 
 
-    def fit(self, trainingInput, trainingOutput, testingDataSequence):
+    def fit(self, trainingInput, trainingOutput, testingDataSequence, output_postprocessor = lambda x: x, printfreq=None):
         def enumerate_params():
             keys, values = zip(*self.param_grid.items())
             for row in itertools.product(*values):
@@ -30,7 +30,7 @@ class GridSearch:
             test_mse = []
             for (testInput, testOutput) in testingDataSequence:
                 esn._x = current_state
-                out_pred = esn.predict(testInput)
+                out_pred = output_postprocessor(esn.predict(testInput))
                 test_mse.append(np.mean((testOutput - out_pred)**2))
 
             test_mse = np.mean(test_mse)
@@ -39,6 +39,9 @@ class GridSearch:
 
             suc += 1
             print("{0}/{1}".format(suc, length))
+
+            if (suc % printfreq == 0):
+                print("buffer: " + str(results))
 
         res = min(results, key=operator.itemgetter(0))
 

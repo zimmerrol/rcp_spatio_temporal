@@ -70,6 +70,53 @@ test_data_out_square   = test_data_out.reshape((-1, 1, 1))
 
 generate_new = True
 
+
+
+
+
+
+from GridSearch import GridSearch
+cv = GridSearch(
+    param_grid={
+        "n_reservoir": [500, 800, 1000], "spectral_radius": [0.3, 0.6, .8, .9, .95, 1.1], "leak_rate": [.2, .6, .8, .9, .95],
+        "random_seed": [40,41,42,43,44], "sparseness": [.05, .1, .2], "weight_generation": ["naive"],
+        "solver": ["pinv"] #, "regression_parameters": [[3e-4],[3e-6],[3e-7]]
+    },
+        fixed_params={"n_output": 1, "n_input": len(index_y), "noise_level": 0.001
+    },
+    esnType=ESN)
+print("start fitting...")
+
+def cutval(val):
+    val[val > 1.0] = 1.0
+    val[val < 0.0] = 0.0
+
+    return val
+
+results = cv.fit(training_data_in_flat[:-T], training_data_out[T:], [(test_data_in_flat[:-T], test_data_out[T:])], cutval, printfreq=10)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+exit()
+
 print("setting up...")
 if (generate_new):
     esn = ESN(n_input = len(index_y), n_output = 1, n_reservoir = 1000,
