@@ -3,6 +3,8 @@ import numpy.random as rnd
 from BaseESN import BaseESN
 
 from sklearn.linear_model import Ridge
+from sklearn.svm import SVR
+from sklearn.linear_model import LogisticRegression
 
 
 class ESN(BaseESN):
@@ -92,6 +94,12 @@ class ESN(BaseESN):
             self._ridgeSolver.fit(self._X.T, Y_target.T)
             train_prediction = self.out_activation(self._ridgeSolver.predict(self._X.T))
 
+        elif (self._solver in ["sklearn_svr", "sklearn_svc"]):
+            self._ridgeSolver = SVR(**self._regression_parameters)
+
+            self._ridgeSolver.fit(self._X.T, Y_target.T.ravel())
+            train_prediction = self.out_activation(self._ridgeSolver.predict(self._X.T))
+
         """
         #alternative represantation of the equation
 
@@ -154,8 +162,8 @@ class ESN(BaseESN):
         for t in range(predLength):
             u = super(ESN, self).update(inputData[t])
 
-            if (self._solver in ["sklearn_auto", "sklearn_lsqr", "sklearn_sag", "sklearn_svd"]):
-                y = self._ridgeSolver.predict(np.vstack((self.output_bias, self.output_input_scaling*u, self._x)).T)
+            if (self._solver in ["sklearn_auto", "sklearn_lsqr", "sklearn_sag", "sklearn_svd", "sklearn_svr"]):
+                y = self._ridgeSolver.predict(np.vstack((self.output_bias, self.output_input_scaling*u, self._x)).T).reshape((-1,1))
             else:
                 y = np.dot(self._W_out, np.vstack((self.output_bias, self.output_input_scaling*u, self._x)))
 

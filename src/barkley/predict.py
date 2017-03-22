@@ -53,8 +53,8 @@ data = np.load("20000.dat.npy")
 data = data[2000:]
 
 T = 100
-training_data = data[:5000]
-test_data = data[5000-T:8000-T]
+training_data = data[:4000]
+test_data = data[4000-T:7000-T]
 
 #input_y, input_x, output_y, output_x = create_patch_indices((12,17), (12,17), (13,16), (13,16)) # -> yields MSE=0.0115 with leak_rate = 0.8
 #input_y, input_x, output_y, output_x = create_patch_indices((4,23), (4,23), (7,20), (7,20)) # -> yields MSE=0.0873 with leak_rate = 0.3
@@ -77,7 +77,7 @@ generate_new = True
 
 
 
-
+"""
 from GridSearch import GridSearch
 cv = GridSearch(
     param_grid={
@@ -103,19 +103,19 @@ print(cv._best_params)
 print(cv._best_mse)
 
 exit()
-
+"""
 
 
 
 #T=50: (0.033947233385081932, 0.071219920423523347, {'sparseness': 0.05, 'solver': 'lsqr', 'spectral_radius': 0.3, 'random_seed': 42, 'regression_parameters': [0.0003], 'n_reservoir': 500, 'leak_rate': 0.2, 'weight_generation': 'naive'})
 #T=10: (0.00078495804606547662, {'leak_rate': 0.9, 'n_reservoir': 500, 'spectral_radius': 0.95, 'solver': 'pinv', 'weight_generation': 'naive', 'random_seed': 44, 'sparseness': 0.05})
 #T=100:  (0.050939652813549598, 0.13093701743229968, {'regression_parameters': [0.003], 'sparseness': 0.05, 'spectral_radius': 0.3, 'n_reservoir': 500, 'leak_rate': 0.2, 'solver': 'lsqr', 'weight_generation': 'naive', 'random_seed': 41})
-
+#T=100, solo:  (0.032009262884647588, 0.11699984785782426, {'random_seed': 42, 'sparseness': 0.1, 'n_reservoir': 800, 'solver': 'lsqr', 'weight_generation': 'naive', 'regression_parameters': [0.0003], 'spectral_radius': 1.1, 'leak_rate': 0.6})
 print("setting up...")
 if (generate_new):
-    esn = ESN(n_input = len(index_y), n_output = 1, n_reservoir = 500,
-            weight_generation = "naive", leak_rate = 0.2, spectral_radius = 0.3,
-            random_seed=41, noise_level=0.0001, sparseness=.05, regression_parameters=[0.003], solver = "lsqr")
+    esn = ESN(n_input = len(index_y), n_output = 1, n_reservoir = 400,
+            weight_generation = "advanced", leak_rate = 0.7, spectral_radius = 1.1,
+            random_seed=42, noise_level=0.0001, sparseness=.2, solver = "lsqr", regression_parameters=[3e-3])
             #out_activation = lambda x: 0.5*(1+np.tanh(x/2)), out_inverse_activation = lambda x:2*np.arctanh(2*x-1))
 
     print("fitting...")
@@ -129,11 +129,12 @@ else:
 
 print("predicting...")
 pred = esn.predict(test_data_in_flat[:-T])
-pred[pred > 1] = 1
-pred[pred < 0] = 0
+#pred[pred > 1] = 1
+#pred[pred < 0] = 0
 
-plt.plot(test_data_out[T:], "b", linestyle="--")
-plt.plot(pred, "r", linestyle=":")
+plt.plot(np.vstack((training_data_out, test_data_out[T:])), "b", linestyle="-")
+plt.plot(np.vstack((training_data_out, pred)), "r", linestyle="--")
+plt.plot(training_data_out, "b", linestyle="-")
 
 
 diff = pred - test_data_out[T:]
