@@ -9,12 +9,12 @@ import matplotlib.pyplot as plt
 
 from scipy.integrate import ode
 
-trainLength = 5000
-skipLength = 500
-testLength = 5000
+trainLength = 3000
+skipLength = 3000
+testLength = 3000
 
 def roessler(n_max):
-    return integrate([0.0, 0.0, 0.0], n_max, 0.05 )
+    return integrate([0.0, 0.0, 0.0], n_max+skipLength, 0.1 )[skipLength:]
 
 def D(t, dat):
     x, y, z = dat
@@ -42,7 +42,7 @@ def integrate(z0, steps, delta_t):
 data = roessler(20000)
 data = data[:,:]
 
-mode = "cross"
+mode = "pred50"
 if mode == "gen":
     print("set up")
     esn = ESN(n_reservoir=2000, n_input=3, n_output=3, leak_rate=0.55, spectral_radius=0.60, random_seed=42, weight_generation='advanced')#0.4
@@ -78,20 +78,20 @@ if mode == "gen":
     plt.show()
 
 if mode == "pred50":
-    predDist = 50
+    predDist = 48
     print("set up")
-    esn = ESN(n_reservoir=300, n_input=3, n_output=3, leak_rate=0.10, spectral_radius=0.35, random_seed=42, weight_generation='advanced')#0.4
+    esn = ESN(n_reservoir=300, n_input=3, n_output=3, leak_rate=0.2, spectral_radius=0.70, random_seed=44, weight_generation='advanced')#0.4
     print("fitting...")
-    trainError = esn.fit(inputData=data[:trainLength,:], outputData=data[predDist+1:trainLength+predDist+1,:])
+    trainError = esn.fit(inputData=data[:trainLength,:], outputData=data[predDist:trainLength+predDist,:])
     print("train error: {0:4f}".format(trainError))
 
-    testLength=5000
+    testLength=3000
     print("generating...")
     #Y = esn.generate(n=testLength, initial_input=data[trainLength+200])
     Y = esn.predict(inputData=data[trainLength:trainLength+testLength,:])
-    errorLength = 4000
+    errorLength = 3000
 
-    mse = np.sum(np.square(data[trainLength+predDist:trainLength+errorLength+predDist, 0] - Y[:errorLength, 0]))/errorLength
+    mse = np.mean((data[trainLength+predDist:trainLength+errorLength+predDist, 0] - Y[:errorLength, 0])**2)
     rmse = np.sqrt(mse)
     nrmse = rmse/np.var(data[trainLength+predDist:trainLength+errorLength+predDist, 0])
     print ('MSE = ' + str( mse ))
@@ -107,7 +107,7 @@ if mode == "pred50":
     plt.plot(Y[:, 0], 'b' , linestyle="--")
     #plt.title('Target and generated signals $y(n)$ starting at $n=0$')
     plt.ylim([-17,23])
-    plt.legend(['Signal $y(n)$', 'Vorhergesagtes Signal $y(n+50)$'], loc="upper center", fancybox=True, shadow=True, ncol=2)
+    plt.legend(['Signal $y(n)$', 'Vorhergesagtes Signal $y(n+48)$'], loc="upper center", fancybox=True, shadow=True, ncol=2)
     plt.xlabel("Zeitschritt n")
     plt.ylabel("Signal")
 
@@ -160,11 +160,11 @@ if mode == "pred100":
 if mode == "cross":
     print("set up")
     esn = ESN(n_reservoir=500, n_input=1, n_output=1, leak_rate=0.20,
-                spectral_radius=0.010, random_seed=42,
+                spectral_radius=0.70, random_seed=42,
                 weight_generation='advanced', solver="pinv")#0.4
     print("fitting...")
     trainError = esn.fit(inputData=data[:trainLength,0].reshape(trainLength, 1),
-        outputData=data[+1:trainLength+1,1].reshape(trainLength, 1))
+        outputData=data[:trainLength,1].reshape(trainLength, 1))
 
     print ('training MSE = ' + str( trainError ))
     print("predicting...")
@@ -172,8 +172,8 @@ if mode == "cross":
     print("done.")
 
     # compute MSE for the first errorLen time steps
-    errorLength = 5000
-    mse = np.sum(np.square(data[trainLength:trainLength+errorLength,1] - Y[:errorLength,0])) / errorLength
+    errorLength = 3000
+    mse =np.mean((data[trainLength:trainLength+testLength,1]-Y[:,0])**2)
     rmse = np.sqrt(mse)
     nrmse = rmse/np.var(data[trainLength:trainLength+errorLength,1])
     print ('MSE = ' + str( mse ))
@@ -195,9 +195,9 @@ if mode == "cross":
     plt.savefig("roessler_cross_pred.pdf")
 
     plt.figure(figsize=(8,3))
-    plt.plot( data[trainLength+1:trainLength+testLength+1,1]-Y[:,0], 'g', linestyle=":" )
+    plt.plot( data[trainLength:trainLength+testLength,1]-Y[:,0], 'g', linestyle=":" )
     #plt.title('Fehler von $y(n)$ und $v(n)$ beginndend ab $n=0$')
-    plt.ylim([-10,10])
+    plt.ylim([-1,1])
     plt.legend(['Fehler des vorhergesagten Signals'], loc="upper center", fancybox=True, shadow=True, ncol=2)
     plt.xlabel("Zeitschritt n")
     plt.ylabel("Differenz $y(n) - v(n)$")

@@ -33,9 +33,9 @@
 \DeclareOption{englishpreamble}%
 {\@preamblelangdeftrue\@englishpreambletrue}
 \DeclareOption{german}%
-{\PassOptionsToClass{\CurrentOption}{scrartcl}\@germanopttrue}
+{\PassOptionsToClass{\CurrentOption}{scrbook}\@germanopttrue}
 \DeclareOption{ngerman}%
-{\PassOptionsToClass{\CurrentOption}{scrartcl}\@ngermanopttrue}
+{\PassOptionsToClass{\CurrentOption}{scrbook}\@ngermanopttrue}
 \newif\if@diplom\@diplomfalse
 \newif\if@review\@reviewfalse
 \newif\if@bachelor\@bachelortrue
@@ -47,7 +47,7 @@
 {\@diplomfalse\@bachelorfalse\@mastertrue\h@snothesistypefalse\@reviewfalse}
 \DeclareOption{review}%
 {\@diplomfalse\@bachelorfalse\@masterfalse\h@snothesistypefalse\@reviewtrue}
-\DeclareOption*{\PassOptionsToClass{\CurrentOption}{scrartcl}}
+\DeclareOption*{\PassOptionsToClass{\CurrentOption}{scrbook}}
 \ProcessOptions\relax
 \ifh@snothesistype
 \@latex@warning@no@line{%
@@ -55,7 +55,7 @@
   \MessageBreak muss angegeben werden. Nehme bachelor.%
 }%
 \fi
-\LoadClass[12pt,a4paper,pagesize, openany]{scrartcl}
+\LoadClass[12pt,a4paper,pagesize, openany]{scrbook}
 \AtBeginDocument{\RequirePackage{graphicx}\RequirePackage{datenumber}}
 \RequirePackage{calc}
 \def\nomname{Nomenclature}
@@ -114,7 +114,7 @@
 \def\ThesisBegin#1#2#3{\setmydatenumber{@countbegin}{#3}{#2}{#1}}
 \def\ThesisEnd#1#2#3{\setmydatenumber{@countend}{#3}{#2}{#1}}
 %\newenvironment{abstract}{\addchap*{\abstractname}}{}
-\newenvironment{abstract2}{\addsec*{\abstractname}}{}
+\newenvironment{abstract}{\addsec*{\abstractname}}{}
 \newenvironment{nomenclature}{%
   \if@nomtotoc
   \addchap{\nomname}

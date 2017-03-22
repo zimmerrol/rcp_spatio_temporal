@@ -1,8 +1,8 @@
-\section{Anwendungen}
+\chapter{Anwendungen}
 \label{chp:applications}
-Um den Aufwand für die spätere Benutzung zu reduzieren ist zuerst eine allgemeine Implementation des \textsc{ESN}s geschrieben worden, welche nun anhand zweier exemplarischer Systeme getastet worden ist.
+Um den Aufwand für die spätere Benutzung zu reduzieren ist zuerst eine allgemeine Implementation des \textsc{ESN}s geschrieben worden. 
 
-\subsection{Vorhersage eines Rössler-Systems}
+\section{Vorhersage eines Rössler-Systems}
 Eine erste Anwendung um die Möglichkeiten eines \textsc{ESN} zu demonstrieren besteht in der Vorhersage des Verhaltens eines \textit{Rössler-Systems}
 \begin{align}
 \label{eq:application_roessler_pde}
@@ -13,12 +13,12 @@ Eine erste Anwendung um die Möglichkeiten eines \textsc{ESN} zu demonstrieren b
 \end{split}
 \end{align}
 
-Hierbei werden zwei verschiedene Aufgaben betrachtet: \textit{(a)} die Vorhersage von $x(n+50)$ durch die Kenntnis von $x(n)$ und \textit{(b)} die Kreuz-Vorhersage $y(n)$ durch $x(n)$. Für beide Aufgaben wurde das System für jeweils $6000$ Schritte mit einer Abtastrate $\Delta t = 0.1$ in Analogie zu \cite{parlitz2005} simuliert, wobei die Hälfte der Daten für das Training und der Rest für die Testergebnisse verwendet worden ist.
+Hierbei werden zwei verschiedene Aufgaben betrachtet: \textit{(a)} die Vorhersage von $x(n+50)$ durch die Kenntnis von $x(n)$ und \textit{(b)} die Kreuz-Vorhersage $y(n)$ durch $x(n)$. Für beide Aufgaben wurde das System für jeweils $10000$ Schritte mit einer Abtastrate $\Delta t = 0.05$ simuliert, wobei die Hälfte der Daten für das Training und der Rest für die Testergebnisse verwendet worden ist.
 
-\subsubsection[Vorhersage $x(n) \rightarrow x(n+48)$]{Vorhersage $\pmb{x(n) \rightarrow x(n+48)}$}
-Hierfür ist durch eine \textsc{GridSearch} ein geeignetes System gefunden werden, dessen Parameter in der Tabelle \ref{tab:application_roessler} dargestellt sind. Als Maß für die Optimierung wurde der \textit{Mean Square Error (MSE)} benutzt.
+\subsection{Vorhersage $x(n) \rightarrow x(n+48)$}
+Hierfür ist durch eine \textsc{GridSearch} ein geeignetes System gefunden werden, Parameter in der Tabelle \ref{tab:application_roessler} dargestellt sind. Als Maß für die Optimierung wurde der \textit{Mean Square Error (MSE)} benutzt.
 
-Hierbei wurde für den Trainingsvorgang ein Fehler $MSE = 0.625$ und für den Testvorgang von $MSE = 0.270$ bestimmt. Ein grafischer Vergleich zwischen der dem Signal $y(t)$ und der Vorhersage $v(n)$ ist in Abbildung \ref{fig:application_roessler_a} zu finden.
+Hierbei wurde für den Trainingsvorgang ein Fehler $MSE = 0.575$ und für den Testvorgang von $MSE = 0.270$ bestimmt. Ein grafischer Vergleich zwischen der dem Signal $y(t)$ und der Vorhersage $v(n)$ ist in Abbildung \ref{fig:application_roessler_a} zu finden.
 
 \begin{table}[H]
 	\centering
@@ -49,29 +49,21 @@ Hierbei wurde für den Trainingsvorgang ein Fehler $MSE = 0.625$ und für den Te
 
 
 
-\subsubsection[Kreuz-Vorhersage $x(n) \rightarrow y(n)$]{Kreuz-Vorhersage $\pmb{x(n) \rightarrow y(n)}$}
+\subsection{Kreuz-Vorhersage $x(n) \rightarrow y(n)$}
 Auch hierfür konnte sehr schnell durch eine \textsc{GridSearch} ein geeignetes System gefunden werden. Als Maß wurde ebenfalls der \textit{MSE} benutzt. Die gefundenen Parameter sind ebenfalls in der Tabelle \ref{tab:application_roessler} dargestellt.\\
 Für das Auslesen wurde eine Linearkombination genutzt, wobei die Lösung $\mathbf{W}_{out}$ mittels der Pseudoinversen bestimmt worden ist.\\
 
-
-\begin{figure}[H]
-    \centering
-     %\includegraphics[width = 0.9 \textwidth]{figures/roessler_cross_pred.pdf}
-     \includegraphics[width = 0.9 \textwidth]{figures/roessler_cross_err.pdf}
-    \caption{Graphische Darstellung des Fehlers $y(n)-v(n)$ zwischen dem Signal $y(n)$ und der Vorhersage $v(n)$.}
-    \label{fig:application_roessler_b1}
-\end{figure}
-
-Hierbei wurde für den Trainingsvorgang ein Fehler $MSE_{train} = 0.0025$ und für den Testvorgang von $MSE_{test} = 0.0001$ bestimmt. Die grafische Darstellung der Vorhersage $v(n)$ und des ermittelten Fehlers sind in den Abbildungen \ref{fig:application_roessler_b1}/\ref{fig:application_roessler_b2} zu finden. Im Vergleich zu anderen Publikationen \cite{parlitz2005} ergibt sich ein ähnlicher Fehler. Leider kann hierbei nur mit den Graphen verglichen werden, da keine Fehler angegeben sind.
+Hierbei wurde für den Trainingsvorgang ein Fehler $MSE_{train} = 0.011$ und für den Testvorgang von $MSE_{test} = 0.091$ bestimmt. Die grafische Darstellung der Vorhersage $v(n)$ und des ermittelten Fehlers sind in den Abbildungen \ref{fig:application_roessler_b1} zu finden. Im Vergleich zu anderen Publikationen \cite{parlitz2005} ergibt sich ein ähnlicher Fehler. Leider kann hierbei nur mit den Graphen verglichen werden, da keine Fehler angegeben sind.
 
 \begin{figure}[H]
     \centering
      \includegraphics[width = 0.9 \textwidth]{figures/roessler_cross_pred.pdf}
-      \caption{Graphische Darstellung des Signals $y(n)$ und der Vorhersage $v(n)$.}
-    \label{fig:application_roessler_b2}
+     \includegraphics[width = 0.9 \textwidth]{figures/roessler_cross_err.pdf}
+    \caption{Graphische Darstellung des Signals $y(n)$, der Vorhersage $v(n)$ und des Fehlers $y(n)-v(n)$.}
+    \label{fig:application_roessler_b1}
 \end{figure}
 
-\subsection{Vorhersage eines Mackey-Glass-Systems}
+\section{Vorhersage eines Mackey-Glass-Systems}
 Als nächste Anwendung wird ein \textit{Mackey-Glass-System}
 \begin{align}
 \label{eq:application_roessler_pde}

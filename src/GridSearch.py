@@ -20,6 +20,9 @@ class GridSearch:
 
         length = sum(1 for x in enumerate_params())
 
+        import progressbar
+        bar = progressbar.ProgressBar(max_value=length, redirect_stdout=True)
+
         suc = 0
         for params in enumerate_params():
             esn = self.esnType(**params, **self.fixed_params)
@@ -35,17 +38,18 @@ class GridSearch:
 
             test_mse = np.mean(test_mse)
 
-            results.append((test_mse, params))
+            results.append((test_mse, training_acc, params))
 
             suc += 1
-            print("{0}/{1}".format(suc, length))
+            bar.update(suc)
 
             if (suc % printfreq == 0):
-                print("buffer: " + str(results))
+                res = min(results, key=operator.itemgetter(0))
+                print("\t: " + str(res))
 
         res = min(results, key=operator.itemgetter(0))
 
-        self._best_params = res[1]
+        self._best_params = res[2]
         self._best_mse = res[0]
 
         return results

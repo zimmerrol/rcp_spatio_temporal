@@ -17,7 +17,7 @@
 %% deutsche Arbeit:
 \documentclass[review,       %% Typ der Arbeit: bachelor oder master
                twoside,        %% zweiseitiges Layout
-               BCOR16mm,       %% Bindekorrektur 10 mm
+               BCOR10mm,       %% Bindekorrektur 10 mm
 %               liststotoc,nomtotoc,bibtotoc, %% Aufnahme der div. Verzeichnisse
                                               %% ins Inhaltsverzeichnis
                english,ngerman, %% Alternativspr. Englisch, Dokumentspr. Deutsch
@@ -49,22 +49,6 @@
 \usepackage[comma,numbers,sort&compress]{natbib}
 %for years etc. in the citations use this line:
 %\usepackage[sort&compress,square,comma,authoryear, numbers]{natbib}
-
-%to get the bar in the top of each page with the chapter's name
-\usepackage[komastyle]{scrpage2}
-\pagestyle{scrheadings}
-\setheadsepline{0.5pt}[\color{black}]
-
-\clearscrheadings
-\renewcommand{\sectionmark}[1]{\markboth{\thesection{}. #1}{}}
-\renewcommand{\subsectionmark}[1]{\markright{\thesubsection{}. #1}}
-\ohead[]{\scshape\leftmark}
-\ihead[]{\rightmark}
-\ofoot[\pagemark]{\pagemark}
-\ifoot[]{}
-\pagestyle{scrheadings}
-\setkomafont{pageheadfoot}{\normalfont}
-
 
 \bibliographystyle{plainnat}
 
@@ -128,59 +112,43 @@
 \ThesisBegin{1}{4}{2009}
 \ThesisEnd{15}{7}{2009}
 %% DO NOT TOUCH THESE LINES!!!!
-%\frontmatter
-\pagenumbering{gobble}
+\frontmatter
 \maketitle
-\clearpage
+\cleardoublepage
 %% Zusammenfassung. Falls nicht gewuenscht, bitte auskommentieren.
 %\input{content/abstract.tex}
 
 %% Ende des Vorspanns
-\clearpage
+\cleardoublepage
 %% Ab hier 1 1/2 facher Zeilenabstand (durch setspace-Paket)
 \onehalfspacing
 %% Erzeugt Inhaltsverzeichnis
 \tableofcontents
 
-
-\clearpage
-
 %% Hier kann man seine Bezeichnungsweisen erklaeren. Falls nicht
 %% benoetigt, bis einschliesslich \end{nomenclature} auskommentieren
 \input{content/nomenclature.tex}
-\clearpage
 %% \listoftables und \listoffigures sollten nur bei genuegender Anzahl Tabellen
 %% verwendet werden
 %\listoffigures
 %\listoftables
 
 
-%\mainmatter   %% Anfang Hauptteil
-\pagenumbering{arabic}
+\mainmatter   %% Anfang Hauptteil
+
 
 \input{content/introduction.tex}
-\clearpage
-
 \input{content/overview_rnn.tex}
-\clearpage
-
 \input{content/esn.tex}
-\clearpage
-
 \input{content/applications.tex}
-\clearpage
-
 \input{content/conclusion.tex}
-\clearpage
-
 \input{content/outlook.tex}
-\clearpage
 
 \nocite{*}
 
 %\appendix
 
-\clearpage
+\cleardoublepage
 %% Bibliographie. Das Argument muss der Name der BIBTeX-Datenbank stehen.
 %% Ein Beispiel fuer eine solche Datenbank finden Sie in bthesis_datenbank.bib
 \bibliography{review_datenbank} 

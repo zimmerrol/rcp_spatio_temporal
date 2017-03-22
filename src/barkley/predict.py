@@ -44,29 +44,32 @@ def create_square(range_x, range_y):
 
 
 print("generating data...")
-#data = generate_data(10000, 50000, 5)
-#np.save("10000.dat", data)
-data = np.load("10000.dat.npy")
+#data = generate_data(20000, 50000, 5)
+#np.save("20000.dat", data)
+data = np.load("20000.dat.npy")
 
 
 
 data = data[2000:]
 
-T = 10
-training_data = data[:6000]
-test_data = data[6000-T:]
+T = 100
+training_data = data[:5000]
+test_data = data[5000-T:8000-T]
 
 #input_y, input_x, output_y, output_x = create_patch_indices((12,17), (12,17), (13,16), (13,16)) # -> yields MSE=0.0115 with leak_rate = 0.8
 #input_y, input_x, output_y, output_x = create_patch_indices((4,23), (4,23), (7,20), (7,20)) # -> yields MSE=0.0873 with leak_rate = 0.3
 index_y, index_x =  create_square((7,9),(7,9))
 
+index_y = [8]
+index_x = [8]
+
 training_data_in_flat = training_data[:, index_y, index_x].reshape(-1, len(index_y))
 training_data_out = training_data[:, 8, 8].reshape(-1, 1)
-test_data_in_square   = test_data[:, index_y, index_x].reshape((-1, 3, 3))
-test_data_in_flat     = test_data_in_square.reshape(-1, len(index_y))
+#test_data_in_square   = test_data[:, index_y, index_x].reshape((-1, 3, 3))
+test_data_in_flat     = test_data[:, index_y, index_x].reshape(-1, len(index_y))
 
 test_data_out   = test_data[:, 8, 8].reshape(-1, 1)
-test_data_out_square   = test_data_out.reshape((-1, 1, 1))
+#test_data_out_square   = test_data_out.reshape((-1, 1, 1))
 
 generate_new = True
 
@@ -78,11 +81,11 @@ generate_new = True
 from GridSearch import GridSearch
 cv = GridSearch(
     param_grid={
-        "n_reservoir": [500, 800, 1000], "spectral_radius": [0.3, 0.6, .8, .9, .95, 1.1], "leak_rate": [.2, .6, .8, .9, .95],
+        "n_reservoir": [200, 300, 500, 800], "spectral_radius": [0.3, 0.6, .8, .9, .95, 1.1], "leak_rate": [.2, .6, .8, .9, .95],
         "random_seed": [40,41,42,43,44], "sparseness": [.05, .1, .2], "weight_generation": ["naive"],
-        "solver": ["pinv"] #, "regression_parameters": [[3e-4],[3e-6],[3e-7]]
+        "solver": ["lsqr"], "regression_parameters": [[3e-3], [3e-4], [3e-5], [3e-6]]
     },
-        fixed_params={"n_output": 1, "n_input": len(index_y), "noise_level": 0.001
+        fixed_params={"n_output": 1, "n_input": len(index_y), "noise_level": 0.001#, "input_scaling":[0.1, 0.1, 0.1, 0.1, 1.0, 0.1, 0.1, 0.1, 0.1]
     },
     esnType=ESN)
 print("start fitting...")
@@ -93,40 +96,31 @@ def cutval(val):
 
     return val
 
-results = cv.fit(training_data_in_flat[:-T], training_data_out[T:], [(test_data_in_flat[:-T], test_data_out[T:])], cutval, printfreq=10)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+results = cv.fit(training_data_in_flat[:-T], training_data_out[T:], [(test_data_in_flat[:-T], test_data_out[T:])], cutval, printfreq=100)
+print(results)
+print("-.-")
+print(cv._best_params)
+print(cv._best_mse)
 
 exit()
 
+
+
+
+#T=50: (0.033947233385081932, 0.071219920423523347, {'sparseness': 0.05, 'solver': 'lsqr', 'spectral_radius': 0.3, 'random_seed': 42, 'regression_parameters': [0.0003], 'n_reservoir': 500, 'leak_rate': 0.2, 'weight_generation': 'naive'})
+#T=10: (0.00078495804606547662, {'leak_rate': 0.9, 'n_reservoir': 500, 'spectral_radius': 0.95, 'solver': 'pinv', 'weight_generation': 'naive', 'random_seed': 44, 'sparseness': 0.05})
+#T=100:  (0.050939652813549598, 0.13093701743229968, {'regression_parameters': [0.003], 'sparseness': 0.05, 'spectral_radius': 0.3, 'n_reservoir': 500, 'leak_rate': 0.2, 'solver': 'lsqr', 'weight_generation': 'naive', 'random_seed': 41})
+
 print("setting up...")
 if (generate_new):
-    esn = ESN(n_input = len(index_y), n_output = 1, n_reservoir = 1000,
-            weight_generation = "naive", leak_rate = 0.98, spectral_radius = 0.65,
-            random_seed=42, noise_level=0.001, sparseness=.1, regression_parameters=[3e-6], solver = "lsqr")
+    esn = ESN(n_input = len(index_y), n_output = 1, n_reservoir = 500,
+            weight_generation = "naive", leak_rate = 0.2, spectral_radius = 0.3,
+            random_seed=41, noise_level=0.0001, sparseness=.05, regression_parameters=[0.003], solver = "lsqr")
             #out_activation = lambda x: 0.5*(1+np.tanh(x/2)), out_inverse_activation = lambda x:2*np.arctanh(2*x-1))
 
     print("fitting...")
 
-    train_error = esn.fit(training_data_in_flat[:-T], training_data_out[T:], transient_quota=0.15)
+    train_error = esn.fit(training_data_in_flat[:-T], training_data_out[T:])
     esn.save("esn" + str(len(index_y)) + ".dat")
     print("train error: {0}".format(train_error))
 
