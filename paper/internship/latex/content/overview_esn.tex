@@ -1,5 +1,5 @@
 \subsection{Überblick}
-Um die (Leistungs)Probleme der \textsc{RNN} zu umgehen wurden als mögliche Lösung die \textsc{Echo State Networks} von H. Jäger vorgeschlagen \cite{jaeger2010}. Etwa zeitgleich wurde von W. Maas das Modell der \textit{Liquid State Machines} vorgeschlagen. In diesem Modell steht der biologische Hintergrund im Fokus, doch sind die Ergebnisse denen der \textsc{Echo State Networks} sehr ähnlich \citep{maas}. 
+Um die (Leistungs)Probleme der \textsc{RNN} zu umgehen wurden als mögliche Lösung die \textsc{Echo State Networks} von H. Jäger vorgeschlagen \cite{jaeger2010}. Etwa zeitgleich wurde von W. Maas das Modell der \textit{Liquid State Machines} vorgeschlagen. In diesem Modell steht der biologische Hintergrund im Fokus, doch sind die Ergebnisse denen der \textsc{Echo State Networks} sehr ähnlich \citep{Maass2011}. 
 
 \subsection{Aufbau}
 Ein \textsc{ESN} ist eine Spezialform eines \textsc{RNN}s. Hierbei wird eine auf dem ersten Blick eigenartige Entscheidung getroffen: Während des gesamten Trainingsvorganges werden die Verbindungen der einzelnen Einheiten größtenteils nicht verändert. Es wird versucht durch das \textit{Echo} der vorherigen Signale, welche noch im Netzwerk gespeichert sind, diese Signale zu rekonstruieren - hier raus ergibt sich auch der Name. Im Folgenden wird der Aufbau und anschließend die Funktionsweise eines solchen Netzwerkes beschrieben \cite{lukoseviciusa2009}.\\
@@ -47,12 +47,14 @@ Nun wird eine Lösung der Gleichung
 für $\mathbf{W}_{out}$ gesucht. Hierfür stehen mehrere Verfahren zur Verfügung, von denen zwei prominente erwähnt sein sollen.
 Zum einen kann die Lösung durch eine \textit{Tikhonov Regularisierung} mittels der Regularisierung $\beta \cdot ||{\vec{W}_i}||^2$ mit der Konstante $\beta$ erhalten werden. Hierbei steht $\vec{W}_i$ für die jeweils $i$-te Zeile der Gewichtsmatrix. Das Verfahren
 \begin{align}
+\label{eq:tikhonov}
 \mathbf{W}_{out} = \mathbf{Y} \mathbf{X}^T \left(\mathbf{X} \mathbf{X}^T + \beta I \right)^{-1}
 \end{align}
 ist sehr leistungsstark, aber auch teilweise numerisch instabil. Es kann allerdings bei geeigneter Wahl von $\beta$ die besten Ergebnisse erzielen \cite{lukoseviciusa2009}.\\
 
 Zum anderen kann zur Lösung die \textit{Moore-Penrose-Pseudoinverse} $\mathbf{X}'$ genutzt werden, sodass für die Ausgabematrix
 \begin{align}
+\label{eq:pseudo_inverse}
 \mathbf{W}_{out} = \mathbf{Y} \mathbf{X}'
 \end{align}
 folgt. Dieses Verfahren ist zwar sehr rechenaufwendig aber dafür numerisch stabil \cite{lukoseviciusa2009, jaeger2012}. Nichts desto trotz, kann allerdings auf Grund des Fehlens einer Regularisierung leicht der Effekt des \textsc{Overfittings} auftreten. Dieser kann umgangen werden, indem in der Zustandsgleichung \ref{eq:esn_stateeq}/\ref{eq:esn_stateeq_feedback} eine leichte normalverteilte Störung $\vec{\nu}(n)$ der Größenordnung $\num{1e-1}$ bis $\num{1e-5}$ addiert wird. Dieser Ansatz beruht auf Empirie, da eine mathematische Begründung hierfür noch nicht vollständig gelungen ist \citep{jaeger2010, lukoseviciusa2009}.\\

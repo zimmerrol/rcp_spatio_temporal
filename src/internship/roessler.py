@@ -101,13 +101,14 @@ if mode == "pred50":
     import matplotlib
     plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern'], 'size': 13})
     plt.rc('text', usetex=True)
+    plt.rc('text.latex', preamble="\\usepackage{mathtools}")
 
     plt.figure(figsize=(8,5))
     plt.plot( data[trainLength+predDist:trainLength+testLength+predDist, 0], 'r', linestyle=":" )
     plt.plot(Y[:, 0], 'b' , linestyle="--")
     #plt.title('Target and generated signals $y(n)$ starting at $n=0$')
     plt.ylim([-17,23])
-    plt.legend(['Signal $y(n)$', 'Vorhergesagtes Signal $y(n+48)$'], loc="upper center", fancybox=True, shadow=True, ncol=2)
+    plt.legend(['Signal $x(n+48)$', 'Vorhersage $x\'(n) \\approx x(n+48)$'], loc="upper center", fancybox=True, shadow=True, ncol=2)
     plt.xlabel("Zeitschritt n")
     plt.ylabel("Signal")
 
