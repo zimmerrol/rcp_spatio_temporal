@@ -17,6 +17,8 @@
 %% deutsche Arbeit:
 \documentclass[review,       %% Typ der Arbeit: bachelor oder master
                twoside,        %% zweiseitiges Layout
+               headinclude,
+               footinclude,
                BCOR16mm,       %% Bindekorrektur 10 mm
 %               liststotoc,nomtotoc,bibtotoc, %% Aufnahme der div. Verzeichnisse
                                               %% ins Inhaltsverzeichnis
@@ -51,7 +53,7 @@
 %\usepackage[sort&compress,square,comma,authoryear, numbers]{natbib}
 
 %to get the bar in the top of each page with the chapter's name
-\usepackage[komastyle]{scrpage2}
+\usepackage[komastyle,automark]{scrpage2}
 \pagestyle{scrheadings}
 \setheadsepline{0.5pt}[\color{black}]
 
@@ -94,7 +96,11 @@
 
 %reduce the margin after a caption
 \setlength{\belowcaptionskip}{-5pt}
-%\usepackage[]{geometry}
+\usepackage[]{geometry}
+\geometry{a4paper, margin=2.5cm, bottom=5cm}
+
+%change header height/top margin
+\addtolength{\topmargin}{+.2in}
 
 %für die caption width
 \usepackage{graphicx,caption}
