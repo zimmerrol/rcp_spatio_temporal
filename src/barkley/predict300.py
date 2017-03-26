@@ -10,25 +10,34 @@ from BarkleySimulation import BarkleySimulation
 from ESN import ESN
 
 def generate_data(N, trans, sample_rate=1):
-    Nx = 30
-    Ny = 30
+    Nx = 150
+    Ny = 150
     deltaT = 1e-2
     epsilon = 0.08
-    h = 1.0#0.2
+    delta_x = 0.1
+    D = 1/50
+    h = D/delta_x**2
+    print(h)
+    #h = D over delta_x
     a = 0.75
-    b = 0.00006
+    b = 0.06
 
     sim = BarkleySimulation(Nx, Ny, deltaT, epsilon, h, a, b)
     sim.initialize_one_spiral()
 
+    import progressbar
+    bar = progressbar.ProgressBar(max_value=trans+N, redirect_stdout=True)
+
     for i in range(trans):
         sim.explicit_step(chaotic=True)
+        bar.update(i)
 
     data = np.empty((N, Nx, Ny))
     for i in range(N):
         for j in range(sample_rate):
             sim.explicit_step(chaotic=True)
         data[i] = sim._u
+        bar.update(i+trans)
 
     return data
 
@@ -44,13 +53,16 @@ def create_square(range_x, range_y):
 
 
 print("generating data...")
-#data = generate_data(20000, 50000, 5)
-#np.save("20000.dat", data)
-data = np.load("20000.dat.npy")
+#data = generate_data(10000, 50000, 5)
+#np.save("10000_150.dat", data)
+#print("done")
+#exit()
+
+data = np.load("10000_150.dat.npy")
 
 
 
-data = data[2000:]
+#data = data[2000:]
 
 T = 100
 training_data = data[:4000]
@@ -63,13 +75,10 @@ index_y, index_x =  create_square((7,9),(7,9))
 index_y = [8]
 index_x = [8]
 
-training_data_in_flat = training_data[:, index_y, index_x].reshape(-1, len(index_y))
-training_data_out = training_data[:, 8, 8].reshape(-1, 1)
-#test_data_in_square   = test_data[:, index_y, index_x].reshape((-1, 3, 3))
-test_data_in_flat     = test_data[:, index_y, index_x].reshape(-1, len(index_y))
+data = data[:,8,8].reshape((-1,1))
 
-test_data_out   = test_data[:, 8, 8].reshape(-1, 1)
-#test_data_out_square   = test_data_out.reshape((-1, 1, 1))
+trainLength = 4000
+testLength = 3000
 
 generate_new = True
 
@@ -113,14 +122,24 @@ exit()
 #T=100, solo:  (0.032009262884647588, 0.11699984785782426, {'random_seed': 42, 'sparseness': 0.1, 'n_reservoir': 800, 'solver': 'lsqr', 'weight_generation': 'naive', 'regression_parameters': [0.0003], 'spectral_radius': 1.1, 'leak_rate': 0.6})
 print("setting up...")
 if (generate_new):
-    esn = ESN(n_input = len(index_y), n_output = 1, n_reservoir = 400,
+    esn = ESN(n_input = 1, n_output = 1, n_reservoir = 1500,
             weight_generation = "advanced", leak_rate = 0.7, spectral_radius = 0.7,
-            random_seed=42, noise_level=0.0001, sparseness=.1, solver = "lsqr", regression_parameters=[3e-3])
+            random_seed=43, noise_level=0.0001, sparseness=.1, solver = "lsqr", regression_parameters=[3e-3])
             #out_activation = lambda x: 0.5*(1+np.tanh(x/2)), out_inverse_activation = lambda x:2*np.arctanh(2*x-1))
 
-    print("fitting...")
+    """
+        T=10:
+            weight_generation = "naive", leak_rate = 0.9, spectral_radius = 1.18,
+            random_seed=42, noise_level=0.0001, sparseness=.1, solver = "lsqr", regression_parameters=[1e-8])
 
-    train_error = esn.fit(training_data_in_flat[:-T], training_data_out[T:])
+        T=20:
+            weight_generation = "naive", leak_rate = 0.75, spectral_radius = 0.80,
+            random_seed=42, noise_level=0.0001, sparseness=.1, solver = "lsqr", regression_parameters=[1e-8])
+    """
+
+    T=100
+    print("fitting...")
+    train_error = esn.fit(data[:trainLength], data[T:trainLength+T], transient_quota=0.2)
     esn.save("esn" + str(len(index_y)) + ".dat")
     print("train error: {0}".format(train_error))
 
@@ -128,16 +147,15 @@ else:
     esn = ESN.load("esn" + str(len(index_y)) + ".dat")
 
 print("predicting...")
-pred = esn.predict(test_data_in_flat[:-T])
+pred = esn.predict(data[trainLength:testLength+trainLength])
 #pred[pred > 1] = 1
 #pred[pred < 0] = 0
 
-plt.plot(np.vstack((training_data_out, test_data_out[T:])), "b", linestyle="-")
-plt.plot(np.vstack((training_data_out, pred)), "r", linestyle="--")
-plt.plot(training_data_out, "b", linestyle="-")
+plt.plot(data[:trainLength+testLength+T], "b", linestyle="-")
+plt.plot(np.arange(trainLength+T, trainLength+testLength+T), pred, "r", linestyle="--")
+plt.ylim([-0.2,1.2])
 
-
-diff = pred - test_data_out[T:]
+diff = pred - data[trainLength+T:trainLength+testLength+T]
 mse = np.mean((diff)**2)
 print("test error: {0}".format(mse))
 

@@ -7,13 +7,17 @@ from matplotlib.widgets import Slider
 
 def demo_chaotic():
     #for chaotic u^3 simulation
-    Nx = 30
-    Ny = 30
+    Nx = 150
+    Ny = 150
     deltaT = 1e-2
     epsilon = 0.08
-    h = 1.0#0.2
+    delta_x = 0.1
+    D = 1/50
+    h = D/delta_x**2#1.0#0.2
+    print(h)
+    #h = D over delta_x
     a = 0.75
-    b = 0.00006
+    b = 0.06
 
     return BarkleySimulation(Nx, Ny, deltaT, epsilon, h, a, b)
 
@@ -32,12 +36,14 @@ def demo_oscillating():
 sim = demo_chaotic()
 sim.initialize_two_spirals()
 
-
+frame = 0
 def update_new(data):
-    global sim
+    global sim, frame
     for j in range(int(sskiprate.val)):
         sim.explicit_step(chaotic=True)
+        frame += 1
     mat.set_data(sim._u)
+    plt.title(frame, x = -0.15, y=-2)
     return [mat]
 
 fig, ax = plt.subplots()

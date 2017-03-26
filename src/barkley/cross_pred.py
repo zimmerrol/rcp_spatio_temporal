@@ -33,11 +33,11 @@ def generate_data(N, trans, sample_rate=1):
     return data
 
 def create_patch_indices(outer_range_x, outer_range_y, inner_range_x, inner_range_y):
-    outer_ind_x = np.tile(range(outer_range_x[0], outer_range_x[1]+1), outer_range_y[1]-outer_range_y[0])
-    outer_ind_y = np.repeat(range(outer_range_y[0], outer_range_y[1]+1), outer_range_x[1]-outer_range_x[0])
+    outer_ind_x = np.tile(range(outer_range_x[0], outer_range_x[1]), outer_range_y[1]-outer_range_y[0])
+    outer_ind_y = np.repeat(range(outer_range_y[0], outer_range_y[1]), outer_range_x[1]-outer_range_x[0])
 
-    inner_ind_x = np.tile(range(inner_range_x[0], inner_range_x[1]+1), inner_range_y[1] - inner_range_y[0])
-    inner_ind_y = np.repeat(range(inner_range_y[0], inner_range_y[1]+1), inner_range_x[1] - inner_range_x[0])
+    inner_ind_x = np.tile(range(inner_range_x[0], inner_range_x[1]), inner_range_y[1] - inner_range_y[0])
+    inner_ind_y = np.repeat(range(inner_range_y[0], inner_range_y[1]), inner_range_x[1] - inner_range_x[0])
 
     outer_list = [c for c in zip(outer_ind_y, outer_ind_x)]
     inner_list = [c for c in zip(inner_ind_y, inner_ind_x)]
@@ -74,8 +74,8 @@ data = np.load("10000.dat.npy")
 training_data = data[:4000]
 test_data = data[4000:]
 
-input_y, input_x, output_y, output_x = create_patch_indices((12,17), (12,17), (13,16), (13,16)) # -> yields MSE=0.0115 with leak_rate = 0.8
-#input_y, input_x, output_y, output_x = create_patch_indices((4,23), (4,23), (7,20), (7,20)) # -> yields MSE=0.0873 with leak_rate = 0.3
+#input_y, input_x, output_y, output_x = create_patch_indices((12,17), (12,17), (13,16), (13,16)) # -> yields MSE=0.0115 with leak_rate = 0.8
+input_y, input_x, output_y, output_x = create_patch_indices((4,23), (4,23), (7,20), (7,20)) # -> yields MSE=0.0873 with leak_rate = 0.3
 
 training_data_in =  training_data[:, input_y, input_x].reshape(-1, len(input_y))
 training_data_out =  training_data[:, output_y, output_x].reshape(-1, len(output_y))
@@ -88,10 +88,10 @@ generate_new = True
 
 print("setting up...")
 if (generate_new):
-    esn = ESN(n_input = len(input_y), n_output = len(output_y), n_reservoir = 1700,
+    esn = ESN(n_input = len(input_y), n_output = len(output_y), n_reservoir = 1700, #used to be 1700
             weight_generation = "advanced", leak_rate = 0.8, spectral_radius = 0.8,
-            random_seed=42, noise_level=0.0001, sparseness=.1, regression_parameters=[6e-1], solver = "lsqr",
-            out_activation = lambda x: 0.5*(1+np.tanh(x/2)), out_inverse_activation = lambda x:2*np.arctanh(2*x-1))
+            random_seed=42, noise_level=0.0001, sparseness=.1, regression_parameters=[6e-1], solver = "lsqr")#,
+            #out_activation = lambda x: 0.5*(1+np.tanh(x/2)), out_inverse_activation = lambda x:2*np.arctanh(2*x-1))
 
     print("fitting...")
 
@@ -104,6 +104,8 @@ else:
 
 print("predicting...")
 pred = esn.predict(test_data_in)
+pred[pred>1.0] = 1.0
+pred[pred<0.0] = 0.0
 
 merged_prediction = test_data.copy()
 merged_prediction[:, output_y, output_x] = pred
