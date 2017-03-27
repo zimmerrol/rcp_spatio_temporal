@@ -13,14 +13,14 @@ Eine erste Anwendung um die Möglichkeiten eines \textsc{ESN} zu demonstrieren b
 \end{split}
 \end{align}
 Dieses System zeigt ein chaotisches Verhalten und stellt somit eine herausfordernde Aufgabe für die zeitliche Vorhersage dar.\\
-Hierbei werden zwei verschiedene Aufgaben betrachtet:\textit{(a)} die Vorhersage von $x(n+50) := x'(n)$ durch die Kenntnis von $x(n)$ und \textit{(b)} die Kreuz-Vorhersage $y(n)$ durch $x(n)$. Für beide Aufgaben wurde das System für jeweils $6000$ Schritte mit einer Abtastrate $\Delta t = 0.1$ in Analogie zu \cite{parlitz2005} simuliert, wobei die Hälfte der Daten für das Training und der Rest für die Testergebnisse verwendet worden ist.
+Hierbei werden zwei verschiedene Aufgaben betrachtet:\textit{(a)} die Vorhersage von $x'(t) \approx x(t+5)$ durch die Kenntnis von $x(t)$ und \textit{(b)} die Kreuz-Vorhersage $y(t)$ durch $x(t)$. Für beide Aufgaben wurde das System für jeweils $6000$ Schritte mit einer Abtastrate $\Delta t = 0.1$ in Analogie zu \cite{parlitz2005} simuliert, wobei die Hälfte der Daten für das Training und der Rest für die Testergebnisse verwendet worden ist.
 
-\subsubsection[Vorhersage $x(n) \rightarrow x(n+50)$]{Vorhersage $\pmb{x(n) \rightarrow x(n+50)}$}
+\subsubsection[Vorhersage $x(t) \rightarrow x(t+5)$]{Vorhersage $\pmb{x(t) \rightarrow x(t+5)}$}
 Für diese erste Aufgabe ist durch eine \textsc{GridSearch} ein geeignetes System gefunden werden, dessen Parameter in der Tabelle \ref{tab:application_roessler} dargestellt sind. Hierfür wurde ein größerer Bereich des Hyperparameterraumes systematisch abgetastet und die jeweilige Leistung des sich ergebenen \textsc{ESN}s ermittelt, um anschließend die bestmöglichen Parameter zu wählen. Als Maß für diese Optimierung wurde der \textit{Mean Square Error (MSE)}
 \begin{align}
-MSE = \sum_n \left(x(n+50) - x'(n) \right)^2
+MSE = \sum_n \left(x(t+5) - x'(t) \right)^2
 \end{align}
-zwischen der Vorhersage $x'(n)$ und dem tatsächlichem Wert $x(n+48)$ benutzt.
+zwischen der Vorhersage $x'(t)$ und dem tatsächlichem Wert $x(t+5)$ benutzt.
 
 \begin{table}[H]
 	\centering
@@ -49,7 +49,7 @@ Hierbei wurde der Trainingsvorgang mittels der \textit{Tikhonov Regularisierung}
 \begin{figure}[H]
     \centering
     \includegraphics[width = 0.9 \textwidth]{figures/roessler_pred50.pdf}
-    \caption{Darstellung des Signals $x(n+50)$ und der Vorhersage $x'(n) \approx x(n+50)$.}
+    \caption{Darstellung des Signals $x(t+5.0)$ und der Vorhersage $x'(t) \approx x(t+5.0)$.}
     \label{fig:application_roessler_a}
 \end{figure}
 
@@ -59,13 +59,13 @@ Hierbei wurde der Trainingsvorgang mittels der \textit{Tikhonov Regularisierung}
 Auch hierfür konnte sehr schnell durch eine \textsc{GridSearch} ein geeignetes System gefunden werden. Als Maß wurde ebenfalls der \textit{MSE} benutzt. Die gefundenen Parameter sind ebenso in der Tabelle \ref{tab:application_roessler} dargestellt.\\
 Für das Auslesen wurde eine Linearkombination genutzt, wobei die Lösung $\mathbf{W}_{out}$ mittels der Pseudoinversen nach Gleichung \ref{eq:pseudo_inverse} bestimmt worden ist.\\
 
-Hierbei wurde für den Trainingsvorgang ein Fehler $MSE_{train} = 0.0025$ und für den Testvorgang von $MSE_{test} = 0.0001$ bestimmt. Die Darstellung der Vorhersage $v(n)$ und des ermittelten Fehlers sind in den Abbildungen \ref{fig:application_roessler_b1}/\ref{fig:application_roessler_b2} zu finden.
+Hierbei wurde für den Trainingsvorgang ein Fehler $MSE_{train} = 0.0025$ und für den Testvorgang von $MSE_{test} = 0.0001$ bestimmt. Die Darstellung der Vorhersage $y'(t)$ und des ermittelten Fehlers sind in den Abbildungen \ref{fig:application_roessler_b1} und \ref{fig:application_roessler_b2} zu finden.
 
 \begin{figure}[H]
     \centering
      %\includegraphics[width = 0.9 \textwidth]{figures/roessler_cross_pred.pdf}
      \includegraphics[width = 0.9 \textwidth]{figures/roessler_cross_err.pdf}
-    \caption{Darstellung des Fehlers $y(n)-v(n)$ zwischen dem Signal $y(n)$ und der Vorhersage $v(n)$.}
+    \caption{Darstellung des Fehlers $y(t)-y'(t)$ zwischen dem Signal $y(t)$ und der Vorhersage $y'(t)$.}
     \label{fig:application_roessler_b1}
 \end{figure}
  Im Vergleich zu anderen Publikationen \cite{parlitz2005} ergibt sich ein ähnlicher Fehler. Leider können hierbei nur die Graphen verglichen werden, da keine expliziten Fehler angegeben sind.
@@ -74,22 +74,23 @@ Hierbei wurde für den Trainingsvorgang ein Fehler $MSE_{train} = 0.0025$ und f�
 \begin{figure}[H]
     \centering
      \includegraphics[width = 0.9 \textwidth]{figures/roessler_cross_pred.pdf}
-      \caption{Darstellung des Signals $y(n)$ und der Vorhersage $v(n)$.}
+      \caption{Darstellung des Signals $y(t)$ und der Vorhersage $y'(t)$.}
     \label{fig:application_roessler_b2}
 \end{figure}
 
 \clearpage
 
 \subsection{Vorhersage eines Mackey-Glass-Systems}
+\label{sec:mackey_glass}
 Als nächste Anwendung wird ein \textit{Mackey-Glass-System}
 \begin{align}
-\label{eq:application_roessler_pde}
+\label{eq:application_mackey_glass_pde}
 \begin{split}
 \dot{x}(t) &= \beta \frac{x(t-\tau)}{1+x(t-\tau)^n}-\gamma x(t)\\
 \end{split}
 \end{align}
-betrachtet, wobei $\tau = 17, n=10, \beta = 0.2$ gewählt wurden. Dies ist eine beliebte Aufgabe im Bereich der Vorhersagen chaotischer Zeitreihen.\\
-Für dieses System wurde in Analogie zu  \citep{caraballo2014} die Vorhersage $x(n) \rightarrow x(n+84)$ betrachtet, wobei die Parameter aus Tabelle \ref{tab:application_mackeyglass} genutzt wurden. Hierfür wurden mittels der expliziten \textit{Euler-Diskretisierung} 
+betrachtet, wobei $\tau = 17, n=10, \gamma=0.1, \beta = 0.2$ gewählt wurden. Dies ist eine beliebte Aufgabe im Bereich der Vorhersagen chaotischer Zeitreihen.\\
+Für dieses System wurde in Analogie zu  \citep{caraballo2014} die Vorhersage $x(t) \rightarrow x(t+84)$ betrachtet, wobei die Parameter aus Tabelle \ref{tab:application_mackeyglass} genutzt wurden. Hierfür wurden mittels der expliziten \textit{Euler-Diskretisierung} 
 
 \begin{align}
 x(t+1) = x(t) + \Delta_t \cdot \left(\beta \frac{x(t-\tau)}{1+x(t-\tau)^n}-\gamma x(t)  \right)
