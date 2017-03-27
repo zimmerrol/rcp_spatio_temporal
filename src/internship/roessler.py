@@ -78,9 +78,9 @@ if mode == "gen":
     plt.show()
 
 if mode == "pred50":
-    predDist = 48
+    predDist = 50
     print("set up")
-    esn = ESN(n_reservoir=300, n_input=3, n_output=3, leak_rate=0.2, spectral_radius=0.70, random_seed=44, weight_generation='advanced')#0.4
+    esn = ESN(n_reservoir=300, n_input=3, n_output=3, leak_rate=0.25, spectral_radius=0.80, random_seed=44, weight_generation='advanced', solver="lsqr", regression_parameters=[1e-6])#0.4
     print("fitting...")
     trainError = esn.fit(inputData=data[:trainLength,:], outputData=data[predDist:trainLength+predDist,:])
     print("train error: {0:4f}".format(trainError))
@@ -108,7 +108,7 @@ if mode == "pred50":
     plt.plot(Y[:, 0], 'b' , linestyle="--")
     #plt.title('Target and generated signals $y(n)$ starting at $n=0$')
     plt.ylim([-17,23])
-    plt.legend(['Signal $x(n+48)$', 'Vorhersage $x\'(n) \\approx x(n+48)$'], loc="upper center", fancybox=True, shadow=True, ncol=2)
+    plt.legend(['Signal $x(n+50)$', 'Vorhersage $x\'(n) \\approx x(n+50)$'], loc="upper center", fancybox=True, shadow=True, ncol=2)
     plt.xlabel("Zeitschritt n")
     plt.ylabel("Signal")
 

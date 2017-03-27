@@ -78,12 +78,13 @@ def pred(predictionHorizon):
     import matplotlib
     plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern'], 'size': 13})
     plt.rc('text', usetex=True)
+    plt.rc('text.latex', preamble="\\usepackage{mathtools}")
 
     plt.figure(figsize=(8,5))
     plt.plot(y_test[predictionHorizon:], 'r', linestyle=":" )
     plt.plot(y_test_pred, 'b' , linestyle="--")
     plt.ylim([0.3, 1.6])
-    plt.legend(['Signal $x(t)$', 'Vorhergesagtes Signal $x(t+{0})$'.format(predictionHorizon)],
+    plt.legend(['Signal $x(t)$', 'Vorhersage $x\'(t) \\approx x(t+{0})$'.format(predictionHorizon)],
           fancybox=True, shadow=True, ncol=2, loc="upper center")
     plt.xlabel("Zeit t")
     plt.ylabel("Signal")

@@ -15,10 +15,10 @@ Eine erste Anwendung um die Möglichkeiten eines \textsc{ESN} zu demonstrieren b
 Dieses System zeigt ein chaotisches Verhalten und stellt somit eine herausfordernde Aufgabe für die zeitliche Vorhersage dar.\\
 Hierbei werden zwei verschiedene Aufgaben betrachtet:\textit{(a)} die Vorhersage von $x(n+50) := x'(n)$ durch die Kenntnis von $x(n)$ und \textit{(b)} die Kreuz-Vorhersage $y(n)$ durch $x(n)$. Für beide Aufgaben wurde das System für jeweils $6000$ Schritte mit einer Abtastrate $\Delta t = 0.1$ in Analogie zu \cite{parlitz2005} simuliert, wobei die Hälfte der Daten für das Training und der Rest für die Testergebnisse verwendet worden ist.
 
-\subsubsection[Vorhersage $x(n) \rightarrow x(n+48)$]{Vorhersage $\pmb{x(n) \rightarrow x(n+48)}$}
+\subsubsection[Vorhersage $x(n) \rightarrow x(n+50)$]{Vorhersage $\pmb{x(n) \rightarrow x(n+50)}$}
 Für diese erste Aufgabe ist durch eine \textsc{GridSearch} ein geeignetes System gefunden werden, dessen Parameter in der Tabelle \ref{tab:application_roessler} dargestellt sind. Hierfür wurde ein größerer Bereich des Hyperparameterraumes systematisch abgetastet und die jeweilige Leistung des sich ergebenen \textsc{ESN}s ermittelt, um anschließend die bestmöglichen Parameter zu wählen. Als Maß für diese Optimierung wurde der \textit{Mean Square Error (MSE)}
 \begin{align}
-MSE = \sum_n \left(x(n+48) - x'(n) \right)^2
+MSE = \sum_n \left(x(n+50) - x'(n) \right)^2
 \end{align}
 zwischen der Vorhersage $x'(n)$ und dem tatsächlichem Wert $x(n+48)$ benutzt.
 
@@ -30,24 +30,26 @@ zwischen der Vorhersage $x'(n)$ und dem tatsächlichem Wert $x(n+48)$ benutzt.
 		\hline \hline 
 		\rule[-1ex]{0pt}{3.5ex} $N$ & $300$ & $500$ \\ 
 		\hline 
-		\rule[-1ex]{0pt}{3.5ex} $\alpha$ & $0.10$ & $0.20$ \\ 
+		\rule[-1ex]{0pt}{3.5ex} $\alpha$ & $0.25$ & $0.20$ \\ 
 		\hline 
-		\rule[-1ex]{0pt}{3.5ex} $\rho(|\mathbf{W}|)$ & $0.035$ & $0.7$\\ 
+		\rule[-1ex]{0pt}{3.5ex} $\rho(|\mathbf{W}|)$ & $0.80$ & $0.70$\\ 
 		\hline 
 		\rule[-1ex]{0pt}{3.5ex} $\nu_{max}$ & $0.01$ & $0.01$\\ 
+		\hline 
+		\rule[-1ex]{0pt}{3.5ex} $\beta$ & $\num{1e-6}$ & $-$\\ 
 		\hline 
 	\end{tabular} 
 	\caption{Auflistung der Parameter für das jeweilige \textsc{ESN} für (a) und (b).}
 	\label{tab:application_roessler}
 \end{table}
 
-Hierbei wurde der Trainingsvorgang mittels der \textit{Tikhonov Regularisierung} nach Gleichung \ref{eq:tikhonov} durchgeführt. Im Training konnte ein Fehler von $MSE = 0.625$ erreicht werden, wobei sich im Testvorgang der Fehler zu $MSE = 0.270$ ergeben hat. Ein graphischer Vergleich zwischen der dem Signal $y(t)$ und der Vorhersage $v(n)$ ist in Abbildung \ref{fig:application_roessler_a} zu finden.
+Hierbei wurde der Trainingsvorgang mittels der \textit{Tikhonov Regularisierung} nach Gleichung \ref{eq:tikhonov} durchgeführt. Im Training konnte ein Fehler von $MSE = 0.555 	$ erreicht werden, wobei sich im Testvorgang der Fehler zu $MSE = 0.237$ ergeben hat. Ein graphischer Vergleich zwischen dem Signal $y(t)$ und der Vorhersage $v(n)$ ist in Abbildung \ref{fig:application_roessler_a} zu finden.
 
-\vspace{-4ex}
+\vspace{-3.75ex}
 \begin{figure}[H]
     \centering
     \includegraphics[width = 0.9 \textwidth]{figures/roessler_pred50.pdf}
-    \caption{Darstellung des Signals $x(n+48)$ und der Vorhersage $x'(n) \approx x(n+48)$.}
+    \caption{Darstellung des Signals $x(n+50)$ und der Vorhersage $x'(n) \approx x(n+50)$.}
     \label{fig:application_roessler_a}
 \end{figure}
 
@@ -55,7 +57,8 @@ Hierbei wurde der Trainingsvorgang mittels der \textit{Tikhonov Regularisierung}
 
 \subsubsection[Kreuz-Vorhersage $x(n) \rightarrow y(n)$]{Kreuz-Vorhersage $\pmb{x(n) \rightarrow y(n)}$}
 Auch hierfür konnte sehr schnell durch eine \textsc{GridSearch} ein geeignetes System gefunden werden. Als Maß wurde ebenfalls der \textit{MSE} benutzt. Die gefundenen Parameter sind ebenso in der Tabelle \ref{tab:application_roessler} dargestellt.\\
-Für das Auslesen wurde eine Linearkombination genutzt, wobei die Lösung $\mathbf{W}_{out}$ mittels der Pseudoinversen nach Gleichung \ref{eq:pseudo_inverse} bestimmt worden ist.
+Für das Auslesen wurde eine Linearkombination genutzt, wobei die Lösung $\mathbf{W}_{out}$ mittels der Pseudoinversen nach Gleichung \ref{eq:pseudo_inverse} bestimmt worden ist.\\
+
 Hierbei wurde für den Trainingsvorgang ein Fehler $MSE_{train} = 0.0025$ und für den Testvorgang von $MSE_{test} = 0.0001$ bestimmt. Die Darstellung der Vorhersage $v(n)$ und des ermittelten Fehlers sind in den Abbildungen \ref{fig:application_roessler_b1}/\ref{fig:application_roessler_b2} zu finden.
 
 \begin{figure}[H]
