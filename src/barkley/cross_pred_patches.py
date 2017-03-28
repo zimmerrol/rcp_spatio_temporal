@@ -166,7 +166,7 @@ last_state = [None]*(((N//sigma+1)//2)*((N//sigma+1)//2))
 
 print(len(output_weights))
 
-generate_new = True
+generate_new = False
 
 if (generate_new == False):
     import dill as pickle
