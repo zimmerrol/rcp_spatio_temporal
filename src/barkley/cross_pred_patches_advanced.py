@@ -44,6 +44,7 @@ def generate_data(N, trans, sample_rate=1, Ngrid=100):
         data[i] = sim._u
         bar.update(i+trans)
 
+    bar.finish()
     return data
 
 def create_indices(N, sigma):
@@ -105,7 +106,7 @@ def train_test_esn(input_idx, output_idx, training_data, test_data, merged_predi
     return esn
 
 
-N = 161
+N = 165
 sigma = 1
 clusterSize = 3
 clusterDistance = clusterSize + 1
@@ -151,7 +152,7 @@ if (generate_new == False):
     esn = pickle.load(f)
     f.close()
 
-for nn in [250, 300]:
+for nn in [200]:#[10, 20, 30, 40, 50, 80, 100, 150, 200, 250, 300]:
     esn = None
     bar.update(0)
     for i in range(1, N//sigma-1, clusterDistance):
