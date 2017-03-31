@@ -19,7 +19,7 @@ def generate_data(N, trans, sample_rate=1, Ngrid=100):
     delta_x = 0.1
     D = 1/50
     h = D/delta_x**2
-    print(h)
+    print("h=" + str(h))
     #h = D over delta_x
     a = 0.75
     b = 0.06
@@ -30,7 +30,6 @@ def generate_data(N, trans, sample_rate=1, Ngrid=100):
     sim = BarkleySimulation(Nx, Ny, deltaT, epsilon, h, a, b)
     sim.initialize_one_spiral()
 
-    import progressbar
     bar = progressbar.ProgressBar(max_value=trans+N, redirect_stdout=True)
 
     for i in range(trans):
@@ -70,7 +69,7 @@ def create_indices(N, sigma):
 
     return indices
 
-def train_test_esn(input_idx, output_idx, training_data, test_data, merged_prediction, esn=None, rs=7, lr=0.8, n=200, reg=1e-2):
+def train_test_esn(input_idx, output_idx, training_data, test_data, merged_prediction, esn=None, rs=7, lr=0.8, n=200, reg=1e-2, rho=0.2):
     input_y = input_idx[:,0]
     input_x = input_idx[:,1]
     output_y = output_idx[:,0]
@@ -87,8 +86,8 @@ def train_test_esn(input_idx, output_idx, training_data, test_data, merged_predi
     if (esn is None):
         print("setting up...")
         esn = ESN(n_input = len(input_y), n_output = len(output_y), n_reservoir = n, #was 30, use 1700 for best performance!
-                weight_generation = "advanced", leak_rate = 0.8, spectral_radius = 0.2,
-                random_seed=7, noise_level=0.0001, sparseness=.1, regression_parameters=[1e-2], solver = "lsqr")
+                weight_generation = "advanced", leak_rate = lr, spectral_radius = rho,
+                random_seed=7, noise_level=0.0001, sparseness=.1, regression_parameters=[reg], solver = "lsqr")
 
     train_error = esn.fit(training_data_in, training_data_out,)
     np.random.seed(42)
@@ -106,8 +105,8 @@ def train_test_esn(input_idx, output_idx, training_data, test_data, merged_predi
     return esn
 
 
-N = 165
-sigma = 1
+N = 162
+sigma = 2
 clusterSize = 3
 clusterDistance = clusterSize + 1
 numberOfClusters = (N//sigma-1)//clusterDistance #was sigma+1
@@ -152,7 +151,9 @@ if (generate_new == False):
     esn = pickle.load(f)
     f.close()
 
-for nn in [200]:#[10, 20, 30, 40, 50, 80, 100, 150, 200, 250, 300]:
+for reg in [6e-3]: #[6e-3, 1e-4, 1e-5, 1e-6]:
+#for nn in [10, 20, 30, 40, 50, 80, 100, 150, 200, 250, 300]:
+    nn = 30
     esn = None
     bar.update(0)
     for i in range(1, N//sigma-1, clusterDistance):
@@ -167,7 +168,7 @@ for nn in [200]:#[10, 20, 30, 40, 50, 80, 100, 150, 200, 250, 300]:
             output_idx = indices[i:i+clusterSize,j:j+clusterSize].astype(int).reshape((-1, 2))
 
             if (generate_new):
-                esn = train_test_esn(input_idx, output_idx, training_data, test_data, merged_prediction, esn, n=nn)
+                esn = train_test_esn(input_idx, output_idx, training_data, test_data, merged_prediction, esn, n=nn, reg=reg, lr=0.8)
                 output_weights[(i-1)//clusterDistance*numberOfClusters + (j-1)//clusterDistance] = esn._W_out
                 last_state[(i-1)//clusterDistance*numberOfClusters + (j-1)//clusterDistance] = esn._x
             else:
