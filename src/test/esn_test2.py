@@ -19,12 +19,15 @@ def sineshit():
     x = np.linspace(1,200*np.pi, 20000)
     y = (0*np.log(x)+np.sin(x)*np.cos(x)).reshape(20000,1)*2
 
-    esn = ESN(n_input=1, n_output=1, n_reservoir=200, random_seed=42, noise_level=0.001, leak_rate=0.7, spectral_radius=1.35, sparseness=0.1)
-    train_error = esn.fit(inputData=y[:5000, :], outputData=y[1:5001,:], transient_quota=0.4, regression_parameter=2e-4)
+    esn = ESN(n_input=1, n_output=1, n_reservoir=200, random_seed=42, noise_level=0.001, leak_rate=0.7, spectral_radius=1.35, sparseness=0.1, solver="lsqr", regression_parameters=[2e-4])
+    train_error = esn.fit(inputData=y[:5000, :], outputData=y[1:5001,:], transient_quota=0.4)
     print("train error: {0:4f}".format(train_error))
     print(np.mean(np.abs(esn._W_out)))
 
     Y = esn.generate(n=15000, continuation=True, initial_input=y[5000,:])
+
+    plt.plot(esn._X.T)
+    plt.show()
 
     print(x[5000:].shape)
     print(Y[:, 0].shape)
