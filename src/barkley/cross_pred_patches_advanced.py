@@ -105,8 +105,8 @@ def train_test_esn(input_idx, output_idx, training_data, test_data, merged_predi
     return esn
 
 
-N = 162
-sigma = 2
+N = 161
+sigma = 1
 clusterSize = 3
 clusterDistance = clusterSize + 1
 numberOfClusters = (N//sigma-1)//clusterDistance #was sigma+1
@@ -153,7 +153,7 @@ if (generate_new == False):
 
 for reg in [6e-3]: #[6e-3, 1e-4, 1e-5, 1e-6]:
 #for nn in [10, 20, 30, 40, 50, 80, 100, 150, 200, 250, 300]:
-    nn = 30
+    nn = 300
     esn = None
     bar.update(0)
     for i in range(1, N//sigma-1, clusterDistance):
@@ -168,7 +168,7 @@ for reg in [6e-3]: #[6e-3, 1e-4, 1e-5, 1e-6]:
             output_idx = indices[i:i+clusterSize,j:j+clusterSize].astype(int).reshape((-1, 2))
 
             if (generate_new):
-                esn = train_test_esn(input_idx, output_idx, training_data, test_data, merged_prediction, esn, n=nn, reg=reg, lr=0.8)
+                esn = train_test_esn(input_idx, output_idx, training_data, test_data, merged_prediction, esn, n=nn, reg=reg, lr=0.95)
                 output_weights[(i-1)//clusterDistance*numberOfClusters + (j-1)//clusterDistance] = esn._W_out
                 last_state[(i-1)//clusterDistance*numberOfClusters + (j-1)//clusterDistance] = esn._x
             else:
