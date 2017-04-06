@@ -35,6 +35,7 @@ def demo_oscillating():
 
 sim = demo_chaotic()
 sim.initialize_two_spirals()
+#sim.initialize_random(42)
 
 frame = 0
 def update_new(data):

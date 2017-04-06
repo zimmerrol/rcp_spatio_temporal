@@ -14,6 +14,14 @@ class BarkleySimulation:
 
         self._boundary_mode = boundary_mode
 
+    def initialize_random(self, seed):
+        np.random.seed(seed)
+
+        self._u = np.random.rand(self._Nx, self._Ny)
+        self._v = np.random.rand(self._Nx, self._Ny)
+        self._v[self._v<0.4] = 0.0
+        self._v[self._v>0.4] = 1.0
+
     def initialize_one_spiral(self):
         self._u = np.zeros((self._Nx, self._Ny))
         self._v = np.zeros((self._Nx, self._Ny))
