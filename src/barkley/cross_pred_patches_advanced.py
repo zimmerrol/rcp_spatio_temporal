@@ -154,7 +154,11 @@ if (generate_new == False):
 for reg in [6e-3]: #[6e-3, 1e-4, 1e-5, 1e-6]:
 #for nn in [10, 20, 30, 40, 50, 80, 100, 150, 200, 250, 300]:
     nn = 300
+<<<<<<< HEAD
     #esn = None
+=======
+    esn = None
+>>>>>>> becd9c9319bdf9cd0751946b4cbb5c2e9ad6bd48
     bar.update(0)
     for i in range(1, N//sigma-1, clusterDistance):
         for j in range(1, N//sigma-1, clusterDistance):
