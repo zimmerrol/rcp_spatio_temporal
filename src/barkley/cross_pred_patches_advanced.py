@@ -140,7 +140,7 @@ generate_new = False
 if (os.path.exists("cache/esn/cross_ped_patches{0}_{1}_{2}.dat".format(N, sigma, clusterSize)) == False):
     generate_new = True
 
-generate_new = True
+#generate_new = True
 
 if (generate_new == False):
     print("loading existing model...")
@@ -154,7 +154,7 @@ if (generate_new == False):
 for reg in [6e-3]: #[6e-3, 1e-4, 1e-5, 1e-6]:
 #for nn in [10, 20, 30, 40, 50, 80, 100, 150, 200, 250, 300]:
     nn = 300
-    esn = None
+    #esn = None
     bar.update(0)
     for i in range(1, N//sigma-1, clusterDistance):
         for j in range(1, N//sigma-1, clusterDistance):
