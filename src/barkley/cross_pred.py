@@ -89,10 +89,10 @@ else:
     print("loading finished")
 
 training_data = data[:8000]
-test_data = data[8000:10000]
+test_data = data[8000:8500]
 
 #input_y, input_x, output_y, output_x = create_patch_indices((12,17), (12,17), (13,16), (13,16)) # -> yields MSE=0.0115 with leak_rate = 0.8
-input_y, input_x, output_y, output_x = create_patch_indices((0,159), (0,159), (30, 130), (30, 130)) # -> yields MSE=0.0873 with leak_rate = 0.3
+input_y, input_x, output_y, output_x = create_patch_indices((20,139), (20,139), (30, 130), (30, 130)) # -> yields MSE=0.0873 with leak_rate = 0.3
 
 training_data_in =  training_data[:, input_y, input_x].reshape(-1, len(input_y))
 training_data_out =  training_data[:, output_y, output_x].reshape(-1, len(output_y))
@@ -102,12 +102,13 @@ test_data_out =  test_data[:, output_y, output_x].reshape(-1, len(output_y))
 
 n_units = 4000
 
-generate_new = True
-if (os.path.exists("cache/esn/cross_pred_" + str(len(input_y)) + "_" + str(n_units) + ".dat") == False):
+generate_new = False
+if (os.path.exists("cache/esn/cross_pred_" + str(len(input_y)) + "_" + str(len(output_y)) + "_" + str(n_units) + ".dat") == False):
     generate_new = True
 
-print("setting up...")
+
 if (generate_new):
+    print("setting up...")
     esn = ESN(n_input = len(input_y), n_output = len(output_y), n_reservoir = n_units, #used to be 1700
             weight_generation = "advanced", leak_rate = 0.2, spectral_radius = 0.1,
             random_seed=42, noise_level=0.0001, sparseness=.1, regression_parameters=[5e-0], solver = "lsqr")#,
@@ -122,6 +123,7 @@ if (generate_new):
     esn.save("cache/esn/cross_pred_" + str(len(input_y)) + "_" + str(len(output_y)) + "_" + str(n_units) + ".dat")
 
 else:
+    print("loading model...")
     esn = ESN.load("cache/esn/cross_pred_" + str(len(input_y)) + "_" + str(len(output_y)) + "_" + str(n_units) + ".dat")
 
 print("predicting...")
@@ -168,7 +170,7 @@ clb.set_clim(vmin=0, vmax=1)
 clb.draw_all()
 pause = False
 image_mode = 0
-ani = animation.FuncAnimation(fig, update_new, interval=1, save_count=50)
+
 
 from matplotlib.widgets import Button
 from matplotlib.widgets import Slider
@@ -211,7 +213,8 @@ bswitchsource.on_clicked(callback.switchsource)
 sposition = Slider(axposition, 'n', 0, len(test_data), valinit=0, valfmt='%1.0f')
 sposition.on_changed(callback.position_changed)
 
+ani = animation.FuncAnimation(fig, update_new, interval=1, save_count=50)
+
 plt.show()
-plt.close()
 
 print("done.")

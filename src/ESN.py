@@ -99,7 +99,9 @@ class ESN(BaseESN):
 
         elif (self._solver in ["sklearn_auto", "sklearn_lsqr", "sklearn_sag", "sklearn_svd"]):
             mode = self._solver[8:]
-            self._ridgeSolver = Ridge(**self._regression_parameters, solver=mode)
+            params = self._regression_parameters
+            params["solver"] = mode
+            self._ridgeSolver = Ridge(**params)
 
             self._ridgeSolver.fit(X.T, Y_target.T)
             train_prediction = self.out_activation(self._ridgeSolver.predict(X.T))

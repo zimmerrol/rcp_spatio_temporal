@@ -3,7 +3,7 @@ import numpy.random as rnd
 #import pickle
 import dill as pickle
 
-class BaseESN:
+class BaseESN(object):
     def __init__(self, n_input, n_reservoir, n_output,
                 spectral_radius=1.0, noise_level=0.01, input_scaling=None,
                 leak_rate=1.0, sparseness=0.2, random_seed=None,
