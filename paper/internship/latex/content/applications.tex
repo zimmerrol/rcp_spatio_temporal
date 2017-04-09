@@ -1,6 +1,6 @@
 \section{Anwendungen}
 \label{chp:applications}
-Um den Aufwand für die spätere Benutzung zu reduzieren ist zuerst eine allgemeine Implementation des \textsc{ESN}s geschrieben worden, welche nun anhand zweier exemplarischer Systeme getastet worden ist.
+Um den Aufwand für die spätere Benutzung zu reduzieren, ist zuerst eine allgemeine Implementation des \textsc{ESN}s geschrieben worden, welche nun anhand zweier exemplarischer Systeme getastet worden ist.
 
 \subsection{Vorhersage eines Rössler-Systems}
 Eine erste Anwendung um die Möglichkeiten eines \textsc{ESN} zu demonstrieren besteht in der Vorhersage des Verhaltens eines \textit{Rössler-Systems}
@@ -16,7 +16,7 @@ Dieses System zeigt ein chaotisches Verhalten und stellt somit eine herausforder
 Hierbei werden zwei verschiedene Aufgaben betrachtet:\textit{(a)} die Vorhersage von $x'(t) \approx x(t+5)$ durch die Kenntnis von $x(t)$ und \textit{(b)} die Kreuz-Vorhersage $y(t)$ durch $x(t)$. Für beide Aufgaben wurde das System für jeweils $6000$ Schritte mit einer Abtastrate $\Delta t = 0.1$ in Analogie zu \cite{parlitz2005} simuliert, wobei die Hälfte der Daten für das Training und der Rest für die Testergebnisse verwendet worden ist.
 
 \subsubsection[Vorhersage $x(t) \rightarrow x(t+5)$]{Vorhersage $\pmb{x(t) \rightarrow x(t+5)}$}
-Für diese erste Aufgabe ist durch eine \textsc{GridSearch} ein geeignetes System gefunden werden, dessen Parameter in der Tabelle \ref{tab:application_roessler} dargestellt sind. Hierfür wurde ein größerer Bereich des Hyperparameterraumes systematisch abgetastet und die jeweilige Leistung des sich ergebenen \textsc{ESN}s ermittelt, um anschließend die bestmöglichen Parameter zu wählen. Als Maß für diese Optimierung wurde der \textit{Mean Square Error (MSE)}
+Für diese erste Aufgabe ist durch eine \textsc{GridSearch} ein geeignetes System gefunden werden, dessen Parameter in der Tabelle \ref{tab:application_roessler} dargestellt sind. Dafür wurde ein größerer Bereich des Hyperparameterraumes systematisch abgetastet und die jeweilige Leistung des sich ergebenen \textsc{ESN}s ermittelt, um anschließend die bestmöglichen Parameter zu wählen. Als Maß für diese Optimierung wurde der \textit{Mean Square Error (MSE)}
 \begin{align}
 MSE = \sum_n \left(x(t+5) - x'(t) \right)^2
 \end{align}
@@ -43,7 +43,7 @@ zwischen der Vorhersage $x'(t)$ und dem tatsächlichem Wert $x(t+5)$ benutzt.
 	\label{tab:application_roessler}
 \end{table}
 
-Hierbei wurde der Trainingsvorgang mittels der \textit{Tikhonov Regularisierung} nach Gleichung \ref{eq:tikhonov} durchgeführt. Im Training konnte ein Fehler von $MSE = 0.555 	$ erreicht werden, wobei sich im Testvorgang der Fehler zu $MSE = 0.237$ ergeben hat. Ein graphischer Vergleich zwischen dem Signal $y(t)$ und der Vorhersage $v(n)$ ist in Abbildung \ref{fig:application_roessler_a} zu finden.
+Der Trainingsvorgang wurde mittels der \textit{Tikhonov Regularisierung} nach Gleichung \ref{eq:tikhonov} durchgeführt. Im Training konnte ein Fehler von $MSE = 0.555 	$ erreicht werden, wobei sich im Testvorgang der Fehler zu $MSE = 0.237$ ergeben hat. Ein graphischer Vergleich zwischen dem Signal $y(t)$ und der Vorhersage $v(n)$ ist in Abbildung \ref{fig:application_roessler_a} zu finden.
 
 \vspace{-3.75ex}
 \begin{figure}[H]
@@ -59,7 +59,7 @@ Hierbei wurde der Trainingsvorgang mittels der \textit{Tikhonov Regularisierung}
 Auch hierfür konnte sehr schnell durch eine \textsc{GridSearch} ein geeignetes System gefunden werden. Als Maß wurde ebenfalls der \textit{MSE} benutzt. Die gefundenen Parameter sind ebenso in der Tabelle \ref{tab:application_roessler} dargestellt.\\
 Für das Auslesen wurde eine Linearkombination genutzt, wobei die Lösung $\mathbf{W}_{out}$ mittels der Pseudoinversen nach Gleichung \ref{eq:pseudo_inverse} bestimmt worden ist.\\
 
-Hierbei wurde für den Trainingsvorgang ein Fehler $MSE_{train} = 0.0025$ und für den Testvorgang von $MSE_{test} = 0.0001$ bestimmt. Die Darstellung der Vorhersage $y'(t)$ und des ermittelten Fehlers sind in den Abbildungen \ref{fig:application_roessler_b1} und \ref{fig:application_roessler_b2} zu finden.
+Damit wurde für den Trainingsvorgang ein Fehler $MSE_{train} = 0.0025$ und für den Testvorgang von $MSE_{test} = 0.0001$ bestimmt. Die Darstellung der Vorhersage $y'(t)$ und des ermittelten Fehlers sind in den Abbildungen \ref{fig:application_roessler_b1} und \ref{fig:application_roessler_b2} zu finden.
 
 \begin{figure}[H]
     \centering
@@ -90,12 +90,13 @@ Als nächste Anwendung wird ein \textit{Mackey-Glass-System}
 \end{split}
 \end{align}
 betrachtet, wobei $\tau = 17, n=10, \gamma=0.1, \beta = 0.2$ gewählt wurden. Dies ist eine beliebte Aufgabe im Bereich der Vorhersagen chaotischer Zeitreihen.\\
-Für dieses System wurde in Analogie zu  \citep{caraballo2014} die Vorhersage $x(t) \rightarrow x(t+84)$ betrachtet, wobei die Parameter aus Tabelle \ref{tab:application_mackeyglass} genutzt wurden. Hierfür wurden mittels der expliziten \textit{Euler-Diskretisierung} 
+Für dieses System wurde in Analogie zu  \citep{caraballo2014} die Vorhersage $x(t) \rightarrow x(t+84)$ betrachtet, wobei die Parameter aus Tabelle \ref{tab:application_mackeyglass} genutzt wurden. Mittels der expliziten \textit{Euler-Diskretisierung} 
 
 \begin{align}
 x(t+1) = x(t) + \Delta_t \cdot \left(\beta \frac{x(t-\tau)}{1+x(t-\tau)^n}-\gamma x(t)  \right)
 \end{align}
-Werte für $0 \leq t \leq 4000$ simuliert, wobei $\Delta_t=\num{1e-2}$ die zeitliche Diskretisierungskonstante ist. Nun sind die ersten $2000$ Werte für den Trainings und die anderen für den Test-Vorgang genutzt worden. Es wurde zur Lösung erneut die \textit{Tikhonov Regularisierung} nach Gleichung \ref{eq:tikhonov} benutzt.
+
+sind Werte für $0 \leq t \leq 4000$ simuliert worden, wobei $\Delta_t=\num{1e-2}$ die zeitliche Diskretisierungskonstante ist. Nun sind die ersten $2000$ Werte für den Trainings und die anderen für den Test-Vorgang genutzt worden. Es wurde zur Lösung erneut die \textit{Tikhonov Regularisierung} nach Gleichung \ref{eq:tikhonov} benutzt.
 
 \begin{table}[H]
 	\centering
@@ -118,7 +119,7 @@ Werte für $0 \leq t \leq 4000$ simuliert, wobei $\Delta_t=\num{1e-2}$ die zeitl
 \end{table}
 
 Interessant ist, dass der Spektralradius größer $1.0$ ist. Dies widerspricht nicht direkt den Aussagen aus Abschnitt \ref{sc:theory}, da diese nur für Signale getroffen werden konnten, welche auch null sein können. Um dies auszuschließen ist ein konstanter \textit{Bias} von $1.0$ als weiteres Eingangssignal genutzt worden.\\
-Eine Darstellung der Ergebnisse ist in Abbildung \ref{fig:application_mackeyglass} zu sehen. Hierbei wurde der \textit{MSE} für die gesamte Trainingsphase als $MSE_{train} = 0.0042$ und der der Testphase als $MSE_{test} = \num{9e-5}$ bestimmt.
+Eine Darstellung der Ergebnisse ist in Abbildung \ref{fig:application_mackeyglass} zu sehen. Der \textit{MSE} wurde für die Trainingsphase als $MSE_{train} = 0.0042$ und für die Testphase als $MSE_{test} = \num{9e-5}$ bestimmt.
 
 \begin{figure}[H]
     \centering

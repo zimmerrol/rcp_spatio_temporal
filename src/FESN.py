@@ -25,7 +25,7 @@ class FESN(BaseESN):
         skipLength = int(trainLength*transient_quota)
 
         #define states' matrix
-        self._X = np.zeros((1+self.n_input+self.n_reservoir,trainLength-skipLength))
+        X = np.zeros((1+self.n_input+self.n_reservoir,trainLength-skipLength))
 
         self._x = np.zeros((self.n_reservoir,1))
 
@@ -35,7 +35,7 @@ class FESN(BaseESN):
 
             if (t >= skipLength):
                 #add valueset to the states' matrix
-                self._X[:,t-skipLength] = np.vstack((self.output_bias, self.output_input_scaling*u, self._x))[:,0]
+                X[:,t-skipLength] = np.vstack((self.output_bias, self.output_input_scaling*u, self._x))[:,0]
             oldOutput = outputData[t]
 
         #define the target values
@@ -44,12 +44,12 @@ class FESN(BaseESN):
 
         #W_out = Y_target.dot(X.T).dot(np.linalg.inv(X.dot(X.T) + regressionParameter*np.identity(1+reservoirInputCount+reservoirSize)) )
         if (regression_parameter is None):
-            self._W_out = np.dot(Y_target, np.linalg.pinv(self._X))
+            self._W_out = np.dot(Y_target, np.linalg.pinv(X))
         else:
-            self._W_out = np.dot(np.dot(Y_target, self._X.T),np.linalg.inv(np.dot(self._X,self._X.T) + regression_parameter*np.identity(1+self.n_input+self.n_reservoir)))
+            self._W_out = np.dot(np.dot(Y_target, X.T),np.linalg.inv(np.dot(X,X.T) + regression_parameter*np.identity(1+self.n_input+self.n_reservoir)))
 
         #calculate the training error now
-        train_prediction = np.dot(self._W_out, self._X).T
+        train_prediction = np.dot(self._W_out, X).T
         training_error = np.sqrt(np.mean((train_prediction - outputData[skipLength:])**2))
 
         return training_error

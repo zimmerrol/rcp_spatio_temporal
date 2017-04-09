@@ -22,7 +22,7 @@ class NLROCESN(BaseESN):
         skipLength = 0
 
         #define states' matrix
-        self._X = np.zeros((1+self.n_input+self.n_reservoir,trainLength-skipLength))
+        X = np.zeros((1+self.n_input+self.n_reservoir,trainLength-skipLength))
 
         t = 0
         for item in inputList:
@@ -30,7 +30,7 @@ class NLROCESN(BaseESN):
 
             for i in range(item.shape[0]):
                 u = super(NLROCESN, self).update(item[i])
-                self._X[:,t] = np.vstack((self.output_bias, self.output_input_scaling*u, self._x))[:,0]
+                X[:,t] = np.vstack((self.output_bias, self.output_input_scaling*u, self._x))[:,0]
                 t+=1
 
         #define the target values
@@ -48,7 +48,7 @@ class NLROCESN(BaseESN):
             self._clf = SVR(**readout_parameters)
         else:
             self._clf = SVC(**readout_parameters)
-        self._clf.fit(self._X.T, Y_target[:,0])
+        self._clf.fit(X.T, Y_target[:,0])
 
     def predict(self, inputData):
         self._x = np.zeros(self._x.shape)

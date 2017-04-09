@@ -9,27 +9,39 @@ import matplotlib.animation as animation
 from BarkleySimulation import BarkleySimulation
 from ESN import ESN
 
-def generate_data(N, trans, sample_rate=1):
-    Nx = 30
-    Ny = 30
+def generate_data(N, trans, sample_rate=1, Ngrid=100):
+    Nx = Ngrid
+    Ny = Ngrid
     deltaT = 1e-2
     epsilon = 0.08
-    h = 1.0#0.2
+    delta_x = 0.1
+    D = 1/50
+    h = D/delta_x**2
+    print("h=" + str(h))
+    #h = D over delta_x
     a = 0.75
-    b = 0.00006
+    b = 0.06
 
     sim = BarkleySimulation(Nx, Ny, deltaT, epsilon, h, a, b)
     sim.initialize_one_spiral()
 
+    sim = BarkleySimulation(Nx, Ny, deltaT, epsilon, h, a, b)
+    sim.initialize_one_spiral()
+
+    bar = progressbar.ProgressBar(max_value=trans+N, redirect_stdout=True)
+
     for i in range(trans):
         sim.explicit_step(chaotic=True)
+        bar.update(i)
 
     data = np.empty((N, Nx, Ny))
     for i in range(N):
         for j in range(sample_rate):
             sim.explicit_step(chaotic=True)
         data[i] = sim._u
+        bar.update(i+trans)
 
+    bar.finish()
     return data
 
 def create_patch_indices(outer_range_x, outer_range_y, inner_range_x, inner_range_y):
@@ -64,18 +76,23 @@ def print_field(input_y, input_x, output_y, output_x):
         string += "|"
         print(string)
 
+N = 160
 
+if (os.path.exists("cache/raw/10000_{0}.dat.npy".format(N)) == False):
+    print("generating data...")
+    data = generate_data(10000, 50000, 5, Ngrid=N)
+    np.save("cache/raw/10000_{0}.dat.npy".format(N), data)
+    print("generating finished")
+else:
+    print("loading data...")
+    data = np.load("cache/raw/10000_{0}.dat.npy".format(N))
+    print("loading finished")
 
-print("generating data...")
-#data = generate_data(10000, 50000, 5)
-#np.save("10000.dat", data)
-data = np.load("10000.dat.npy")
-
-training_data = data[:4000]
-test_data = data[4000:]
+training_data = data[:8000]
+test_data = data[8000:10000]
 
 #input_y, input_x, output_y, output_x = create_patch_indices((12,17), (12,17), (13,16), (13,16)) # -> yields MSE=0.0115 with leak_rate = 0.8
-input_y, input_x, output_y, output_x = create_patch_indices((4,23), (4,23), (7,20), (7,20)) # -> yields MSE=0.0873 with leak_rate = 0.3
+input_y, input_x, output_y, output_x = create_patch_indices((0,159), (0,159), (30, 130), (30, 130)) # -> yields MSE=0.0873 with leak_rate = 0.3
 
 training_data_in =  training_data[:, input_y, input_x].reshape(-1, len(input_y))
 training_data_out =  training_data[:, output_y, output_x].reshape(-1, len(output_y))
@@ -83,27 +100,32 @@ training_data_out =  training_data[:, output_y, output_x].reshape(-1, len(output
 test_data_in =  test_data[:, input_y, input_x].reshape(-1, len(input_y))
 test_data_out =  test_data[:, output_y, output_x].reshape(-1, len(output_y))
 
+n_units = 4000
 
 generate_new = True
+if (os.path.exists("cache/esn/cross_pred_" + str(len(input_y)) + "_" + str(n_units) + ".dat") == False):
+    generate_new = True
 
 print("setting up...")
 if (generate_new):
-    esn = ESN(n_input = len(input_y), n_output = len(output_y), n_reservoir = 1700, #used to be 1700
-            weight_generation = "advanced", leak_rate = 0.8, spectral_radius = 0.8,
-            random_seed=42, noise_level=0.0001, sparseness=.1, regression_parameters=[6e-1], solver = "lsqr")#,
+    esn = ESN(n_input = len(input_y), n_output = len(output_y), n_reservoir = n_units, #used to be 1700
+            weight_generation = "advanced", leak_rate = 0.2, spectral_radius = 0.1,
+            random_seed=42, noise_level=0.0001, sparseness=.1, regression_parameters=[5e-0], solver = "lsqr")#,
             #out_activation = lambda x: 0.5*(1+np.tanh(x/2)), out_inverse_activation = lambda x:2*np.arctanh(2*x-1))
 
     print("fitting...")
 
-    train_error = esn.fit(training_data_in, training_data_out,)
-    esn.save("esn" + str(len(input_y)) + ".dat")
+    train_error = esn.fit(training_data_in, training_data_out, verbose=1)
     print("train error: {0}".format(train_error))
 
+    print("saving to: " + "cache/esn/cross_pred_" + str(len(input_y)) + "_" + str(len(output_y)) + "_" + str(n_units) + ".dat")
+    esn.save("cache/esn/cross_pred_" + str(len(input_y)) + "_" + str(len(output_y)) + "_" + str(n_units) + ".dat")
+
 else:
-    esn = ESN.load("esn" + str(len(input_y)) + ".dat")
+    esn = ESN.load("cache/esn/cross_pred_" + str(len(input_y)) + "_" + str(len(output_y)) + "_" + str(n_units) + ".dat")
 
 print("predicting...")
-pred = esn.predict(test_data_in)
+pred = esn.predict(test_data_in, verbose=1)
 pred[pred>1.0] = 1.0
 pred[pred<0.0] = 0.0
 
@@ -119,24 +141,25 @@ difference = np.abs(test_data - merged_prediction)
 i = 0
 def update_new(data):
     global i
-    if (not pause):
-        if (image_mode == 0):
-            mat.set_data(merged_prediction[i])
-            clb.set_clim(vmin=0, vmax=1)
-            clb.draw_all()
-        elif (image_mode == 1):
-            mat.set_data(test_data[i])
-            clb.set_clim(vmin=0, vmax=1)
-            clb.draw_all()
-        else:
-            mat.set_data(difference[i])
-            clb.set_clim(vmin=0, vmax=np.max(difference[i-50:i+50]))
-            clb.draw_all()
 
-        i = (i+1) % len(diff)
+    if (image_mode == 0):
+        mat.set_data(merged_prediction[i])
+        clb.set_clim(vmin=0, vmax=1)
+        clb.draw_all()
+    elif (image_mode == 1):
+        mat.set_data(test_data[i])
+        clb.set_clim(vmin=0, vmax=1)
+        clb.draw_all()
+    else:
+        mat.set_data(difference[i])
+        if (i < len(difference)-50 and i > 50):
+            clb.set_clim(vmin=0, vmax=np.max(difference[i-50:i+50]))
+        clb.draw_all()
+
+    if (not pause):
+        i = (i+1) % len(difference)
         sposition.set_val(i)
     return [mat]
-
 
 fig, ax = plt.subplots()
 mat = plt.imshow(merged_prediction[0], origin="lower", interpolation="none")
@@ -153,7 +176,7 @@ class UICallback(object):
     def position_changed(self, value):
         global i
         value = int(value)
-        i = value
+        i = value % len(difference)
 
     def playpause(self, event):
         global pause, bplaypause

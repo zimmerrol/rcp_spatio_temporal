@@ -5,6 +5,7 @@ from BaseESN import BaseESN
 from sklearn.linear_model import Ridge
 from sklearn.svm import SVR
 from sklearn.linear_model import LogisticRegression
+import progressbar
 
 
 class ESN(BaseESN):
@@ -33,7 +34,7 @@ class ESN(BaseESN):
             sklearn_sag
         """
 
-    def fit(self, inputData, outputData, transient_quota=0.05):
+    def fit(self, inputData, outputData, transient_quota=0.05, verbose=0):
         if (inputData.shape[0] != outputData.shape[0]):
             raise ValueError("Amount of input and output datasets is not equal - {0} != {1}".format(inputData.shape[0], outputData.shape[0]))
 
@@ -42,15 +43,24 @@ class ESN(BaseESN):
         skipLength = int(trainLength*transient_quota)
 
         #define states' matrix
-        self._X = np.zeros((1+self.n_input+self.n_reservoir,trainLength-skipLength))
+        X = np.zeros((1+self.n_input+self.n_reservoir,trainLength-skipLength))
 
         self._x = np.zeros((self.n_reservoir,1))
+
+        if (verbose > 0):
+            bar = progressbar.ProgressBar(max_value=trainLength, redirect_stdout=True, poll_interval=0.0001)
+            bar.update(0)
 
         for t in range(trainLength):
             u = super(ESN, self).update(inputData[t])
             if (t >= skipLength):
                 #add valueset to the states' matrix
-                self._X[:,t-skipLength] = np.vstack((self.output_bias, self.output_input_scaling*u, self._x))[:,0]
+                X[:,t-skipLength] = np.vstack((self.output_bias, self.output_input_scaling*u, self._x))[:,0]
+            if (verbose > 0):
+                bar.update(t)
+
+        if (verbose > 0):
+            bar.finish()
 
         #define the target values
         #                                  +1
@@ -68,7 +78,7 @@ class ESN(BaseESN):
             import skcuda.misc as cumisc
             culinalg.init()
 
-            X_gpu = gpuarray.to_gpu(self._X)
+            X_gpu = gpuarray.to_gpu(X)
             X_inv_gpu = culinalg.pinv(X_gpu)
             Y_gpu = gpuarray.to_gpu(Y_target)
             W_out_gpu = Y_gpu * W_out_gpu
@@ -76,42 +86,44 @@ class ESN(BaseESN):
 
             self._W_out = gpuarray.from_gpu(W_out_gpu)
             """
-            self._W_out = np.dot(Y_target, np.linalg.pinv(self._X))
+            self._W_out = np.dot(Y_target, np.linalg.pinv(X))
 
             #calculate the training error now
-            train_prediction = self.out_activation((np.dot(self._W_out, self._X)).T)
+            train_prediction = self.out_activation((np.dot(self._W_out, X)).T)
 
         elif (self._solver == "lsqr"):
-            self._W_out = np.dot(np.dot(Y_target, self._X.T),np.linalg.inv(np.dot(self._X,self._X.T) + self._regression_parameters[0]*np.identity(1+self.n_input+self.n_reservoir)))
+            self._W_out = np.dot(np.dot(Y_target, X.T),np.linalg.inv(np.dot(X,X.T) + self._regression_parameters[0]*np.identity(1+self.n_input+self.n_reservoir)))
 
             #calculate the training error now
-            train_prediction = self.out_activation(np.dot(self._W_out, self._X).T)
+            train_prediction = self.out_activation(np.dot(self._W_out, X).T)
 
         elif (self._solver in ["sklearn_auto", "sklearn_lsqr", "sklearn_sag", "sklearn_svd"]):
             mode = self._solver[8:]
             self._ridgeSolver = Ridge(**self._regression_parameters, solver=mode)
 
-            self._ridgeSolver.fit(self._X.T, Y_target.T)
-            train_prediction = self.out_activation(self._ridgeSolver.predict(self._X.T))
+            self._ridgeSolver.fit(X.T, Y_target.T)
+            train_prediction = self.out_activation(self._ridgeSolver.predict(X.T))
 
         elif (self._solver in ["sklearn_svr", "sklearn_svc"]):
             self._ridgeSolver = SVR(**self._regression_parameters)
 
-            self._ridgeSolver.fit(self._X.T, Y_target.T.ravel())
-            train_prediction = self.out_activation(self._ridgeSolver.predict(self._X.T))
+            self._ridgeSolver.fit(X.T, Y_target.T.ravel())
+            train_prediction = self.out_activation(self._ridgeSolver.predict(X.T))
 
         """
         #alternative represantation of the equation
 
-        Xt = self._X.T
+        Xt = X.T
 
-        A = np.dot(self._X, Y_target.T)
+        A = np.dot(X, Y_target.T)
 
-        B = np.linalg.inv(np.dot(self._X, Xt)  + regression_parameter*np.identity(1+self.n_input+self.n_reservoir))
+        B = np.linalg.inv(np.dot(X, Xt)  + regression_parameter*np.identity(1+self.n_input+self.n_reservoir))
 
         self._W_out = np.dot(B, A)
         self._W_out = self._W_out.T
         """
+
+        X = None
 
         training_error = np.sqrt(np.mean((train_prediction - outputData[skipLength:])**2))
         return training_error
@@ -147,7 +159,7 @@ class ESN(BaseESN):
 
         return Y.T
 
-    def predict(self, inputData, continuation=True, initial_data=None, update_processor=lambda x:x):
+    def predict(self, inputData, continuation=True, initial_data=None, update_processor=lambda x:x, verbose=0):
         if (not continuation):
             self._x = np.zeros(self._x.shape)
 
@@ -159,6 +171,10 @@ class ESN(BaseESN):
 
         Y = np.zeros((self.n_output,predLength))
 
+        if (verbose > 0):
+            bar = progressbar.ProgressBar(max_value=predLength, redirect_stdout=True, poll_interval=0.0001)
+            bar.update(0)
+
         for t in range(predLength):
             u = super(ESN, self).update(inputData[t])
 
@@ -168,5 +184,10 @@ class ESN(BaseESN):
                 y = np.dot(self._W_out, np.vstack((self.output_bias, self.output_input_scaling*u, self._x)))
 
             Y[:,t] = update_processor(self.out_activation(y[:,0]))
+            if (verbose > 0):
+                bar.update(t)
+
+        if (verbose > 0):
+            bar.finish()
 
         return Y.T
