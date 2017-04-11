@@ -73,7 +73,7 @@ def create_patch_indices(range_x, range_y):
 
     return ind_list[:, 0], ind_list[:, 1]
 
-ind_y, ind_x = create_patch_indices((50, 50+N), (50, 50+N)) #create_patch_indices((75, 75+N), (75, 75+N))
+ind_y, ind_x = create_patch_indices((30, 30+N), (30, 30+N)) #create_patch_indices((75, 75+N), (75, 75+N))
 
 data = data[:, :, ind_y, ind_x].reshape((2, -1, N, N))
 print(data.shape)

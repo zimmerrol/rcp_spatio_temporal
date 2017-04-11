@@ -92,7 +92,7 @@ training_data = data[:18000]
 test_data = data[18000:20000]
 
 #input_y, input_x, output_y, output_x = create_patch_indices((12,17), (12,17), (13,16), (13,16)) # -> yields MSE=0.0115 with leak_rate = 0.8
-input_y, input_x, output_y, output_x = create_patch_indices((40, 119), (40, 119), (50, 109), (50, 109)) # -> yields MSE=0.0873 with leak_rate = 0.3
+input_y, input_x, output_y, output_x = create_patch_indices((60, 99), (60, 99), (70, 89), (70, 89)) # -> yields MSE=0.0873 with leak_rate = 0.3
 
 training_data_in =  training_data[:, input_y, input_x].reshape(-1, len(input_y))
 training_data_out =  training_data[:, output_y, output_x].reshape(-1, len(output_y))
@@ -100,7 +100,7 @@ training_data_out =  training_data[:, output_y, output_x].reshape(-1, len(output
 test_data_in =  test_data[:, input_y, input_x].reshape(-1, len(input_y))
 test_data_out =  test_data[:, output_y, output_x].reshape(-1, len(output_y))
 
-n_units = 6000
+n_units = 4000
 
 generate_new = False
 if (os.path.exists("cache/esn/cross_pred_" + str(len(input_y)) + "_" + str(len(output_y)) + "_" + str(n_units) + ".dat") == False):
@@ -112,7 +112,7 @@ if (generate_new):
     esn = ESN(n_input = len(input_y), n_output = len(output_y), n_reservoir = n_units, #used to be 1700
             weight_generation = "advanced", leak_rate = 0.2, spectral_radius = 0.1,
             random_seed=42, noise_level=0.0001, sparseness=.1, regression_parameters=[5e-0], solver = "lsqr")#,
-#            out_activation = lambda x: 0.5*(1+np.tanh(x/2)), out_inverse_activation = lambda x:2*np.arctanh(2*x-1))
+            #out_activation = lambda x: 0.5*(1+np.tanh(x/2)), out_inverse_activation = lambda x:2*np.arctanh(2*x-1))
 
     print("fitting...")
 
