@@ -11,6 +11,7 @@ import matplotlib.animation as animation
 from BarkleySimulation import BarkleySimulation
 from ESN import ESN
 import progressbar
+import dill as pickle
 
 def generate_data(N, trans, sample_rate=1, Ngrid=100):
     Nx = Ngrid
@@ -49,38 +50,50 @@ def generate_data(N, trans, sample_rate=1, Ngrid=100):
     return data
 
 N = 150
+ndata = 20000
+sigma = 5
+n_units = 1000
 
-
-
-if (os.path.exists("../cache/raw/5000_{0}.uv.dat.npy".format(N)) == False):
+if (os.path.exists("../cache/raw/{0}_{1}.uv.dat.npy".format(ndata, N)) == False):
     print("generating data...")
-    data = generate_data(5000, 50000, 5, Ngrid=N)
-    np.save("../cache/raw/5000_{0}.uv.dat.npy".format(N), data)
+    data = generate_data(ndata, 50000, 5, Ngrid=N)
+    np.save("../cache/raw/{0}_{1}.uv.dat.npy".format(ndata, N), data)
     print("generating finished")
 else:
     print("loading data...")
-    data = np.load("../cache/raw/20000_{0}.uv.dat.npy".format(N))
+    data = np.load("../cache/raw/{0}_{1}.uv.dat.npy".format(ndata, N))
     print("loading finished")
-
-
-
-sigma = 5
-
+    
 def create_patch_indices(range_x, range_y):
     ind_x = np.tile(range(range_x[0], range_x[1]), range_y[1] - range_y[0])
     ind_y = np.repeat(range(range_y[0], range_y[1]), range_x[1] - range_x[0])
 
     return ind_y, ind_x
 
-print("setting up...")
-n_units = 2000
-esn = ESN(n_input = sigma*sigma, n_output = sigma*sigma, n_reservoir = n_units,
-        weight_generation = "advanced", leak_rate = 0.70, spectral_radius = 0.8,
-        random_seed=42, noise_level=0.0001, sparseness=.1, regression_parameters=[5e-1], solver = "lsqr")
+generate_new = False
+if (os.path.exists("../cache/esn/uv/cross_pred_patches{0}_{1}_{2}_{3}.dat".format(N, ndata, sigma, n_units)) == False):
+    generate_new = True
 
-training_data = data[:, :4000]
-test_data = data[:, 4000:5000]
-prediction = np.ones((1000, N, N))
+if (generate_new):
+    print("setting up...")
+    esn = ESN(n_input = sigma*sigma, n_output = sigma*sigma, n_reservoir = n_units,
+            weight_generation = "advanced", leak_rate = 0.70, spectral_radius = 0.8,
+            random_seed=42, noise_level=0.0001, sparseness=.1, regression_parameters=[5e-1], solver = "lsqr")
+
+    last_states = np.empty(((N//sigma)*(N//sigma), n_units, 1))
+    output_weights = np.empty(((N//sigma)*(N//sigma),sigma*sigma, sigma*sigma+1+n_units))
+else:
+    print("loading existing model...")
+
+    f = open("../cache/esn/uv/cross_pred_patches{0}_{1}_{2}_{3}.dat".format(N, ndata, sigma, n_units), "rb")
+    output_weights = pickle.load(f)
+    last_states = pickle.load(f)
+    esn = pickle.load(f)
+    f.close()
+
+training_data = data[:, :ndata-2000]
+test_data = data[:, ndata-2000:]
+prediction = np.ones((2000, N, N))
 
 print("fitting...")
 bar = progressbar.ProgressBar(max_value=(N//sigma)*(N//sigma), redirect_stdout=True, poll_interval=0.0001)
@@ -90,18 +103,22 @@ for y in range(0, N, sigma):
     for x in range(0, N, sigma):
         ind_y, ind_x = create_patch_indices((x, x + sigma), (y, y + sigma))
 
-        aa = training_data[1][:, ind_y, ind_x]
-        print(aa.shape)
-
         training_data_in = training_data[1][:, ind_y, ind_x].reshape(-1, sigma*sigma)
         training_data_out = training_data[0][:, ind_y, ind_x].reshape(-1, sigma*sigma)
 
         test_data_in = test_data[1][:, ind_y, ind_x].reshape(-1, sigma*sigma)
         test_data_out = test_data[0][:, ind_y, ind_x].reshape(-1, sigma*sigma)
 
-        train_error = esn.fit(training_data_in, training_data_out, verbose=0)
-        print("train error: {0}".format(train_error))
-
+        if (generate_new):
+            train_error = esn.fit(training_data_in, training_data_out, verbose=0)
+            print("train error: {0}".format(train_error))
+           
+            last_states[y//sigma*(N//sigma) + x//sigma] = esn._x
+            output_weights[y//sigma*(N//sigma) + x//sigma] = esn._W_out
+        else:
+            esn._x = last_states[y//sigma*(N//sigma) + x//sigma]
+            esn._W_out = output_weights[y//sigma*(N//sigma) + x//sigma]
+        
         pred = esn.predict(test_data_in, verbose=0)
         pred[pred>1.0] = 1.0
         pred[pred<0.0] = 0.0
@@ -114,9 +131,18 @@ for y in range(0, N, sigma):
 
         prediction[:, ind_y, ind_x] = pred
 
-        bar.update(y//sigma*(N//sigma) + x//sigma)
+        bar.update(y//sigma*(N//sigma) + x//sigma+1)
 
 bar.finish()
+
+if (generate_new):
+    print("saving model...")
+
+    f = open("../cache/esn/uv/cross_pred_patches{0}_{1}_{2}_{3}.dat".format(N, ndata, sigma, n_units), "wb")
+    pickle.dump(output_weights, f, protocol=pickle.HIGHEST_PROTOCOL)
+    pickle.dump(last_states, f, protocol=pickle.HIGHEST_PROTOCOL)
+    pickle.dump(esn, f, protocol=pickle.HIGHEST_PROTOCOL)
+    f.close()
 
 diff = test_data[0]-prediction
 mse = np.mean((diff)**2)
