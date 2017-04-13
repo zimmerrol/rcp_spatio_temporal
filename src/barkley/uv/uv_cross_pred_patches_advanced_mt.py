@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import os,sys,inspect
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)
@@ -105,33 +107,34 @@ test_data = data[:, ndata-2000:]
 prediction = np.ones((2000, N, N))
 
 def fit_predict_pixel(y, x, running_index, prediction, last_states, output_weights, training_data, test_data, esn):
+    print("{0},{1}".format(y, x))    
     ind_y, ind_x = create_patch_indices((x - 2, x + 3), (y - 2, y + 3))
-
+    print("{0},{1}".format(y, x))
     training_data_in = training_data[1][:, ind_y, ind_x].reshape(-1, 5*5)
     training_data_out = training_data[0][:, y, x].reshape(-1, 1)
-
+    print("{0},{1}".format(y, x))
     test_data_in = test_data[1][:, ind_y, ind_x].reshape(-1, 5*5)
     test_data_out = test_data[0][:, y, x].reshape(-1, 1)
-
+    print("{0},{1}".format(y, x))
     if (generate_new):
-        train_error = esn.fit(training_data_in, training_data_out, verbose=0)
-
+        train_error = esn.fit(training_data_in, training_data_out, verbose=1)
+        print("{0},{1}".format(y, x))
         #last_states[running_index] = esn._x
         #output_weights[running_index] = esn._W_out
     else:
         esn._x = last_states[running_index]
         esn._W_out = output_weights[running_index]
-
+    print("{0},{1}".format(y, x))
     pred = esn.predict(test_data_in, verbose=0)
     pred[pred>1.0] = 1.0
     pred[pred<0.0] = 0.0
-
+    print("{0},{1}".format(y, x))
     return pred[:,0]
 
 def fit_predict_frame_pixel(y, x, running_index, prediction, last_states, output_weights, training_data, test_data, progressCounter):
     #print("{0} - {1}".format(running_index, progressCounter))
     #return
-
+    
     ind_y, ind_x = create_patch_indices((x, x + 2), (y, y + 2))
     #print(ind_x)
     #print("{0},{1}".format(x,y))
@@ -163,8 +166,8 @@ def fit_predict_frame_pixel(y, x, running_index, prediction, last_states, output
     prediction[:, ind_y, ind_x] = pred
 
 print("fitting...")
-bar = progressbar.ProgressBar(max_value=(N-4)*(N-4) + N//2*2 + (N-2)//2*2, redirect_stdout=True, poll_interval=0.0001)
-bar.update(0)
+#bar = progressbar.ProgressBar(max_value=(N-4)*(N-4) + N//2*2 + (N-2)//2*2, redirect_stdout=True, poll_interval=0.0001)
+#bar.update(0)
 
 from threading import Thread
 from queue import Queue
@@ -184,19 +187,22 @@ def processThreadResults(threadname, q, numberOfWorkers, numberOfResults):
 
         prediction[:, ind_y, ind_x] = data
 
-        bar.update(finishedResults)
+        #bar.update(finishedResults)
 
 def predict_inner(threadname, q, yStart, height, esn):
     for offset in range(height):
         y = offset + yStart
+        
         for x in range(2, N-2):
+            print("{0},{1}".format(y, x))
             pred = fit_predict_pixel(y, x, (y-2)*(N-4) + (x-2), prediction, last_states, output_weights, training_data, test_data, esn)
+            print("{0},{1}".format(y, x))
             q.put((y, x, pred))
 
-threadNumber = 2
+threadNumber = 16
 if ((N-4) % threadNumber != 0):
     print("please adjust the threadNumber!")
-    exit()
+    #exit()
 
 mt_height = (N-4)//threadNumber
 
@@ -204,11 +210,18 @@ queue = Queue()
 processThreadResultsThread = Thread(target=processThreadResults, args=("processThreadResultsThread", queue, mt_height, (N-4)*(N-4)) )
 processThreadResultsThread.start()
 
+print("thread balance:")
 modifyDataThreadList = []
-for y in range(2, N-2, mt_height):
+for i in range(threadNumber):
+    y = mt_height*i
+    if (i == threadNumber-1):
+        mt_height = (N-2)-(i-1)*mt_height
+    print(" -{0}".format(mt_height))
     modifyDataThread = Thread(target=predict_inner, args=("modifyDataThread-{0}".format(y), queue, y, mt_height, copy.deepcopy(esn)))
     modifyDataThreadList.append(modifyDataThread)
-    modifyDataThread.start()
+
+for thread in modifyDataThreadList:
+    thread.start()
 
 for thread in modifyDataThreadList:
     thread.join()
