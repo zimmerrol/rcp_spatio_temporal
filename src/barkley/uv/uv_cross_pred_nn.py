@@ -20,42 +20,7 @@ import progressbar
 import dill as pickle
 from scipy.spatial import KDTree
 from sklearn.neighbors import NearestNeighbors as NN
-
-def generate_data(N, trans, sample_rate=1, Ngrid=100):
-    Nx = Ngrid
-    Ny = Ngrid
-    deltaT = 1e-2
-    epsilon = 0.08
-    delta_x = 0.1
-    D = 1/50
-    h = D/delta_x**2
-    print("h=" + str(h))
-    #h = D over delta_x
-    a = 0.75
-    b = 0.06
-
-    sim = BarkleySimulation(Nx, Ny, deltaT, epsilon, h, a, b)
-    sim.initialize_one_spiral()
-
-    sim = BarkleySimulation(Nx, Ny, deltaT, epsilon, h, a, b)
-    sim.initialize_one_spiral()
-
-    bar = progressbar.ProgressBar(max_value=trans+N, redirect_stdout=True)
-
-    for i in range(trans):
-        sim.explicit_step(chaotic=True)
-        bar.update(i)
-
-    data = np.empty((2, N, Nx, Ny))
-    for i in range(N):
-        for j in range(sample_rate):
-            sim.explicit_step(chaotic=True)
-        data[0, i] = sim._u
-        data[1, i] = sim._v
-        bar.update(i+trans)
-
-    bar.finish()
-    return data
+import helper
 
 def create_2d_delay_coordinates(data, delay_dimension, tau):
     result = np.repeat(data[:, :, :, np.newaxis], repeats=delay_dimension, axis=3)
@@ -66,12 +31,6 @@ def create_2d_delay_coordinates(data, delay_dimension, tau):
     result[0:delay_dimension-1,:,:] = 0
 
     return result
-
-def create_patch_indices(range_x, range_y):
-    ind_x = np.tile(range(range_x[0], range_x[1]), range_y[1] - range_y[0])
-    ind_y = np.repeat(range(range_y[0], range_y[1]), range_x[1] - range_x[0])
-
-    return ind_y, ind_x
 
 def create_2d_delayed_patches(data, delay_dimension, tau, patch_size):
         print("creating delay coordinates")
@@ -91,7 +50,7 @@ def create_2d_delayed_patches(data, delay_dimension, tau, patch_size):
             for x in range(patch_radius, N-patch_radius):
                 ind_y, ind_x = create_patch_indices((x-patch_radius, x+patch_radius+1), (y-patch_radius, y+patch_radius+1))
 
-                result_data[:, y, x] = delayed_data[:, ind_y, ind_x, :].reshape(-1, delay_dimension*patch_size*patch_size)
+                result_data[:, y, x] = delayed_data[:, y-patch_radius:y+patch_radius, x-patch_radius:x+patch_radius, :].reshape(-1, delay_dimension*patch_size*patch_size)
                 bar.update((x-patch_radius) + (y-patch_radius)*(N-patch_radius*2))
 
         bar.finish()
@@ -102,7 +61,7 @@ def generate_delayed_data(N, trans, sample_rate, Ngrid, delay_dimension, patch_s
     data = None
     if (os.path.exists("../cache/raw/{0}_{1}.uv.dat.npy".format(N, Ngrid)) == False):
         print("generating data...")
-        data = generate_data(N, 50000, 5, Ngrid=Ngrid)
+        data = generate_uv_data(N, 50000, 5, Ngrid=Ngrid)
         np.save("../cache/raw/{0}_{1}.uv.dat.npy".format(N, Ngrid), data)
         print("generating finished")
     else:

@@ -15,11 +15,14 @@ import matplotlib.animation as animation
 from BarkleySimulation import BarkleySimulation
 from ESN import ESN
 import progressbar
-import dill as pickle
+import dill as pickle #we require version >=0.2.6. Otherwise we will get an "EOFError: Ran out of input" exception
 import copy
-from multiprocessing import Process, Queue, Pool
+from multiprocessing import Process, Queue, Manager, Pool #we require Pathos version >=0.2.6. Otherwise we will get an "EOFError: Ran out of input" exception
+#from pathos.multiprocessing import Pool
 import multiprocessing
 import ctypes
+
+from helper import *
 
 N = 150
 ndata = 10000
@@ -56,62 +59,18 @@ def setupArrays():
     frame_output_weights = frame_output_weights.reshape((N-2)*(N-2),2*2, 2*2+1+n_units)
 setupArrays()
 
-def generate_data(N, trans, sample_rate=1, Ngrid=100):
-    Nx = Ngrid
-    Ny = Ngrid
-    deltaT = 1e-2
-    epsilon = 0.08
-    delta_x = 0.1
-    D = 1/50
-    h = D/delta_x**2
-    print("h=" + str(h))
-    #h = D over delta_x
-    a = 0.75
-    b = 0.06
-
-    sim = BarkleySimulation(Nx, Ny, deltaT, epsilon, h, a, b)
-    sim.initialize_one_spiral()
-
-    sim = BarkleySimulation(Nx, Ny, deltaT, epsilon, h, a, b)
-    sim.initialize_one_spiral()
-
-    bar = progressbar.ProgressBar(max_value=trans+N, redirect_stdout=True)
-
-    for i in range(trans):
-        sim.explicit_step(chaotic=True)
-        bar.update(i)
-
-    data = np.empty((2, N, Nx, Ny))
-    for i in range(N):
-        for j in range(sample_rate):
-            sim.explicit_step(chaotic=True)
-        data[0, i] = sim._u
-        data[1, i] = sim._v
-        bar.update(i+trans)
-
-    bar.finish()
-    return data
-
-def create_patch_indices(range_x, range_y):
-    ind_x = np.tile(range(range_x[0], range_x[1]), range_y[1] - range_y[0])
-    ind_y = np.repeat(range(range_y[0], range_y[1]), range_x[1] - range_x[0])
-
-    return ind_y, ind_x
-
 def fit_predict_pixel(y, x, running_index, last_states, output_weights, training_data, test_data, esn, generate_new):
-    ind_y, ind_x = create_patch_indices((x - 2, x + 3), (y - 2, y + 3))
-
-    training_data_in = training_data[1][:, ind_y, ind_x].reshape(-1, 5*5)
+    training_data_in = training_data[1][:, y - 2:y + 3, x - 2:x + 3].reshape(-1, 5*5)
     training_data_out = training_data[0][:, y, x].reshape(-1, 1)
 
-    test_data_in = test_data[1][:, ind_y, ind_x].reshape(-1, 5*5)
+    test_data_in = test_data[1][:, y - 2:y + 3, x - 2:x + 3].reshape(-1, 5*5)
     test_data_out = test_data[0][:, y, x].reshape(-1, 1)
 
     if (generate_new):
         train_error = esn.fit(training_data_in, training_data_out, verbose=0)
 
-        #last_states[running_index] = esn._x
-        #output_weights[running_index] = esn._W_out
+        last_states[running_index] = esn._x
+        output_weights[running_index] = esn._W_out
     else:
         esn._x = last_states[running_index]
         esn._W_out = output_weights[running_index]
@@ -142,6 +101,9 @@ def fit_predict_frame_pixel(y, x, running_index, last_states, output_weights, tr
     pred[pred<0.0] = 0.0
 
     return pred[:, 0]
+
+def get_prediction_init(q):
+    get_prediction.q = q
 
 def get_prediction(data, def_param=(shared_training_data, shared_test_data, frame_output_weights, output_weights, last_states)):
     y, x, running_index = data
@@ -187,91 +149,6 @@ def processThreadResults(threadname, q, numberOfWorkers, numberOfResults, def_pa
 
         bar.update(finishedResults)
 
-def showResults(test_data, prediction, difference):
-    i = 0
-    pause = False
-    image_mode = 0
-
-    def update_new(data):
-        nonlocal i
-
-        if (image_mode == 0):
-            mat.set_data(prediction[i])
-            clb.set_clim(vmin=0, vmax=1)
-            clb.draw_all()
-        elif (image_mode == 1):
-            mat.set_data(test_data[0, i])
-            clb.set_clim(vmin=0, vmax=1)
-            clb.draw_all()
-        elif (image_mode == 2):
-            mat.set_data(test_data[1, i])
-            clb.set_clim(vmin=0, vmax=1)
-            clb.draw_all()
-        else:
-            mat.set_data(difference[i])
-            if (i < len(difference)-50 and i > 50):
-                clb.set_clim(vmin=0, vmax=np.max(difference[i-50:i+50]))
-            clb.draw_all()
-
-        if (not pause):
-            i = (i+1) % len(difference)
-            sposition.set_val(i)
-        return [mat]
-
-    fig, ax = plt.subplots()
-    mat = plt.imshow(prediction[0], origin="lower", interpolation="none")
-    clb = plt.colorbar(mat)
-    clb.set_clim(vmin=0, vmax=1)
-    clb.draw_all()
-
-    from matplotlib.widgets import Button
-    from matplotlib.widgets import Slider
-    class UICallback(object):
-        def position_changed(self, value):
-            nonlocal i
-            value = int(value)
-            i = value % len(difference)
-
-        def playpause(self, event):
-            nonlocal pause, bplaypause
-            pause = not pause
-            bplaypause.label.set_text("Play" if pause else "Pause")
-
-        def switchsource(self, event):
-            nonlocal image_mode, bswitchsource
-            if (event.button == 1):
-                image_mode = (image_mode + 1) % 4
-            else:
-                image_mode = (image_mode - 1) % 4
-
-            if (image_mode == 0):
-                bswitchsource.label.set_text("Pred")
-            elif (image_mode == 1):
-                bswitchsource.label.set_text("Orig")
-            elif (image_mode == 2):
-                bswitchsource.label.set_text("Orig v")
-            else:
-                bswitchsource.label.set_text("Diff")
-
-    callback = UICallback()
-    axplaypause = plt.axes([0.145, 0.91, 0.10, 0.05])
-    axswitchsource = plt.axes([0.645, 0.91, 0.10, 0.05])
-    axposition = plt.axes([0.275, 0.91, 0.30, 0.05])
-
-    bplaypause = Button(axplaypause, "Pause")
-    bplaypause.on_clicked(callback.playpause)
-
-    bswitchsource = Button(axswitchsource, "Pred")
-    bswitchsource.on_clicked(callback.switchsource)
-
-    sposition = Slider(axposition, 'n', 0, len(test_data[0]), valinit=0, valfmt='%1.0f')
-    sposition.on_changed(callback.position_changed)
-
-    ani = animation.FuncAnimation(fig, update_new, interval=1, save_count=50)
-
-    plt.show()
-
-    print("done.")
 
 def mainFunction():
     global output_weights, frame_output_weights, last_states
@@ -284,7 +161,6 @@ def mainFunction():
         print("loading data...")
         data = np.load("../cache/raw/{0}_{1}.uv.dat.npy".format(ndata, N))
         print("loading finished")
-
 
     generate_new = False
     if (os.path.exists("../cache/esn/uv/cross_pred_patches_advanced_mt{0}_{1}_{2}_{3}.dat".format(N, ndata, sigma, n_units)) == False):
@@ -305,6 +181,7 @@ def mainFunction():
         last_states_t = pickle.load(f)
         f.close()
 
+        print(output_weights.shape)
         output_weights[:] = output_weights_t[:]
         frame_output_weights[:] = frame_output_weights_t[:]
         last_states[:] = last_states_t[:]
@@ -315,16 +192,12 @@ def mainFunction():
     shared_training_data[:, :, :, :] = training_data[:, :, :, :]
     shared_test_data[:, :, :, :] = test_data[:, :, :, :]
 
-
+    queue = Queue() # use manager.queue() ?
     print("preparing threads...")
-    def get_prediction_init(q):
-        get_prediction.q = q
+    pool = Pool(processes=2, initializer=get_prediction_init, initargs=[queue,])
 
-    queue = Queue()
-    pool = Pool(16, get_prediction_init, [queue])
-    processProcessResultsThread = Process(target=processThreadResults, args=("processProcessResultsThread", queue, 16, N*N) )
+    processProcessResultsThread = Process(target=processThreadResults, args=("processProcessResultsThread", queue, 2, N*N) )
 
-    print("process balance:")
     modifyDataProcessList = []
     jobs = []
     inner_index = 0
@@ -360,7 +233,7 @@ def mainFunction():
     mse = np.mean((diff)**2)
     print("test error: {0}".format(mse))
 
-    showResults(shared_test_data, prediction, diff)
+    show_results({"Orig" : shared_test_data, "Pred" : prediction, "Diff" : diff})
 
 if __name__== '__main__':
     mainFunction()
