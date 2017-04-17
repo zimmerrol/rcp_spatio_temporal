@@ -24,9 +24,10 @@ import ctypes
 N = 150
 ndata = 10000
 sigma = 5
-n_units = 100
+n_units = 50
 
 def setupArrays():
+    #TODO: Correct the array dimensions!
     global shared_training_data_base, shared_test_data_base, prediction_base, last_states_base, output_weights_base, frame_output_weights_base
     global shared_training_data, shared_test_data, prediction, last_states, output_weights, frame_output_weights
 
@@ -296,7 +297,7 @@ def mainFunction():
         output_weights = np.empty(((N-2)*(N-2),sigma*sigma, sigma*sigma+1+n_units))
         frame_output_weights = np.empty(((N-2)*(N-2),2*2, 2*2+1+n_units))
     else:
-        print("loading existing model...")
+        print("loading existing model (../cache/esn/uv/cross_pred_patches_advanced_mt{0}_{1}_{2}_{3}.dat)...".format(N, ndata, sigma, n_units))
 
         f = open("../cache/esn/uv/cross_pred_patches_advanced_mt{0}_{1}_{2}_{3}.dat".format(N, ndata, sigma, n_units), "rb")
         output_weights_t = pickle.load(f)
@@ -355,7 +356,7 @@ def mainFunction():
         pickle.dump(last_states, f, protocol=pickle.HIGHEST_PROTOCOL)
         f.close()
 
-    diff = test_data[0]-prediction
+    diff = (test_data[0]-prediction)
     mse = np.mean((diff)**2)
     print("test error: {0}".format(mse))
 
