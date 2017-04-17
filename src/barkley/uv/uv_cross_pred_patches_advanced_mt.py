@@ -46,7 +46,7 @@ def setupArrays():
     prediction = np.ctypeslib.as_array(prediction_base.get_obj())
     prediction = prediction.reshape(-1, N, N)
 
-    last_states_base = multiprocessing.Array(ctypes.c_double, (N-2)*(N-2)*n_units)
+    last_states_base = multiprocessing.Array(ctypes.c_double, N*N*n_units)
     last_states = np.ctypeslib.as_array(last_states_base.get_obj())
     last_states = last_states.reshape(-1, n_units, 1)
 
@@ -116,7 +116,7 @@ def get_prediction(data, def_param=(shared_training_data, shared_test_data, fram
                     random_seed=42, noise_level=0.0001, sparseness=.1, regression_parameters=[5e-1], solver = "lsqr")
 
 
-        pred = fit_predict_pixel(y, x, running_index, output_weights, last_states, shared_training_data, shared_test_data, esn, True)
+        pred = fit_predict_pixel(y, x, running_index, last_states, output_weights, shared_training_data, shared_test_data, esn, True)
 
     else:
         #frame
@@ -124,7 +124,7 @@ def get_prediction(data, def_param=(shared_training_data, shared_test_data, fram
                 weight_generation = "advanced", leak_rate = 0.70, spectral_radius = 0.8,
                 random_seed=42, noise_level=0.0001, sparseness=.1, regression_parameters=[5e-1], solver = "lsqr")
 
-        pred = fit_predict_frame_pixel(y, x, running_index, frame_output_weights, last_states, shared_training_data, shared_test_data, esn, True)
+        pred = fit_predict_frame_pixel(y, x, running_index, last_states, frame_output_weights, shared_training_data, shared_test_data, esn, True)
 
     get_prediction.q.put((y, x, pred))
 
