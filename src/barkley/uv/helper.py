@@ -79,7 +79,9 @@ def generate_data(N, trans, sample_rate=1, Ngrid=100):
 
 def show_results(dataDictionary):
     shape = None
-    for key, value in dataDictionary.iteritems():
+    data = []
+
+    for key, value in dataDictionary.items():
         tmpItem = [key,value]
         if (type(value) is not np.ndarray):
             raise ValueError("Item for key '{0}' is not of the type numpy.ndarray".format(key))
@@ -108,7 +110,7 @@ def show_results(dataDictionary):
         return [mat]
 
     fig, ax = plt.subplots()
-    mat = plt.imshow(data[0][1], origin="lower", interpolation="none")
+    mat = plt.imshow(data[0][1][0], origin="lower", interpolation="none")
     clb = plt.colorbar(mat)
     clb.set_clim(vmin=0, vmax=1)
     clb.draw_all()
@@ -129,9 +131,9 @@ def show_results(dataDictionary):
         def switchsource(self, event):
             nonlocal image_mode, bswitchsource
             if (event.button == 1):
-                image_mode = (image_mode + 1) % 4
+                image_mode = (image_mode + 1) % len(data)
             else:
-                image_mode = (image_mode - 1) % 4
+                image_mode = (image_mode - 1) % len(data)
 
             bswitchsource.label.set_text(data[image_mode][0])
 

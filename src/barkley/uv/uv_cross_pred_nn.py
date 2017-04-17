@@ -20,7 +20,7 @@ import progressbar
 import dill as pickle
 from scipy.spatial import KDTree
 from sklearn.neighbors import NearestNeighbors as NN
-import helper
+from helper import *
 
 def create_2d_delay_coordinates(data, delay_dimension, tau):
     result = np.repeat(data[:, :, :, np.newaxis], repeats=delay_dimension, axis=3)
@@ -35,12 +35,13 @@ def create_2d_delay_coordinates(data, delay_dimension, tau):
 def create_2d_delayed_patches(data, delay_dimension, tau, patch_size):
         print("creating delay coordinates")
         delayed_data = create_2d_delay_coordinates(data=data, delay_dimension=delay_dimension, tau=tau)
-        print(delayed_data.shape)
+
         patch_radius = patch_size//2
-        print(patch_radius)
         N = data.shape[1]
 
         print("setting up delayed patches result array")
+
+
         result_data = np.empty((len(data), N, N, delay_dimension*patch_size*patch_size))
 
         bar = progressbar.ProgressBar(max_value=(N-patch_radius*2)**2, redirect_stdout=True, poll_interval=0.0001)
@@ -48,9 +49,7 @@ def create_2d_delayed_patches(data, delay_dimension, tau, patch_size):
 
         for y in range(patch_radius, N-patch_radius):
             for x in range(patch_radius, N-patch_radius):
-                ind_y, ind_x = create_patch_indices((x-patch_radius, x+patch_radius+1), (y-patch_radius, y+patch_radius+1))
-
-                result_data[:, y, x] = delayed_data[:, y-patch_radius:y+patch_radius, x-patch_radius:x+patch_radius, :].reshape(-1, delay_dimension*patch_size*patch_size)
+                result_data[:, y, x] = delayed_data[:, y-patch_radius:y+patch_radius+1, x-patch_radius:x+patch_radius+1, :].reshape(-1, delay_dimension*patch_size*patch_size)
                 bar.update((x-patch_radius) + (y-patch_radius)*(N-patch_radius*2))
 
         bar.finish()
@@ -72,9 +71,8 @@ def generate_delayed_data(N, trans, sample_rate, Ngrid, delay_dimension, patch_s
     delayed_patched_data = create_2d_delayed_patches(data[1], delay_dimension=delay_dimension, tau=32, patch_size=patch_size)
 
     patch_radius = patch_size // 2
-    ind_y, ind_x = create_patch_indices((patch_radius,Ngrid-patch_radius), (patch_radius,Ngrid-patch_radius))
 
-    return delayed_patched_data, data[0][:, ind_y, ind_x].reshape(-1, Ngrid-2*patch_radius, Ngrid-2*patch_radius)
+    return delayed_patched_data, data[0][:, patch_radius:Ngrid-patch_radius, patch_radius:Ngrid-patch_radius].reshape(-1, Ngrid-2*patch_radius, Ngrid-2*patch_radius)
 
 N = 150
 ndata = 10000
@@ -117,8 +115,9 @@ flat_u_data_test = u_data_test.reshape(-1,1)
 
 neigh = NN(2)
 print("fitting")
-print(flat_v_data_train.shape)
+
 neigh.fit(flat_v_data_train)
+
 print("predicting...")
 distances, indices = neigh.kneighbors(flat_v_data_test)
 print(distances)
@@ -130,30 +129,7 @@ print(np.mean(diff**2))
 
 prediction = flat_u_prediction.reshape(2000, 150, 150)
 
-i = 0
-def update_new(data):
-    global i
-
-    mat.set_data(prediction[i])
-    clb.set_clim(vmin=0, vmax=1)
-    clb.draw_all()
-
-    i = (i+1) % len(prediction)
-
-    fig.canvas.set_window_title(str(i))
-
-
-    return [mat]
-
-fig, ax = plt.subplots()
-mat = plt.imshow(prediction[0], origin="lower", interpolation="none")
-clb = plt.colorbar(mat)
-clb.set_clim(vmin=0, vmax=1)
-clb.draw_all()
-
-ani = animation.FuncAnimation(fig, update_new, interval=1, save_count=50)
-
-plt.show()
+show_results({"prediction": prediction})
 
 """
 print("settting up the tree...")

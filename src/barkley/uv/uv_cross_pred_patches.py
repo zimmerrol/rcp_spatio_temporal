@@ -13,41 +13,7 @@ from ESN import ESN
 import progressbar
 import dill as pickle
 
-def generate_data(N, trans, sample_rate=1, Ngrid=100):
-    Nx = Ngrid
-    Ny = Ngrid
-    deltaT = 1e-2
-    epsilon = 0.08
-    delta_x = 0.1
-    D = 1/50
-    h = D/delta_x**2
-    print("h=" + str(h))
-    #h = D over delta_x
-    a = 0.75
-    b = 0.06
-
-    sim = BarkleySimulation(Nx, Ny, deltaT, epsilon, h, a, b)
-    sim.initialize_one_spiral()
-
-    sim = BarkleySimulation(Nx, Ny, deltaT, epsilon, h, a, b)
-    sim.initialize_one_spiral()
-
-    bar = progressbar.ProgressBar(max_value=trans+N, redirect_stdout=True)
-
-    for i in range(trans):
-        sim.explicit_step(chaotic=True)
-        bar.update(i)
-
-    data = np.empty((2, N, Nx, Ny))
-    for i in range(N):
-        for j in range(sample_rate):
-            sim.explicit_step(chaotic=True)
-        data[0, i] = sim._u
-        data[1, i] = sim._v
-        bar.update(i+trans)
-
-    bar.finish()
-    return data
+from helper import *
 
 N = 150
 ndata = 20000
@@ -63,12 +29,6 @@ else:
     print("loading data...")
     data = np.load("../cache/raw/{0}_{1}.uv.dat.npy".format(ndata, N))
     print("loading finished")
-    
-def create_patch_indices(range_x, range_y):
-    ind_x = np.tile(range(range_x[0], range_x[1]), range_y[1] - range_y[0])
-    ind_y = np.repeat(range(range_y[0], range_y[1]), range_x[1] - range_x[0])
-
-    return ind_y, ind_x
 
 generate_new = False
 if (os.path.exists("../cache/esn/uv/cross_pred_patches{0}_{1}_{2}_{3}.dat".format(N, ndata, sigma, n_units)) == False):
@@ -103,22 +63,22 @@ for y in range(0, N, sigma):
     for x in range(0, N, sigma):
         ind_y, ind_x = create_patch_indices((x, x + sigma), (y, y + sigma))
 
-        training_data_in = training_data[1][:, ind_y, ind_x].reshape(-1, sigma*sigma)
-        training_data_out = training_data[0][:, ind_y, ind_x].reshape(-1, sigma*sigma)
+        training_data_in = training_data[1][:, y:y+sigma, x:x+sigma].reshape(-1, sigma*sigma)
+        training_data_out = training_data[0][:, y:y+sigma, x:x+sigma].reshape(-1, sigma*sigma)
 
-        test_data_in = test_data[1][:, ind_y, ind_x].reshape(-1, sigma*sigma)
-        test_data_out = test_data[0][:, ind_y, ind_x].reshape(-1, sigma*sigma)
+        test_data_in = test_data[1][:, y:y+sigma, x:x+sigma].reshape(-1, sigma*sigma)
+        test_data_out = test_data[0][:, y:y+sigma, x:x+sigma].reshape(-1, sigma*sigma)
 
         if (generate_new):
             train_error = esn.fit(training_data_in, training_data_out, verbose=0)
             print("train error: {0}".format(train_error))
-           
+
             last_states[y//sigma*(N//sigma) + x//sigma] = esn._x
             output_weights[y//sigma*(N//sigma) + x//sigma] = esn._W_out
         else:
             esn._x = last_states[y//sigma*(N//sigma) + x//sigma]
             esn._W_out = output_weights[y//sigma*(N//sigma) + x//sigma]
-        
+
         pred = esn.predict(test_data_in, verbose=0)
         pred[pred>1.0] = 1.0
         pred[pred<0.0] = 0.0

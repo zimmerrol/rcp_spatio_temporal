@@ -27,6 +27,7 @@ from helper import *
 N = 150
 ndata = 10000
 sigma = 5
+patch_radius = sigma // 2
 n_units = 50
 
 def setupArrays():
@@ -50,13 +51,13 @@ def setupArrays():
     last_states = np.ctypeslib.as_array(last_states_base.get_obj())
     last_states = last_states.reshape(-1, n_units, 1)
 
-    output_weights_base = multiprocessing.Array(ctypes.c_double, sigma*sigma*(sigma*sigma+1+n_units))
+    output_weights_base = multiprocessing.Array(ctypes.c_double, (N-patch_radius)*(N-patch_radius)*sigma*sigma*(sigma*sigma+1+n_units))
     output_weights = np.ctypeslib.as_array(output_weights_base.get_obj())
     output_weights = output_weights.reshape(-1, sigma*sigma, sigma*sigma+1+n_units)
 
-    frame_output_weights_base = multiprocessing.Array(ctypes.c_double, (N-2)*(N-2) * 2*2 * (2*2+1+n_units))
+    frame_output_weights_base = multiprocessing.Array(ctypes.c_double, (N*N-(N-patch_radius)*(N-patch_radius)) * 2*2 * (2*2+1+n_units))
     frame_output_weights = np.ctypeslib.as_array(frame_output_weights_base.get_obj())
-    frame_output_weights = frame_output_weights.reshape((N-2)*(N-2),2*2, 2*2+1+n_units)
+    frame_output_weights = frame_output_weights.reshape(-1, 2*2, 2*2+1+n_units)
 setupArrays()
 
 def fit_predict_pixel(y, x, running_index, last_states, output_weights, training_data, test_data, esn, generate_new):
@@ -82,7 +83,7 @@ def fit_predict_pixel(y, x, running_index, last_states, output_weights, training
     return pred[:,0]
 
 def fit_predict_frame_pixel(y, x, running_index, last_states, output_weights, training_data, test_data, esn, generate_new):
-    ind_y, ind_x = y, x #create_patch_indices((x,x+2), (y-2, y))
+    ind_y, ind_x = y, x
 
     training_data_in = training_data[1][:, ind_y, ind_x].reshape(-1, 1*1)
     training_data_out = training_data[0][:, y, x].reshape(-1, 1*1)
@@ -169,9 +170,9 @@ def mainFunction():
     if (generate_new):
         print("setting up...")
 
-        last_states = np.empty(((N-2)*(N-2), n_units, 1))
-        output_weights = np.empty(((N-2)*(N-2),sigma*sigma, sigma*sigma+1+n_units))
-        frame_output_weights = np.empty(((N-2)*(N-2),2*2, 2*2+1+n_units))
+        #last_states = np.empty(((N-2)*(N-2), n_units, 1))
+        #output_weights = np.empty(((N-2)*(N-2),sigma*sigma, sigma*sigma+1+n_units))
+        #frame_output_weights = np.empty(((N-2)*(N-2),2*2, 2*2+1+n_units))
     else:
         print("loading existing model (../cache/esn/uv/cross_pred_patches_advanced_mt{0}_{1}_{2}_{3}.dat)...".format(N, ndata, sigma, n_units))
 
@@ -194,9 +195,9 @@ def mainFunction():
 
     queue = Queue() # use manager.queue() ?
     print("preparing threads...")
-    pool = Pool(processes=2, initializer=get_prediction_init, initargs=[queue,])
+    pool = Pool(processes=16, initializer=get_prediction_init, initargs=[queue,])
 
-    processProcessResultsThread = Process(target=processThreadResults, args=("processProcessResultsThread", queue, 2, N*N) )
+    processProcessResultsThread = Process(target=processThreadResults, args=("processProcessResultsThread", queue, 16, N*N) )
 
     modifyDataProcessList = []
     jobs = []
