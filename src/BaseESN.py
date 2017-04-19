@@ -9,7 +9,7 @@ class BaseESN(object):
                 leak_rate=1.0, sparseness=0.2, random_seed=None,
                 out_activation=lambda x:x, out_inverse_activation=lambda x:x,
                 weight_generation='naive', bias=1.0, output_bias=1.0, output_input_scaling=1.0,
-                feedback=False):
+                feedback=False, scale_input_matrix=False):
 
                 self.n_input = n_input
                 self.n_reservoir = n_reservoir
@@ -29,7 +29,7 @@ class BaseESN(object):
                         raise ValueError("Dimension of input_scaling ({0}) does not match the input data dimension ({1})".format(len(input_scaling), n_input))
 
                 self._input_scaling_matrix = np.diag(input_scaling)
-                self._expanded_input_scaling_matrix = np.diag(np.append([1.0],input_scaling))
+                self._expanded_input_scaling_matrix = np.diag(np.append([1.0], input_scaling))
 
                 self.out_activation = out_activation
                 self.out_inverse_activation = out_inverse_activation

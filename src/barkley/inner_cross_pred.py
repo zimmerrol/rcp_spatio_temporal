@@ -27,23 +27,28 @@ def print_field(input_y, input_x, output_y, output_x):
         string += "|"
         print(string)
 
-N = 160
+N = 150
+ndata = 10000
+trainLength = 2000
+n_units = 15000
 
-if (os.path.exists("cache/raw/20000_{0}.dat.npy".format(N)) == False):
+if (os.path.exists("cache/raw/{0}_{1}.dat.npy".format(ndata, N)) == False):
     print("generating data...")
-    data = generate_data(20000, 50000, 5, Ngrid=N)
-    np.save("cache/raw/20000_{0}.dat.npy".format(N), data)
+    data = generate_data(ndata, 50000, 5, Ngrid=N)
+    np.save("cache/raw/{0}_{1}.dat.npy".format(ndata, N), data)
     print("generating finished")
 else:
     print("loading data...")
-    data = np.load("cache/raw/20000_{0}.dat.npy".format(N))
+    data = np.load("cache/raw/{0}_{1}.dat.npy".format(ndata, N))
     print("loading finished")
 
-training_data = data[:18000]
-test_data = data[18000:20000]
+training_data = data[:ndata-trainLength]
+test_data = data[ndata-trainLength:]
+
+print(training_data.shape)
 
 #input_y, input_x, output_y, output_x = create_patch_indices((12,17), (12,17), (13,16), (13,16)) # -> yields MSE=0.0115 with leak_rate = 0.8
-input_y, input_x, output_y, output_x = create_patch_indices((40, 119), (40, 119), (50, 109), (50, 109)) # -> yields MSE=0.0873 with leak_rate = 0.3
+input_y, input_x, output_y, output_x = create_patch_indices((0, N), (0, N), (1, N-1), (1, N-1)) # -> yields MSE=0.0873 with leak_rate = 0.3
 
 training_data_in =  training_data[:, input_y, input_x].reshape(-1, len(input_y))
 training_data_out =  training_data[:, output_y, output_x].reshape(-1, len(output_y))
@@ -51,19 +56,18 @@ training_data_out =  training_data[:, output_y, output_x].reshape(-1, len(output
 test_data_in =  test_data[:, input_y, input_x].reshape(-1, len(input_y))
 test_data_out =  test_data[:, output_y, output_x].reshape(-1, len(output_y))
 
-n_units = 6000
 
 generate_new = False
 if (os.path.exists("cache/esn/cross_pred_" + str(len(input_y)) + "_" + str(len(output_y)) + "_" + str(n_units) + ".dat") == False):
     generate_new = True
 
-
 if (generate_new):
     print("setting up...")
     esn = ESN(n_input = len(input_y), n_output = len(output_y), n_reservoir = n_units, #used to be 1700
             weight_generation = "advanced", leak_rate = 0.2, spectral_radius = 0.1,
-            random_seed=42, noise_level=0.0001, sparseness=.1, regression_parameters=[5e-0], solver = "lsqr")#,
-#            out_activation = lambda x: 0.5*(1+np.tanh(x/2)), out_inverse_activation = lambda x:2*np.arctanh(2*x-1))
+            random_seed=42, noise_level=0.0001, sparseness=.1, regression_parameters=[5e-0], solver = "lsqr",
+            #out_activation = lambda x: 0.5*(1+np.tanh(x/2)), out_inverse_activation = lambda x:2*np.arctanh(2*x-1)
+            )
 
     print("fitting...")
 

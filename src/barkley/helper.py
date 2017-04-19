@@ -66,16 +66,30 @@ def generate_data(N, trans, sample_rate=1, Ngrid=100):
         sim.explicit_step(chaotic=True)
         bar.update(i)
 
-    data = np.empty((2, N, Nx, Ny))
+    data = np.empty((N, Nx, Ny))
     for i in range(N):
         for j in range(sample_rate):
             sim.explicit_step(chaotic=True)
-        data[0, i] = sim._u
-        data[1, i] = sim._v
+        data[i] = sim._u
         bar.update(i+trans)
 
     bar.finish()
     return data
+
+def create_patch_indices(outer_range_x, outer_range_y, inner_range_x, inner_range_y):
+    outer_ind_x = np.tile(range(outer_range_x[0], outer_range_x[1]), outer_range_y[1]-outer_range_y[0])
+    outer_ind_y = np.repeat(range(outer_range_y[0], outer_range_y[1]), outer_range_x[1]-outer_range_x[0])
+
+    inner_ind_x = np.tile(range(inner_range_x[0], inner_range_x[1]), inner_range_y[1] - inner_range_y[0])
+    inner_ind_y = np.repeat(range(inner_range_y[0], inner_range_y[1]), inner_range_x[1] - inner_range_x[0])
+
+    outer_list = [c for c in zip(outer_ind_y, outer_ind_x)]
+    inner_list = [c for c in zip(inner_ind_y, inner_ind_x)]
+
+    real_list = np.array([x for x in outer_list if x not in inner_list])
+    inner_list = np.array(inner_list)
+
+    return real_list[:,0], real_list[:,1], inner_list[:, 0], inner_list[:, 1]
 
 def show_results(dataDictionary):
     shape = None

@@ -198,7 +198,7 @@ if mode == "cross":
     plt.figure(figsize=(8,3))
     plt.plot(np.linspace(300, 600, 3000), data[trainLength:trainLength+testLength,1]-Y[:,0], 'g', linestyle=":" )
     #plt.title('Fehler von $y(n)$ und $v(n)$ beginndend ab $n=0$')
-    plt.ylim([-1,1])
+    plt.ylim([-0.125, 0.125])
     plt.legend(['Fehler des Vorhersage'], loc="upper center", fancybox=True, shadow=True, ncol=2)
     plt.xlabel("Zeit t")
     plt.ylabel("Differenz $y(t) - y'(t)$")

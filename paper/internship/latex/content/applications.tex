@@ -1,6 +1,6 @@
 \section{Anwendungen}
 \label{chp:applications}
-Um den Aufwand für die spätere Benutzung zu reduzieren, ist zuerst eine allgemeine Implementation des \textsc{ESN}s geschrieben worden, welche nun anhand zweier exemplarischer Systeme getastet worden ist.
+Um den Aufwand für die spätere Benutzung zu reduzieren, ist zuerst eine allgemeine Implementation des \textsc{ESN}s geschrieben worden, welche nun anhand zweier exemplarischer Systeme getestet worden ist.
 
 \subsection{Vorhersage eines Rössler-Systems}
 Eine erste Anwendung um die Möglichkeiten eines \textsc{ESN} zu demonstrieren besteht in der Vorhersage des Verhaltens eines \textit{Rössler-Systems}
@@ -68,7 +68,7 @@ Damit wurde für den Trainingsvorgang ein Fehler $MSE_{train} = 0.0025$ und für
     \caption{Darstellung des Fehlers $y(t)-y'(t)$ zwischen dem Signal $y(t)$ und der Vorhersage $y'(t)$.}
     \label{fig:application_roessler_b1}
 \end{figure}
- Im Vergleich zu anderen Publikationen \cite{parlitz2005} ergibt sich ein ähnlicher Fehler. Leider können hierbei nur die Graphen verglichen werden, da keine expliziten Fehler angegeben sind.
+ Im Vergleich zu der vorhandenen Publikation \cite{parlitz2005} ergibt sich ein ähnlicher Fehler. Leider können hierbei nur die Graphen verglichen werden, da keine expliziten Fehler angegeben sind.
 
 
 \begin{figure}[H]
@@ -89,8 +89,8 @@ Als nächste Anwendung wird ein \textit{Mackey-Glass-System}
 \dot{x}(t) &= \beta \frac{x(t-\tau)}{1+x(t-\tau)^n}-\gamma x(t)\\
 \end{split}
 \end{align}
-betrachtet, wobei $\tau = 17, n=10, \gamma=0.1, \beta = 0.2$ gewählt wurden. Dies ist eine beliebte Aufgabe im Bereich der Vorhersagen chaotischer Zeitreihen.\\
-Für dieses System wurde in Analogie zu  \citep{caraballo2014} die Vorhersage $x(t) \rightarrow x(t+84)$ betrachtet, wobei die Parameter aus Tabelle \ref{tab:application_mackeyglass} genutzt wurden. Mittels der expliziten \textit{Euler-Diskretisierung} 
+betrachtet, wobei $\tau = 17, n=10, \gamma=0.1, \beta = 0.2$ gewählt wurden, um die Ergebnisse abschließend mit den Resultaten von \citep{caraballo2014} vergleichen zu können. Dies ist eine beliebte Aufgabe im Bereich der Vorhersagen chaotischer Zeitreihen.\\
+Um die Resultate mit \citep{caraballo2014} vergleichen zu können, wurde für das System in Analogie die Vorhersage $x(t) \rightarrow x(t+84)$ betrachtet. Dabei wurden die Parameter aus Tabelle \ref{tab:application_mackeyglass} genutzt. Mittels der expliziten \textit{Euler-Diskretisierung} 
 
 \begin{align}
 x(t+1) = x(t) + \Delta_t \cdot \left(\beta \frac{x(t-\tau)}{1+x(t-\tau)^n}-\gamma x(t)  \right)

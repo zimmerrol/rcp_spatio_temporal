@@ -26,8 +26,8 @@ def sineshit():
 
     Y = esn.generate(n=15000, continuation=True, initial_input=y[5000,:])
 
-    plt.plot(esn._X.T)
-    plt.show()
+    #plt.plot(esn._X.T)
+    #plt.show()
 
     print(x[5000:].shape)
     print(Y[:, 0].shape)
