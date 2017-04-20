@@ -9,11 +9,13 @@ import matplotlib.animation as animation
 from BarkleySimulation import BarkleySimulation
 from ESN import ESN
 from helper import *
+from scipy.spatial import KDTree
+from sklearn.neighbors import NearestNeighbors as NN
 
 N = 150
-ndata = 10000
-testLength = 2000
-ddim = 1
+ndata = 100000
+testLength = 1000
+ddim = 15
 tau = 32
 
 def create_1d_delay_coordinates(data, delay_dimension, tau):
@@ -36,41 +38,53 @@ else:
     data = np.load("cache/raw/{0}_{1}.dat.npy".format(ndata, N))
     print("loading finished")
 
-delayed_data = create_1d_delay_coordinates(data, ddim, tau)
-
-delayed_training_data = delayed_data[:ndata-testLength]
-delayed_test_data = delayed_data[ndata-testLength:]
-
 input_y, input_x, output_y, output_x = create_patch_indices((0, N), (0, N), (1, N-1), (1, N-1))
 
-training_data_in = delayed_training_data[:, input_y, input_x].reshape(-1, len(input_y), delayed_training_data.shape[2])
-training_data_out = training_data[ndata-testLength:][:, output_y, output_x].reshape(-1, len(output_y))
 
-test_data_in = delayed_test_data[:, input_y, input_x].reshape(-1, len(input_y), delayed_training_data.shape[2])
-test_data_out = test_data[ndata-testLength:][:, output_y, output_x].reshape(-1, len(output_y))
 
-flat_test_data_in = test_data_in.reshape(-1, delayed_patched_v_data.shape[2])
-flat_training_data_in = training_data_in.reshape(-1, delayed_patched_v_data.shape[2])
+delayed_input_data = create_1d_delay_coordinates(data[:, input_y, input_x], ddim, tau)
+print(delayed_input_data.shape)
+
+training_data_in = delayed_input_data[:ndata-testLength]    #delayed_
+test_data_in = delayed_input_data[ndata-testLength:]        #delayed_
+
+print(test_data_in.shape)
+
+training_data_out = data[:ndata-testLength][:, output_y, output_x].reshape(-1, len(output_y))
+test_data_out = data[ndata-testLength:][:, output_y, output_x].reshape(-1, len(output_y))
+
+flat_test_data_in = test_data_in.reshape(len(test_data_out), -1)
+flat_training_data_in = training_data_in.reshape(len(training_data_out), -1)
 
 flat_test_data_out = test_data_out.reshape(-1, len(output_y))
 flat_training_out = training_data_out.reshape(-1, len(output_y))
 
-neigh = NN(2)
+print(flat_training_data_in.shape)
+print(flat_training_out.shape)
+
+neigh = NN(2, n_jobs=16)
 print("fitting")
 
-neigh.fit(flat_test_data_in)
+neigh.fit(flat_training_data_in)
 
 print("predicting...")
-distances, indices = neigh.kneighbors(flat_training_data_in)
+distances, indices = neigh.kneighbors(flat_test_data_in)
 print(distances)
 
-flat_prediction = flat_training_out[indices[:, 0]]
+test_data = data[ndata-testLength:]
+
+flat_prediction = (flat_training_out[indices[:, 0]]+flat_training_out[indices[:, 1]])/2.0
+print(flat_prediction.shape)
+print(indices[:, 0].shape)
 #prediction = flat_prediction.reshape(2000, 148, 148)
 
 merged_prediction = test_data.copy()
 merged_prediction[:, output_y, output_x] = flat_prediction
 
 difference = np.abs(test_data - merged_prediction)
+
+diff = flat_test_data_out - flat_prediction
+print("MSE = {0:4f}".format(np.mean(diff**2)))
 
 show_results({"pred": merged_prediction , "orig": test_data, "diff": difference})
 

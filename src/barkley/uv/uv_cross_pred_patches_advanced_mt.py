@@ -28,7 +28,7 @@ N = 150
 ndata = 10000
 sigma = 5
 patch_radius = sigma // 2
-n_units = 50
+n_units = 400
 
 def setupArrays():
     #TODO: Correct the array dimensions!
@@ -38,40 +38,44 @@ def setupArrays():
     shared_training_data_base = multiprocessing.Array(ctypes.c_double, 2*8000*N*N)
     shared_training_data = np.ctypeslib.as_array(shared_training_data_base.get_obj())
     shared_training_data = shared_training_data.reshape(2, -1, N, N)
-
+   
     shared_test_data_base = multiprocessing.Array(ctypes.c_double, 2*2000*N*N)
     shared_test_data = np.ctypeslib.as_array(shared_test_data_base.get_obj())
     shared_test_data = shared_test_data.reshape(2, -1, N, N)
-
+    
     prediction_base = multiprocessing.Array(ctypes.c_double, 2000*N*N)
     prediction = np.ctypeslib.as_array(prediction_base.get_obj())
     prediction = prediction.reshape(-1, N, N)
-
+    
     last_states_base = multiprocessing.Array(ctypes.c_double, N*N*n_units)
     last_states = np.ctypeslib.as_array(last_states_base.get_obj())
     last_states = last_states.reshape(-1, n_units, 1)
-
+    
     output_weights_base = multiprocessing.Array(ctypes.c_double, (N-patch_radius)*(N-patch_radius)*sigma*sigma*(sigma*sigma+1+n_units))
     output_weights = np.ctypeslib.as_array(output_weights_base.get_obj())
     output_weights = output_weights.reshape(-1, sigma*sigma, sigma*sigma+1+n_units)
-
-    frame_output_weights_base = multiprocessing.Array(ctypes.c_double, (N*N-(N-patch_radius)*(N-patch_radius)) * 2*2 * (2*2+1+n_units))
-    frame_output_weights = np.ctypeslib.as_array(frame_output_weights_base.get_obj())
-    frame_output_weights = frame_output_weights.reshape(-1, 2*2, 2*2+1+n_units)
+    
+    if (patch_radius > 0):
+        frame_output_weights_base = multiprocessing.Array(ctypes.c_double, (N*N-(N-patch_radius)*(N-patch_radius)) * 2*2 * (2*2+1+n_units))
+        frame_output_weights = np.ctypeslib.as_array(frame_output_weights_base.get_obj())
+        frame_output_weights = frame_output_weights.reshape(-1, 2*2, 2*2+1+n_units)
+    else:
+        frame_output_weights = None
+    
 setupArrays()
 
 def fit_predict_pixel(y, x, running_index, last_states, output_weights, training_data, test_data, esn, generate_new):
-    training_data_in = training_data[1][:, y - 2:y + 3, x - 2:x + 3].reshape(-1, 5*5)
+    training_data_in = training_data[1][:, y - patch_radius:y + patch_radius+1, x - patch_radius:x + patch_radius+1].reshape(-1, sigma*sigma)
     training_data_out = training_data[0][:, y, x].reshape(-1, 1)
 
-    test_data_in = test_data[1][:, y - 2:y + 3, x - 2:x + 3].reshape(-1, 5*5)
+    test_data_in = test_data[1][:, y - patch_radius:y + patch_radius+1, x - patch_radius:x + patch_radius+1].reshape(-1, sigma*sigma)
     test_data_out = test_data[0][:, y, x].reshape(-1, 1)
 
     if (generate_new):
         train_error = esn.fit(training_data_in, training_data_out, verbose=0)
 
-        last_states[running_index] = esn._x
-        output_weights[running_index] = esn._W_out
+        #last_states[running_index] = esn._x
+        #output_weights[running_index] = esn._W_out
     else:
         esn._x = last_states[running_index]
         esn._W_out = output_weights[running_index]
@@ -95,7 +99,7 @@ def fit_predict_frame_pixel(y, x, running_index, last_states, output_weights, tr
         train_error = esn.fit(training_data_in, training_data_out, verbose=0)
     else:
         esn._x = last_states[running_index]
-        esn._W_out = frame_output_weights[running_index-(N-4)*(N-4)]
+        esn._W_out = frame_output_weights[running_index-(N-2*patch_radius)*(N-2*patch_radius)]
 
     pred = esn.predict(test_data_in, verbose=0)
     pred[pred>1.0] = 1.0
@@ -110,11 +114,11 @@ def get_prediction(data, def_param=(shared_training_data, shared_test_data, fram
     y, x, running_index = data
 
     pred = None
-    if (y > 1 and y < N-2 and x > 1 and x < N-2):
+    if (y >= patch_radius and y < N-patch_radius and x >= patch_radius and x < N-patch_radius):
         #inner point
         esn = ESN(n_input = sigma*sigma, n_output = 1, n_reservoir = n_units,
                     weight_generation = "advanced", leak_rate = 0.70, spectral_radius = 0.8,
-                    random_seed=42, noise_level=0.0001, sparseness=.1, regression_parameters=[5e-1], solver = "lsqr")
+                    random_seed=42, noise_level=0.0001, sparseness=.1, regression_parameters=[5e-6], solver = "lsqr")
 
 
         pred = fit_predict_pixel(y, x, running_index, last_states, output_weights, shared_training_data, shared_test_data, esn, True)
@@ -123,7 +127,7 @@ def get_prediction(data, def_param=(shared_training_data, shared_test_data, fram
         #frame
         esn = ESN(n_input = 1, n_output = 1, n_reservoir = n_units,
                 weight_generation = "advanced", leak_rate = 0.70, spectral_radius = 0.8,
-                random_seed=42, noise_level=0.0001, sparseness=.1, regression_parameters=[5e-1], solver = "lsqr")
+                random_seed=42, noise_level=0.0001, sparseness=.1, regression_parameters=[5e-6], solver = "lsqr")
 
         pred = fit_predict_frame_pixel(y, x, running_index, last_states, frame_output_weights, shared_training_data, shared_test_data, esn, True)
 
@@ -153,6 +157,7 @@ def processThreadResults(threadname, q, numberOfWorkers, numberOfResults, def_pa
 
 def mainFunction():
     global output_weights, frame_output_weights, last_states
+    
     if (os.path.exists("../cache/raw/{0}_{1}.uv.dat.npy".format(ndata, N)) == False):
         print("generating data...")
         data = generate_data(ndata, 50000, 5, Ngrid=N)
@@ -168,7 +173,7 @@ def mainFunction():
         generate_new = True
 
     if (generate_new):
-        print("setting up...")
+        print("setting up...doing nothing...")
 
         #last_states = np.empty(((N-2)*(N-2), n_units, 1))
         #output_weights = np.empty(((N-2)*(N-2),sigma*sigma, sigma*sigma+1+n_units))
@@ -205,7 +210,7 @@ def mainFunction():
     outer_index = 0
     for y in range(N):
         for x in range(N):
-            if (y > 1 and y < N-2 and x > 1 and x < N-2):
+            if (y >= patch_radius and y < N-patch_radius and x >= patch_radius and x < N-patch_radius):
                 inner_index += 1
                 jobs.append((y, x, inner_index))
             else:
@@ -233,8 +238,9 @@ def mainFunction():
     diff = (test_data[0]-prediction)
     mse = np.mean((diff)**2)
     print("test error: {0}".format(mse))
+    print("inner test error: {0}".format(np.mean(((test_data[0]-prediction)[patch_radius:N-patch_radius, patch_radius:N-patch_radius])**2)))
 
-    show_results({"Orig" : shared_test_data, "Pred" : prediction, "Diff" : diff})
+    show_results({"Orig" : shared_test_data[0], "Pred" : prediction, "Diff" : diff})
 
 if __name__== '__main__':
     mainFunction()

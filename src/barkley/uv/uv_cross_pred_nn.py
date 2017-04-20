@@ -27,6 +27,7 @@ def create_2d_delay_coordinates(data, delay_dimension, tau):
     print("delayed data copied")
 
     for n in range(1, delay_dimension):
+        print(n)
         result[:, :, :, n] = np.roll(result[:, :, :, n], n*tau, axis=0)
     result[0:delay_dimension-1,:,:] = 0
 
@@ -46,10 +47,13 @@ def create_2d_delayed_patches(data, delay_dimension, tau, patch_size):
 
         bar = progressbar.ProgressBar(max_value=(N-patch_radius*2)**2, redirect_stdout=True, poll_interval=0.0001)
         bar.update(0)
+        print(delayed_data.shape)
+        print("copying stuff...")
 
         for y in range(patch_radius, N-patch_radius):
-            for x in range(patch_radius, N-patch_radius):
-                result_data[:, y, x] = delayed_data[:, y-patch_radius:y+patch_radius+1, x-patch_radius:x+patch_radius+1, :].reshape(-1, delay_dimension*patch_size*patch_size)
+            for x in range(patch_radius, N-patch_radius):   
+                #result_data[:, y, x]
+                a = delayed_data[:, y-patch_radius:y+patch_radius+1, x-patch_radius:x+patch_radius+1, :].reshape(-1, delay_dimension*patch_size*patch_size)
                 bar.update((x-patch_radius) + (y-patch_radius)*(N-patch_radius*2))
 
         bar.finish()
@@ -77,7 +81,7 @@ def generate_delayed_data(N, trans, sample_rate, Ngrid, delay_dimension, patch_s
 N = 150
 ndata = 10000
 sigma = 1
-ddim = 3
+ddim = 4
 
 force_generation = True
 
@@ -101,11 +105,11 @@ print("reshaping...")
 4000        0.00686822737285
 8000        0.00631390262526
 """
-delayed_patched_v_data_train = delayed_patched_v_data[:8000]
-u_data_train = u_data[:8000]
+delayed_patched_v_data_train = delayed_patched_v_data[:4000]
+u_data_train = u_data[:4000]
 
-delayed_patched_v_data_test = delayed_patched_v_data[8000:10000]
-u_data_test = u_data[8000:10000]
+delayed_patched_v_data_test = delayed_patched_v_data[4000:6000]
+u_data_test = u_data[4000:6000]
 
 flat_v_data_train = delayed_patched_v_data_train.reshape(-1, delayed_patched_v_data.shape[3])
 flat_u_data_train = u_data_train.reshape(-1,1)
@@ -122,7 +126,7 @@ print("predicting...")
 distances, indices = neigh.kneighbors(flat_v_data_test)
 print(distances)
 
-flat_u_prediction = flat_u_data_train[indices[:, 0]]
+flat_u_prediction = (flat_u_data_train[indices[:, 0]] + flat_u_data_train[indices[:, 1]])/2.0
 
 diff = flat_u_prediction - flat_u_data_test
 print(np.mean(diff**2))
