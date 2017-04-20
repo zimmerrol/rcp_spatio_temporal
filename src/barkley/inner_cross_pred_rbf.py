@@ -9,13 +9,11 @@ import matplotlib.animation as animation
 from BarkleySimulation import BarkleySimulation
 from ESN import ESN
 from helper import *
-from scipy.spatial import KDTree
-from sklearn.neighbors import NearestNeighbors as NN
 
 N = 150
 ndata = 10000
 testLength = 1000
-ddim = 15
+ddim = 3
 tau = 32
 
 def create_1d_delay_coordinates(data, delay_dimension, tau):
@@ -40,8 +38,6 @@ else:
 
 input_y, input_x, output_y, output_x = create_patch_indices((0, N), (0, N), (1, N-1), (1, N-1))
 
-
-
 delayed_input_data = create_1d_delay_coordinates(data[:, input_y, input_x], ddim, tau)
 print(delayed_input_data.shape)
 
@@ -59,30 +55,60 @@ flat_training_data_in = training_data_in.reshape(len(training_data_out), -1)
 flat_test_data_out = test_data_out.reshape(-1, len(output_y))
 flat_training_out = training_data_out.reshape(-1, len(output_y))
 
-print(flat_training_data_in.shape)
-print(flat_training_out.shape)
+print("preparing fitting...")
 
-neigh = NN(2, n_jobs=16)
+
+
+m = 1125
+n = ndata-testLength
+nprime = len(output_y)
+
+samplingDist = n//m
+samplingPoints = flat_training_data_in[0::samplingDist]
+sigmam = np.ones(m)*5
+
+#construct matrices
+A = np.empty((n, m))
+F = np.empty((n, nprime))
+L = None
+
+#construct target matrix F
+F = flat_training_out.copy()
+
+def rbf(xi, yi, sigmam):
+    return np.exp(-np.sum((xi-yi)**2)/(2*sigmam**2))
+
+def rbf2(xi, yi, sigmam):
+    xi = np.tile(xi, (len(yi),1))
+
+    return np.exp(-np.sum((xi-yi)**2, axis=1)/(2*sigmam**2))
+
+#construct trainig matrix A
+for i in range(n):
+    A[i] = rbf2(flat_training_data_in[i], samplingPoints, sigmam)
+    #for j in range(m):
+        #A[i, j] = rbf(flat_training_data_in[i], samplingPoints[j], sigmam[j])
+
 print("fitting")
+#calculate the resulting weights L
+APINV = np.linalg.pinv(A)
+L = np.dot(APINV, F)
 
-neigh.fit(flat_training_data_in)
+Lt = L.T
 
 print("predicting...")
-distances, indices = neigh.kneighbors(flat_test_data_in)
-print(distances)
+
+flat_prediction = np.zeros((testLength, len(output_y)))
+
+for i in range(0, flat_prediction.shape[0]):
+    flat_prediction[i] = np.dot(L.T, rbf2(flat_test_data_in[i], samplingPoints, sigmam))
 
 test_data = data[ndata-testLength:]
-
-flat_prediction = (flat_training_out[indices[:, 0]]+flat_training_out[indices[:, 1]])/2.0
-print(flat_prediction.shape)
-print(indices[:, 0].shape)
-#prediction = flat_prediction.reshape(2000, 148, 148)
 
 merged_prediction = test_data.copy()
 merged_prediction[:, output_y, output_x] = flat_prediction
 
 difference = np.abs(test_data - merged_prediction)
-
 diff = flat_test_data_out - flat_prediction
 print("MSE = {0:4f}".format(np.mean(diff**2)))
 
