@@ -27,10 +27,10 @@ def print_field(input_y, input_x, output_y, output_x):
         string += "|"
         print(string)
 
-N = 150
+N = 50
 ndata = 10000
 trainLength = 2000
-n_units = 15000
+n_units = 20000
 
 if (os.path.exists("cache/raw/{0}_{1}.dat.npy".format(ndata, N)) == False):
     print("generating data...")
