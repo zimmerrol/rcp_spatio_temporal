@@ -101,35 +101,47 @@ print("reshaping...")
 4000        0.00686822737285
 8000        0.00631390262526
 """
+
 trainLength = 9000
 testLength = 1000
-delayed_patched_v_data_train = delayed_patched_v_data[:trainLength]
-u_data_train = u_data[:trainLength]
 
-delayed_patched_v_data_test = delayed_patched_v_data[trainLength:trainLength+testLength]
-u_data_test = u_data[trainLength:trainLength+testLength]
+if (trainLength +testLength > ndata):
+    print("Please adjust the trainig and testing phase length!")
+    exit()
 
-flat_v_data_train = delayed_patched_v_data_train.reshape(-1, delayed_patched_v_data.shape[3])
-flat_u_data_train = u_data_train.reshape(-1,1)
+#x = 50
+#y = 50
 
-flat_v_data_test = delayed_patched_v_data_test.reshape(-1, delayed_patched_v_data.shape[3])
-flat_u_data_test = u_data_test.reshape(-1,1)
+for y in range(150):
+    print(y)
+    for x in range(150):
+        delayed_patched_v_data_train = delayed_patched_v_data[:trainLength, y, x]
+        u_data_train = u_data[:trainLength, y, x]
 
-neigh = NN(2, n_jobs=26)
-print("fitting")
+        delayed_patched_v_data_test = delayed_patched_v_data[trainLength:trainLength+testLength, y, x]
+        u_data_test = u_data[trainLength:trainLength+testLength, y, x]
 
-neigh.fit(flat_v_data_train)
+        flat_v_data_train = delayed_patched_v_data_train.reshape(-1, delayed_patched_v_data.shape[3])
+        flat_u_data_train = u_data_train.reshape(-1,1)
 
-print("predicting...")
-distances, indices = neigh.kneighbors(flat_v_data_test)
-print(distances)
+        flat_v_data_test = delayed_patched_v_data_test.reshape(-1, delayed_patched_v_data.shape[3])
+        flat_u_data_test = u_data_test.reshape(-1,1)
 
-flat_u_prediction = flat_u_data_train[indices[:, 0]]
+        neigh = NN(2, n_jobs=26)
+        #print("fitting")
 
-diff = flat_u_prediction - flat_u_data_test
-print(np.mean(diff**2))
+        neigh.fit(flat_v_data_train)
 
-prediction = flat_u_prediction.reshape(1000, 150, 150)
+        #print("predicting...")
+        distances, indices = neigh.kneighbors(flat_v_data_test)
+        #print(distances)
+
+        flat_u_prediction = (flat_u_data_train[indices[:, 0]] + flat_u_data_train[indices[:, 1]])/2.0
+
+        diff = flat_u_prediction - flat_u_data_test
+        #print("{0},{1}: {2}".format(y, x, np.mean(diff**2)))
+
+prediction = flat_u_prediction.reshape(testLength, 1, 1)
 
 show_results({"prediction": prediction})
 

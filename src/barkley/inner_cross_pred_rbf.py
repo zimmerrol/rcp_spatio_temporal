@@ -13,8 +13,10 @@ from helper import *
 N = 150
 ndata = 10000
 testLength = 1000
-ddim = 3
+ddim = 1
 tau = 32
+
+#ddim = 1 -> 0.145029
 
 def create_1d_delay_coordinates(data, delay_dimension, tau):
     result = np.repeat(data[:, :, np.newaxis], repeats=delay_dimension, axis=2)
@@ -38,7 +40,7 @@ else:
 
 input_y, input_x, output_y, output_x = create_patch_indices((0, N), (0, N), (1, N-1), (1, N-1))
 
-delayed_input_data = create_1d_delay_coordinates(data[:, input_y, input_x], ddim, tau)
+delayed_input_data = create_1d_delay_coordinates(data[:, input_y, input_x], ddim, tau).reshape((ndata, -1))
 print(delayed_input_data.shape)
 
 training_data_in = delayed_input_data[:ndata-testLength]    #delayed_

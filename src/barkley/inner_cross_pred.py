@@ -27,10 +27,16 @@ def print_field(input_y, input_x, output_y, output_x):
         string += "|"
         print(string)
 
-N = 50
+N = 150
 ndata = 10000
 trainLength = 2000
-n_units = 20000
+n_units = 10000
+
+"""
+n_units accuricy
+10000   0.18049000161901738
+15000   0.17985260548782417
+"""
 
 if (os.path.exists("cache/raw/{0}_{1}.dat.npy".format(ndata, N)) == False):
     print("generating data...")
@@ -38,9 +44,11 @@ if (os.path.exists("cache/raw/{0}_{1}.dat.npy".format(ndata, N)) == False):
     np.save("cache/raw/{0}_{1}.dat.npy".format(ndata, N), data)
     print("generating finished")
 else:
-    print("loading data...")
+    print("loading data... from: " + "cache/raw/{0}_{1}.dat.npy".format(ndata, N))
     data = np.load("cache/raw/{0}_{1}.dat.npy".format(ndata, N))
     print("loading finished")
+
+show_results({"orig": data})
 
 training_data = data[:ndata-trainLength]
 test_data = data[ndata-trainLength:]
