@@ -15,8 +15,14 @@ from sklearn.neighbors import NearestNeighbors as NN
 N = 150
 ndata = 10000
 testLength = 1000
-ddim = 15
+ddim = 10
 tau = 32
+
+"""
+ddim    accuracy
+10      
+15      0.254207
+"""
 
 def create_1d_delay_coordinates(data, delay_dimension, tau):
     result = np.repeat(data[:, :, np.newaxis], repeats=delay_dimension, axis=2)
