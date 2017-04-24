@@ -21,6 +21,7 @@ import dill as pickle
 from scipy.spatial import KDTree
 from sklearn.neighbors import NearestNeighbors as NN
 from helper import *
+from datetime import datetime
 
 def create_2d_delay_coordinates(data, delay_dimension, tau):
     result = np.repeat(data[:, :, :, np.newaxis], repeats=delay_dimension, axis=3)
@@ -101,11 +102,13 @@ print("reshaping...")
 4000        0.00686822737285
 8000        0.00631390262526
 """
-delayed_patched_v_data_train = delayed_patched_v_data[:8000]
-u_data_train = u_data[:8000]
 
-delayed_patched_v_data_test = delayed_patched_v_data[8000:10000]
-u_data_test = u_data[8000:10000]
+trainLength = 4000
+delayed_patched_v_data_train = delayed_patched_v_data[:trainLength]
+u_data_train = u_data[:trainLength]
+
+delayed_patched_v_data_test = delayed_patched_v_data[trainLength:]
+u_data_test = u_data[trainLength:]
 
 flat_v_data_train = delayed_patched_v_data_train.reshape(-1, delayed_patched_v_data.shape[3])
 flat_u_data_train = u_data_train.reshape(-1,1)
@@ -113,12 +116,15 @@ flat_u_data_train = u_data_train.reshape(-1,1)
 flat_v_data_test = delayed_patched_v_data_test.reshape(-1, delayed_patched_v_data.shape[3])
 flat_u_data_test = u_data_test.reshape(-1,1)
 
-neigh = NN(2)
+neigh = NN(2, n_jobs=4, leaf_size=3000)
 print("fitting")
 
+print(datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
 neigh.fit(flat_v_data_train)
 
 print("predicting...")
+print(datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+
 distances, indices = neigh.kneighbors(flat_v_data_test)
 print(distances)
 
@@ -127,7 +133,7 @@ flat_u_prediction = flat_u_data_train[indices[:, 0]]
 diff = flat_u_prediction - flat_u_data_test
 print(np.mean(diff**2))
 
-prediction = flat_u_prediction.reshape(2000, 150, 150)
+prediction = flat_u_prediction.reshape(len(delayed_patched_v_data_test), 150, 150)
 
 show_results({"prediction": prediction})
 
