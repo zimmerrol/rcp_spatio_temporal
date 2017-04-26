@@ -34,8 +34,8 @@ def demo_oscillating():
     return BarkleySimulation(Nx, Ny, deltaT, epsilon, h, a, b)
 
 sim = demo_chaotic()
-sim.initialize_two_spirals()
-#sim.initialize_random(42)
+#sim.initialize_two_spirals()
+sim.initialize_random(42, 0.1)
 
 frame = 0
 def update_new(data):

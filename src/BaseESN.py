@@ -43,7 +43,7 @@ class BaseESN(object):
                 self.output_input_scaling = output_input_scaling
                 self._create_reservoir(weight_generation, feedback)
 
-    def _create_reservoir(self, weight_generation, feedback=False):
+    def _create_reservoir(self, weight_generation, feedback=False, verbose=False):
         if (weight_generation == 'naive'):
             #random weight matrix from -0.5 to 0.5
             self._W = rnd.rand(self.n_reservoir, self.n_reservoir) - 0.5
@@ -69,18 +69,23 @@ class BaseESN(object):
                 self._W[i] = rnd.rand(self.n_reservoir)/2.0
                 #if (i % 1000 == 0):
                     #print(i)
-        
+
             #set sparseness% to zero
             print("aa")
-            mask = rnd.choice(a=[False, True], size=(self.n_reservoir, self.n_reservoir), p=[self.sparseness,1-self.sparseness])      
+            mask = rnd.choice(a=[False, True], size=(self.n_reservoir, self.n_reservoir), p=[self.sparseness,1-self.sparseness])
             self._W[mask] = 0.0
-     
+
             #just calculate the largest EV - hopefully this is the right code to do so...
             _W_eigenvalue = np.max(np.abs(sp.sparse.linalg.eigs(self._W, k=1)[0]))
             #_W_eigenvalue = np.max(np.abs(np.linalg.eig(self._W)[0]))
- 
+
+
             self._W *= self.spectral_radius / _W_eigenvalue
 
+            if (verbose):
+                M = self.leak_rate*self._W + (1 - self.leak_rate)*np.identity(n=self._W.shape[0])
+                M_eigenvalue = np.max(np.abs(np.linalg.eig(M)[0]))#np.max(np.abs(sp.sparse.linalg.eigs(M, k=1)[0]))
+                print("eff. spectral radius: {0}".format(M_eigenvalue))
 
             #change random signs
             random_signs = np.power(-1, rnd.random_integers(self.n_reservoir, self.n_reservoir))

@@ -161,7 +161,7 @@ if mode == "pred100":
 if mode == "cross":
     print("set up")
     esn = ESN(n_reservoir=500, n_input=1, n_output=1, leak_rate=0.20,
-                spectral_radius=0.70, random_seed=42,
+                spectral_radius=3.00, random_seed=42,
                 weight_generation='advanced', solver="pinv")#0.4
     print("fitting...")
     trainError = esn.fit(inputData=data[:trainLength,0].reshape(trainLength, 1),
