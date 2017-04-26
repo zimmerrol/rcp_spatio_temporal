@@ -118,7 +118,7 @@ def get_prediction(data, def_param=(shared_training_data, shared_test_data, fram
         #inner point
         esn = ESN(n_input = sigma*sigma, n_output = 1, n_reservoir = n_units,
                     weight_generation = "advanced", leak_rate = 0.70, spectral_radius = 0.8,
-                    random_seed=42, noise_level=0.0001, sparseness=.1, regression_parameters=[1e-6], solver = "lsqr")
+                    random_seed=42, noise_level=0.0001, sparseness=.1, regression_parameters=[1e-4], solver = "lsqr")
 
 
         pred = fit_predict_pixel(y, x, running_index, last_states, output_weights, shared_training_data, shared_test_data, esn, True)
@@ -127,7 +127,7 @@ def get_prediction(data, def_param=(shared_training_data, shared_test_data, fram
         #frame
         esn = ESN(n_input = 1, n_output = 1, n_reservoir = n_units,
                 weight_generation = "advanced", leak_rate = 0.70, spectral_radius = 0.8,
-                random_seed=42, noise_level=0.0001, sparseness=.1, regression_parameters=[1e-6], solver = "lsqr")
+                random_seed=42, noise_level=0.0001, sparseness=.1, regression_parameters=[1e-4], solver = "lsqr")
 
         pred = fit_predict_frame_pixel(y, x, running_index, last_states, frame_output_weights, shared_training_data, shared_test_data, esn, True)
 
@@ -160,12 +160,20 @@ def mainFunction():
     
     if (os.path.exists("../cache/raw/{0}_{1}.uv.dat.npy".format(ndata, N)) == False):
         print("generating data...")
-        data = generate_data(ndata, 50000, 5, Ngrid=N)
+        data = generate_uv_data(ndata, 20000, 5, Ngrid=N) #20000 was 50000
         np.save("../cache/raw/{0}_{1}.uv.dat.npy".format(ndata, N), data)
         print("generating finished")
     else:
         print("loading data...")
         data = np.load("../cache/raw/{0}_{1}.uv.dat.npy".format(ndata, N))
+        
+        
+        #switch the entries for the u->v prediction
+        tmp = data[0].copy()
+        data[0] = data[1].copy()
+        data[1] = tmp.copy()
+        
+        
         print("loading finished")
 
     generate_new = False

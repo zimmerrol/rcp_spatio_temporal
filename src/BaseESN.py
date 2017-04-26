@@ -63,18 +63,12 @@ class BaseESN(object):
             #then change randomly the signs of the matrix
 
             #random weight matrix from 0 to 0.5
-            print("aa")
-            self._W = np.empty((self.n_reservoir, self.n_reservoir))# rnd.rand(self.n_reservoir, self.n_reservoir) / 2.0
-            for i in range(self.n_reservoir):
-                self._W[i] = rnd.rand(self.n_reservoir)/2.0
-                #if (i % 1000 == 0):
-                    #print(i)
-        
+            self._W = rnd.rand(self.n_reservoir, self.n_reservoir) / 2
+
             #set sparseness% to zero
-            print("aa")
-            mask = rnd.choice(a=[False, True], size=(self.n_reservoir, self.n_reservoir), p=[self.sparseness,1-self.sparseness])      
+            mask = rnd.rand(self.n_reservoir, self.n_reservoir) > self.sparseness
             self._W[mask] = 0.0
-     
+   
             #just calculate the largest EV - hopefully this is the right code to do so...
             _W_eigenvalue = np.max(np.abs(sp.sparse.linalg.eigs(self._W, k=1)[0]))
             #_W_eigenvalue = np.max(np.abs(np.linalg.eig(self._W)[0]))

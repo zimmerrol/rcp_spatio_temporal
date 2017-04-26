@@ -14,11 +14,16 @@ class BarkleySimulation:
 
         self._boundary_mode = boundary_mode
 
-    def initialize_random(self, seed):
+    def initialize_random(self, seed, delta_x):
         np.random.seed(seed)
 
-        self._u = np.random.rand(self._Nx, self._Ny)
-        self._v = np.random.rand(self._Nx, self._Ny)
+        n = int(np.ceil(1/delta_x))
+
+        self._u = np.random.rand(self._Nx//n, self._Ny//n)
+        tmp = np.repeat(self._u, np.ones(len(self._u), dtype=int)*n, axis=0)
+        self._u = np.repeat(tmp, np.ones(len(self._u), dtype=int)*n, axis=1)
+
+        self._v = self._u.copy()
         self._v[self._v<0.4] = 0.0
         self._v[self._v>0.4] = 1.0
 

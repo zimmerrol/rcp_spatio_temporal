@@ -32,12 +32,24 @@ from multiprocessing import process
 process.current_process()._config['tempdir'] =  '/dev/shm/' #'/data.bmp/roland/temp/'
 
 N = 150
-ndata = 91000
-sigma = 3
+ndata = 10000
+sigma = 5
 ddim = 3
 patch_radius = sigma//2
-trainLength = 90000
+trainLength = 9000
 testLength = 1000
+
+m = trainLength//20
+n = trainLength
+nprime = 1
+samplingDist = n//m
+
+def rbf(xi, yi, sigmam):
+    return np.exp(-np.sum((xi-yi)**2)/(2*sigmam**2))
+
+def rbf_vec(xi, yi, sigmam):
+    xi = np.tile(xi, (len(yi),1))
+    return np.exp(-np.sum((xi-yi)**2, axis=1)/(2*sigmam**2))
 
 def setupArrays():
     global shared_v_data_base, shared_u_data_base, shared_prediction_base
@@ -118,13 +130,33 @@ def predict_frame_pixel(data, def_param=(shared_v_data, shared_u_data)):
     flat_v_data_test = delayed_patched_v_data_test.reshape(-1, ddim)
     flat_u_data_test = u_data_test.reshape(-1,1)
 
-    neigh = NN(2, n_jobs=26)
+    samplingPoints = flat_v_data_train[0::samplingDist]
+    sigmam = np.ones(m)*5
 
-    neigh.fit(flat_v_data_train)
+    #construct matrices
+    A = np.empty((n, m))
+    F = np.empty((n, nprime))
+    L = None
 
-    distances, indices = neigh.kneighbors(flat_v_data_test)
+    #construct target matrix F
+    #F = flat_u_data_train.copy()
 
-    pred = ((flat_u_data_train[indices[:, 0]] + flat_u_data_train[indices[:, 1]])/2.0).ravel()
+    #construct trainig matrix A
+    for i in range(n):
+        A[i] = rbf_vec(flat_v_data_train[i], samplingPoints, sigmam)
+
+    #calculate the resulting weights L
+    APINV = np.linalg.pinv(A)
+    L = np.dot(APINV, flat_u_data_train) #F
+
+    Lt = L.T
+
+    flat_prediction = np.zeros((testLength, nprime))
+
+    for i in range(0, flat_prediction.shape[0]):
+        flat_prediction[i] = np.dot(Lt, rbf_vec(flat_v_data_test[i], samplingPoints, sigmam))
+
+    pred = flat_prediction.ravel()
     
     return pred    
     
@@ -146,17 +178,36 @@ def predict_inner_pixel(data, def_param=(shared_v_data, shared_u_data)):
 
     flat_v_data_test = delayed_patched_v_data_test.reshape(-1, shared_delayed_patched_v_data.shape[3])
     flat_u_data_test = u_data_test.reshape(-1,1)
-
-    neigh = NN(2, n_jobs=26)
-
-    neigh.fit(flat_v_data_train)
-
-    distances, indices = neigh.kneighbors(flat_v_data_test)
-
-    pred = ((flat_u_data_train[indices[:, 0]] + flat_u_data_train[indices[:, 1]])/2.0).ravel()
     
-    return pred
-   
+    samplingPoints = flat_v_data_train[0::samplingDist]
+    sigmam = np.ones(m)*5
+
+    #construct matrices
+    A = np.empty((n, m))
+    F = np.empty((n, nprime))
+    L = None
+
+    #construct target matrix F
+    #F = flat_u_data_train.copy()
+
+    #construct trainig matrix A
+    for i in range(n):
+        A[i] = rbf_vec(flat_v_data_train[i], samplingPoints, sigmam)
+
+    #calculate the resulting weights L
+    APINV = np.linalg.pinv(A)
+    L = np.dot(APINV, flat_u_data_train) #F
+
+    Lt = L.T
+
+    flat_prediction = np.zeros((testLength, nprime))
+
+    for i in range(0, flat_prediction.shape[0]):
+        flat_prediction[i] = np.dot(Lt, rbf_vec(flat_v_data_test[i], samplingPoints, sigmam))
+
+    pred = flat_prediction.ravel()
+    
+    return pred       
 
 def processThreadResults(threadname, q, numberOfWorkers, numberOfResults, def_param=(shared_prediction, shared_u_data)):
     global prediction
@@ -190,7 +241,7 @@ def mainFunction():
     delayed_patched_v_data = None
     u_data = None
     print("generating data...")
-    u_data_t, v_data_t = generate_data(ndata, 20000, 5, Ngrid=N)#20000 was 50000 #, delay_dimension=ddim, patch_size=sigma)
+    u_data_t, v_data_t = generate_data(ndata, 50000, 5, Ngrid=N)#, delay_dimension=ddim, patch_size=sigma)
     shared_v_data[:] = v_data_t[:]
     shared_u_data[:] = u_data_t[:]
     print("generation finished")
@@ -199,12 +250,12 @@ def mainFunction():
     print("preparing threads...")
     pool = Pool(processes=16, initializer=get_prediction_init, initargs=[queue,])
 
-    processProcessResultsThread = Process(target=processThreadResults, args=("processProcessResultsThread", queue, 16, N*N) )
+    processProcessResultsThread = Process(target=processThreadResults, args=("processProcessResultsThread", queue, 16, N*N)) #*N
 
     modifyDataProcessList = []
     jobs = []
     for y in range(N):
-        for x in range(N):
+        for x in range(N): #N
                 jobs.append((y, x))
 
     print("fitting...")
