@@ -33,7 +33,7 @@ zwischen der Vorhersage $x'(t)$ und dem tatsächlichem Wert $x(t+5)$ benutzt.
 		\hline 
 		\rule[-1ex]{0pt}{3.5ex} $\alpha$ & $0.25$ & $0.20$ \\ 
 		\hline 
-		\rule[-1ex]{0pt}{3.5ex} $\rho(|\mathbf{W}|)$ & $0.80$ & $0.70$\\ 
+		\rule[-1ex]{0pt}{3.5ex} $\rho(|\mathbf{W}|)$ & $0.80$ & $3.00$\\ 
 		\hline 
 		\rule[-1ex]{0pt}{3.5ex} $\nu_{max}$ & $0.01$ & $0.01$\\ 
 		\hline 
@@ -60,9 +60,10 @@ In dieser ist zu erkennen, dass die vorhergesagten Werte sehr nahe an den tatsä
 
 \subsubsection[Kreuz-Vorhersage $x(n) \rightarrow y(n)$]{Kreuz-Vorhersage $\pmb{x(n) \rightarrow y(n)}$}
 Auch für die Kreuz-Vorhersage von der $x(n)$ auf die $y(n)$ Zeitreihe konnte sehr schnell durch eine \textsc{GridSearch} ein geeignetes System gefunden werden. Als Maß wurde ebenfalls der \textit{MSE} benutzt. Die gefundenen Parameter sind ebenso in der Tabelle \ref{tab:application_roessler} dargestellt.\\
+Interessant ist, dass der Spektralradius größer $1.0$ ist. Dies widerspricht nicht direkt den Aussagen aus Abschnitt \ref{sc:theory}, da diese nur für Signale getroffen werden konnten, welche auch null sein können. Um dies auszuschließen ist ein konstanter \textit{Bias} von $1.0$ als weiteres Eingangssignal genutzt worden.\\
 Für das Auslesen wurde eine Linearkombination genutzt, wobei die Lösung $\mathbf{W}_{out}$ mittels der Pseudoinversen nach Gleichung \ref{eq:pseudo_inverse} bestimmt worden ist.\\
 
-Mit dieser Methode wurde für den Trainingsvorgang ein Fehler $MSE_{train} = 0.0025$ und für den Testvorgang von $MSE_{test} = 0.0001$ bestimmt. Dies spricht wieder für eine gute Vorhersage. Die Darstellung der Vorhersage $y'(t)$ und des ermittelten Fehlers sind in den Abbildungen \ref{fig:application_roessler_b2} und \ref{fig:application_roessler_b1} zu finden.
+Mit dieser Methode wurde für den Trainingsvorgang ein Fehler $MSE_{train} = \num{6.2E-4}$ und für den Testvorgang von $MSE_{test} = \num{3.0E-5}$ bestimmt. Dies spricht wieder für eine gute Vorhersage. Die Darstellung der Vorhersage $y'(t)$ und des ermittelten Fehlers sind in den Abbildungen \ref{fig:application_roessler_b2} und \ref{fig:application_roessler_b1} zu finden.
 
 \begin{figure}[H]
     \centering
@@ -81,7 +82,7 @@ In Abbildung \ref{fig:application_roessler_b2} stimmt die Vorhersage $y'(t)$ aug
     \label{fig:application_roessler_b1}
 \end{figure}
 
-Die grafische Darstellung des Fehlers zeigt einen nahezu konstanten Verlauf mit nur einem starken Ausreißer. Dies passt gut zu der qualitativen Analyse von Abbildung \ref{fig:application_roessler_b1}.  Im Vergleich zu der vorhandenen Publikation \cite{parlitz2005} ergibt sich ein ähnlicher Verlauf des Fehlers. Leider können hierbei nur die Graphen verglichen werden, da keine expliziten Fehler angegeben sind.
+Die grafische Darstellung des Fehlers zeigt einen nahezu konstanten Verlauf mit nur wenigen Ausreißer, welche scharfe Peaks sind. Dies passt gut zu der qualitativen Analyse von Abbildung \ref{fig:application_roessler_b1}.  Im Vergleich zu der vorhandenen Publikation \cite{parlitz2005} ergibt sich ein ähnlicher Verlauf des Fehlers. Leider können hierbei nur die Graphen verglichen werden, da keine expliziten Fehler angegeben sind.
 
 
 
@@ -126,7 +127,7 @@ sind Werte für $0 \leq t \leq 4000$ simuliert worden, wobei $\Delta_t=\num{1e-2
 \label{tab:application_mackeyglass}
 \end{table}
 
-Interessant ist, dass der Spektralradius größer $1.0$ ist. Dies widerspricht nicht direkt den Aussagen aus Abschnitt \ref{sc:theory}, da diese nur für Signale getroffen werden konnten, welche auch null sein können. Um dies auszuschließen ist ein konstanter \textit{Bias} von $1.0$ als weiteres Eingangssignal genutzt worden.\\
+Auch hier ist wieder interessant, dass der Spektralradius größer $1.0$ ist. Um dies sinnvoll nutzen zu können, ist ein konstanter \textit{Bias} von $1.0$ als weiteres Eingangssignal genutzt worden.\\
 Der \textit{MSE} wurde für die Trainingsphase als $MSE_{train} = 0.0042$ und für die Testphase als $MSE_{test} = \num{9e-5}$ bestimmt.
 Eine Darstellung der Ergebnisse ist in Abbildung \ref{fig:application_mackeyglass} zu sehen.
 
