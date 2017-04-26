@@ -80,14 +80,15 @@ F = flat_training_out.copy()
 def rbf(xi, yi, sigmam):
     return np.exp(-np.sum((xi-yi)**2)/(2*sigmam**2))
 
-def rbf2(xi, yi, sigmam):
+def rbf_vec(xi, yi, sigmam):
     xi = np.tile(xi, (len(yi),1))
 
     return np.exp(-np.sum((xi-yi)**2, axis=1)/(2*sigmam**2))
 
 #construct trainig matrix A
 for i in range(n):
-    A[i] = rbf2(flat_training_data_in[i], samplingPoints, sigmam)
+    print(i)
+    A[i] = rbf_vec(flat_training_data_in[i], samplingPoints, sigmam)
     #for j in range(m):
         #A[i, j] = rbf(flat_training_data_in[i], samplingPoints[j], sigmam[j])
 
@@ -103,7 +104,7 @@ print("predicting...")
 flat_prediction = np.zeros((testLength, len(output_y)))
 
 for i in range(0, flat_prediction.shape[0]):
-    flat_prediction[i] = np.dot(L.T, rbf2(flat_test_data_in[i], samplingPoints, sigmam))
+    flat_prediction[i] = np.dot(L.T, rbf_vec(flat_test_data_in[i], samplingPoints, sigmam))
 
 test_data = data[ndata-testLength:]
 

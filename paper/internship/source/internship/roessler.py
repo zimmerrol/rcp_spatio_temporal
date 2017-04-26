@@ -1,3 +1,4 @@
+#import statements
 import os,sys,inspect
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)
@@ -6,13 +7,13 @@ sys.path.insert(0,parentdir)
 from ESN import ESN
 import numpy as np
 import matplotlib.pyplot as plt
-
 from scipy.integrate import ode
 
 trainLength = 3000
 skipLength = 3000
 testLength = 3000
 
+#creates a roessler time series
 def roessler(n_max):
     return integrate([0.0, 0.0, 0.0], n_max+skipLength, 0.1 )[skipLength:]
 
@@ -20,6 +21,7 @@ def D(t, dat):
     x, y, z = dat
     return [-y-z, x+0.25*y, 0.4+(x-8.5)*z]
 
+#solves the ODE
 def integrate(z0, steps, delta_t):
     #z0: start condition
 
@@ -38,12 +40,15 @@ def integrate(z0, steps, delta_t):
 
     return solution
 
-
+#create new data set
 data = roessler(20000)
 data = data[:,:]
 
+#sets the current mode. in the internship just the "cross" and "pred50" version have been really explored.
+#The other two methods are just old fragments which might be usefull for furhter exploration.
 mode = "cross"
 if mode == "gen":
+    #this mode generates a time series autonom.
     print("set up")
     esn = ESN(n_reservoir=2000, n_input=3, n_output=3, leak_rate=0.55, spectral_radius=0.60, random_seed=42, weight_generation='advanced')#0.4
     print("fitting...")
@@ -62,6 +67,7 @@ if mode == "gen":
     print ('RMSE = ' + str( rmse ))
     print ('NRMSE = ' + str( nrmse ))
 
+    #perform the plots
     plt.figure()
     plt.plot(data[trainLength:trainLength+testLength, 0], 'g', linestyle=":" )
     plt.plot(Y[:, 0], 'b' , linestyle="--")
@@ -78,6 +84,7 @@ if mode == "gen":
     plt.show()
 
 if mode == "pred50":
+    #this mode predicts the time series 50 steps ahead
     predDist = 50
     print("set up")
     esn = ESN(n_reservoir=300, n_input=3, n_output=3, leak_rate=0.25, spectral_radius=0.80, random_seed=44, weight_generation='advanced', solver="lsqr", regression_parameters=[1e-6])#0.4
@@ -87,10 +94,11 @@ if mode == "pred50":
 
     testLength=3000
     print("generating...")
-    #Y = esn.generate(n=testLength, initial_input=data[trainLength+200])
+
     Y = esn.predict(inputData=data[trainLength:trainLength+testLength,:])
     errorLength = 3000
 
+    #calculate and print errors
     mse = np.mean((data[trainLength+predDist:trainLength+errorLength+predDist, 0] - Y[:errorLength, 0])**2)
     rmse = np.sqrt(mse)
     nrmse = rmse/np.var(data[trainLength+predDist:trainLength+errorLength+predDist, 0])
@@ -98,15 +106,17 @@ if mode == "pred50":
     print ('RMSE = ' + str( rmse ))
     print ('NRMSE = ' + str( nrmse ))
 
+    #prepare the plots
     import matplotlib
     plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern'], 'size': 13})
     plt.rc('text', usetex=True)
     plt.rc('text.latex', preamble="\\usepackage{mathtools}")
 
+    #perform the plots
     plt.figure(figsize=(8,5))
     plt.plot(np.linspace(300, 600, 3000), data[trainLength+predDist:trainLength+testLength+predDist, 0], 'r', linestyle=":" )
     plt.plot(np.linspace(300, 600, 3000), Y[:, 0], 'b' , linestyle="--")
-    #plt.title('Target and generated signals $y(n)$ starting at $n=0$')
+
     plt.ylim([-17,23])
     plt.legend(['Signal $x(t+5.0)$', 'Vorhersage $x\'(t) \\approx x(t+5.0)$'], loc="upper center", fancybox=True, shadow=True, ncol=2)
     plt.xlabel("Zeit t")
@@ -123,6 +133,7 @@ if mode == "pred50":
     plt.show()
 
 if mode == "pred100":
+    #this mode predicts the time series 100 steps ahead
     predDist = 100
     print("set up")
     esn = ESN(n_reservoir=300, n_input=3, n_output=3, leak_rate=0.10, spectral_radius=0.40, random_seed=42, weight_generation='advanced')#0.4
@@ -131,10 +142,10 @@ if mode == "pred100":
 
     testLength=5000
     print("generating...")
-    #Y = esn.generate(n=testLength, initial_input=data[trainLength+200])
     Y = esn.predict(inputData=data[trainLength:trainLength+testLength,:], initial_input=data[trainLength-1, :])
     errorLength = 4000
 
+    #calculate and print errors
     mse = np.sum(np.square(data[trainLength+predDist:trainLength+errorLength+predDist, 0] - Y[:errorLength, 0]))/errorLength
     rmse = np.sqrt(mse)
     nrmse = rmse/np.var(data[trainLength+predDist:trainLength+errorLength+predDist, 0])
@@ -142,6 +153,7 @@ if mode == "pred100":
     print ('RMSE = ' + str( rmse ))
     print ('NRMSE = ' + str( nrmse ))
 
+    #perform the plots
     plt.figure()
     plt.plot( data[trainLength+predDist:trainLength+testLength+predDist, 0], 'g', linestyle=":" )
     plt.plot(Y[:, 0], 'b' , linestyle="--")
@@ -172,7 +184,7 @@ if mode == "cross":
     Y = esn.predict(inputData=data[trainLength:trainLength+testLength,0])
     print("done.")
 
-    # compute MSE for the first errorLen time steps
+    #calculate and print errors
     errorLength = 3000
     mse =np.mean((data[trainLength:trainLength+testLength,1]-Y[:,0])**2)
     rmse = np.sqrt(mse)
@@ -181,14 +193,16 @@ if mode == "cross":
     print ('RMSE = ' + str( rmse ))
     print ('NRMSE = ' + str( nrmse ))
 
+    #prepeare the plot
     import matplotlib
     plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern'], 'size': 13})
     plt.rc('text', usetex=True)
 
+    #perform the plots
     plt.figure(figsize=(8,5))
     plt.plot(np.linspace(300, 600, 3000), data[trainLength:trainLength+testLength,1], 'r', linestyle=":" )
     plt.plot(np.linspace(300, 600, 3000), Y[:,0], 'b' , linestyle="--")
-    #plt.title('Signal $y(n)$ und vorhergesagtes Signal $v(n)$ beginndend ab $n=0$')
+
     plt.ylim([-20,20])
     plt.legend(['Signal $y(t)$', 'Vorhersage $y\'(t) \\approx y(t)$'], loc="upper center", fancybox=True, shadow=True, ncol=2)
     plt.xlabel("Zeit t")
@@ -197,7 +211,7 @@ if mode == "cross":
 
     plt.figure(figsize=(8,3))
     plt.plot(np.linspace(300, 600, 3000), data[trainLength:trainLength+testLength,1]-Y[:,0], 'g', linestyle=":" )
-    #plt.title('Fehler von $y(n)$ und $v(n)$ beginndend ab $n=0$')
+
     plt.ylim([-0.125, 0.125])
     plt.legend(['Fehler des Vorhersage'], loc="upper center", fancybox=True, shadow=True, ncol=2)
     plt.xlabel("Zeit t")

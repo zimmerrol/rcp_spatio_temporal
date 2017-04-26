@@ -43,7 +43,7 @@ class BaseESN(object):
                 self.output_input_scaling = output_input_scaling
                 self._create_reservoir(weight_generation, feedback)
 
-    def _create_reservoir(self, weight_generation, feedback=False):
+    def _create_reservoir(self, weight_generation, feedback=False, verbose=False):
         if (weight_generation == 'naive'):
             #random weight matrix from -0.5 to 0.5
             self._W = rnd.rand(self.n_reservoir, self.n_reservoir) - 0.5
@@ -63,6 +63,7 @@ class BaseESN(object):
             #then change randomly the signs of the matrix
 
             #random weight matrix from 0 to 0.5
+
             self._W = rnd.rand(self.n_reservoir, self.n_reservoir) / 2
 
             #set sparseness% to zero
@@ -75,9 +76,14 @@ class BaseESN(object):
  
             self._W *= self.spectral_radius / _W_eigenvalue
 
+            if (verbose):
+                M = self.leak_rate*self._W + (1 - self.leak_rate)*np.identity(n=self._W.shape[0])
+                M_eigenvalue = np.max(np.abs(np.linalg.eig(M)[0]))#np.max(np.abs(sp.sparse.linalg.eigs(M, k=1)[0]))
+                print("eff. spectral radius: {0}".format(M_eigenvalue))
 
             #change random signs
             random_signs = np.power(-1, rnd.random_integers(self.n_reservoir, self.n_reservoir))
+
             self._W = np.multiply(self._W, random_signs)
 
         else:

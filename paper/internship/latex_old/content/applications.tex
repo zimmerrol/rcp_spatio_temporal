@@ -1,8 +1,8 @@
-\chapter{Anwendungen}
+\section{Anwendungen}
 \label{chp:applications}
-Um den Aufwand für die spätere Benutzung zu reduzieren ist zuerst eine allgemeine Implementation des \textsc{ESN}s geschrieben worden. 
+Um den Aufwand für die spätere Benutzung zu reduzieren, ist zuerst eine allgemeine Implementation des \textsc{ESN}s geschrieben worden, welche nun anhand zweier exemplarischer Systeme getestet worden ist.
 
-\section{Vorhersage eines Rössler-Systems}
+\subsection{Vorhersage eines Rössler-Systems}
 Eine erste Anwendung um die Möglichkeiten eines \textsc{ESN} zu demonstrieren besteht in der Vorhersage des Verhaltens eines \textit{Rössler-Systems}
 \begin{align}
 \label{eq:application_roessler_pde}
@@ -12,13 +12,15 @@ Eine erste Anwendung um die Möglichkeiten eines \textsc{ESN} zu demonstrieren b
 \dot{z} &= 0.4 + (x - 8.5)\cdot z.
 \end{split}
 \end{align}
+Dieses System zeigt ein chaotisches Verhalten und stellt somit eine herausfordernde Aufgabe für die zeitliche Vorhersage dar.\\
+Hierbei werden zwei verschiedene Aufgaben betrachtet:\textit{(a)} die Vorhersage von $x'(t) \approx x(t+5)$ durch die Kenntnis von $x(t)$ und \textit{(b)} die Kreuz-Vorhersage $y(t)$ durch $x(t)$. Für beide Aufgaben wurde das System für jeweils $6000$ Schritte mit einer Abtastrate $\Delta t = 0.1$ in Analogie zu \cite{parlitz2005} simuliert, wobei die Hälfte der Daten für das Training und der Rest für die Testergebnisse verwendet worden ist.
 
-Hierbei werden zwei verschiedene Aufgaben betrachtet: \textit{(a)} die Vorhersage von $x(n+50)$ durch die Kenntnis von $x(n)$ und \textit{(b)} die Kreuz-Vorhersage $y(n)$ durch $x(n)$. Für beide Aufgaben wurde das System für jeweils $10000$ Schritte mit einer Abtastrate $\Delta t = 0.05$ simuliert, wobei die Hälfte der Daten für das Training und der Rest für die Testergebnisse verwendet worden ist.
-
-\subsection{Vorhersage $x(n) \rightarrow x(n+48)$}
-Hierfür ist durch eine \textsc{GridSearch} ein geeignetes System gefunden werden, Parameter in der Tabelle \ref{tab:application_roessler} dargestellt sind. Als Maß für die Optimierung wurde der \textit{Mean Square Error (MSE)} benutzt.
-
-Hierbei wurde für den Trainingsvorgang ein Fehler $MSE = 0.575$ und für den Testvorgang von $MSE = 0.270$ bestimmt. Ein grafischer Vergleich zwischen der dem Signal $y(t)$ und der Vorhersage $v(n)$ ist in Abbildung \ref{fig:application_roessler_a} zu finden.
+\subsubsection[Vorhersage $x(t) \rightarrow x(t+5)$]{Vorhersage $\pmb{x(t) \rightarrow x(t+5)}$}
+Für diese erste Aufgabe ist durch eine \textsc{GridSearch} ein geeignetes System gefunden werden, dessen Parameter in der Tabelle \ref{tab:application_roessler} dargestellt sind. Dafür wurde ein größerer Bereich des Hyperparameterraumes systematisch abgetastet und die jeweilige Leistung des sich ergebenen \textsc{ESN}s ermittelt, um anschließend die bestmöglichen Parameter zu wählen. Als Maß für diese Optimierung wurde der \textit{Mean Square Error (MSE)}
+\begin{align}
+MSE = \sum_n \left(x(t+5) - x'(t) \right)^2
+\end{align}
+zwischen der Vorhersage $x'(t)$ und dem tatsächlichem Wert $x(t+5)$ benutzt.
 
 \begin{table}[H]
 	\centering
@@ -28,51 +30,73 @@ Hierbei wurde für den Trainingsvorgang ein Fehler $MSE = 0.575$ und für den Te
 		\hline \hline 
 		\rule[-1ex]{0pt}{3.5ex} $N$ & $300$ & $500$ \\ 
 		\hline 
-		\rule[-1ex]{0pt}{3.5ex} $\alpha$ & $0.10$ & $0.20$ \\ 
+		\rule[-1ex]{0pt}{3.5ex} $\alpha$ & $0.25$ & $0.20$ \\ 
 		\hline 
-		\rule[-1ex]{0pt}{3.5ex} $\rho(|\mathbf{W}|)$ & $0.035$ & $0.01$\\ 
+		\rule[-1ex]{0pt}{3.5ex} $\rho(|\mathbf{W}|)$ & $0.80$ & $0.70$\\ 
 		\hline 
 		\rule[-1ex]{0pt}{3.5ex} $\nu_{max}$ & $0.01$ & $0.01$\\ 
+		\hline 
+		\rule[-1ex]{0pt}{3.5ex} $\beta$ & $\num{1e-6}$ & $-$\\ 
 		\hline 
 	\end{tabular} 
 	\caption{Auflistung der Parameter für das jeweilige \textsc{ESN} für (a) und (b).}
 	\label{tab:application_roessler}
 \end{table}
 
-\vspace{-4ex}
+Der Trainingsvorgang wurde mittels der \textit{Tikhonov Regularisierung} nach Gleichung \ref{eq:tikhonov} durchgeführt. Im Training konnte ein Fehler von $MSE = 0.555 	$ erreicht werden, wobei sich im Testvorgang der Fehler zu $MSE = 0.237$ ergeben hat. Ein graphischer Vergleich zwischen dem Signal $y(t)$ und der Vorhersage $v(n)$ ist in Abbildung \ref{fig:application_roessler_a} zu finden.
+
+\vspace{-3.75ex}
 \begin{figure}[H]
     \centering
     \includegraphics[width = 0.9 \textwidth]{figures/roessler_pred50.pdf}
-    \caption{Graphische Darstellung des Signals $y(n)$ und der Vorhersage $y(n+50)$.}
+    \caption{Darstellung des Signals $x(t+5.0)$ und der Vorhersage $x'(t) \approx x(t+5.0)$.}
     \label{fig:application_roessler_a}
 \end{figure}
 
 
 
-\subsection{Kreuz-Vorhersage $x(n) \rightarrow y(n)$}
-Auch hierfür konnte sehr schnell durch eine \textsc{GridSearch} ein geeignetes System gefunden werden. Als Maß wurde ebenfalls der \textit{MSE} benutzt. Die gefundenen Parameter sind ebenfalls in der Tabelle \ref{tab:application_roessler} dargestellt.\\
-Für das Auslesen wurde eine Linearkombination genutzt, wobei die Lösung $\mathbf{W}_{out}$ mittels der Pseudoinversen bestimmt worden ist.\\
+\subsubsection[Kreuz-Vorhersage $x(n) \rightarrow y(n)$]{Kreuz-Vorhersage $\pmb{x(n) \rightarrow y(n)}$}
+Auch hierfür konnte sehr schnell durch eine \textsc{GridSearch} ein geeignetes System gefunden werden. Als Maß wurde ebenfalls der \textit{MSE} benutzt. Die gefundenen Parameter sind ebenso in der Tabelle \ref{tab:application_roessler} dargestellt.\\
+Für das Auslesen wurde eine Linearkombination genutzt, wobei die Lösung $\mathbf{W}_{out}$ mittels der Pseudoinversen nach Gleichung \ref{eq:pseudo_inverse} bestimmt worden ist.\\
 
-Hierbei wurde für den Trainingsvorgang ein Fehler $MSE_{train} = 0.011$ und für den Testvorgang von $MSE_{test} = 0.091$ bestimmt. Die grafische Darstellung der Vorhersage $v(n)$ und des ermittelten Fehlers sind in den Abbildungen \ref{fig:application_roessler_b1} zu finden. Im Vergleich zu anderen Publikationen \cite{parlitz2005} ergibt sich ein ähnlicher Fehler. Leider kann hierbei nur mit den Graphen verglichen werden, da keine Fehler angegeben sind.
+Damit wurde für den Trainingsvorgang ein Fehler $MSE_{train} = 0.0025$ und für den Testvorgang von $MSE_{test} = 0.0001$ bestimmt. Die Darstellung der Vorhersage $y'(t)$ und des ermittelten Fehlers sind in den Abbildungen \ref{fig:application_roessler_b1} und \ref{fig:application_roessler_b2} zu finden.
+
+\begin{figure}[H]
+    \centering
+     %\includegraphics[width = 0.9 \textwidth]{figures/roessler_cross_pred.pdf}
+     \includegraphics[width = 0.9 \textwidth]{figures/roessler_cross_err.pdf}
+    \caption{Darstellung des Fehlers $y(t)-y'(t)$ zwischen dem Signal $y(t)$ und der Vorhersage $y'(t)$.}
+    \label{fig:application_roessler_b1}
+\end{figure}
+ Im Vergleich zu der vorhandenen Publikation \cite{parlitz2005} ergibt sich ein ähnlicher Fehler. Leider können hierbei nur die Graphen verglichen werden, da keine expliziten Fehler angegeben sind.
+
 
 \begin{figure}[H]
     \centering
      \includegraphics[width = 0.9 \textwidth]{figures/roessler_cross_pred.pdf}
-     \includegraphics[width = 0.9 \textwidth]{figures/roessler_cross_err.pdf}
-    \caption{Graphische Darstellung des Signals $y(n)$, der Vorhersage $v(n)$ und des Fehlers $y(n)-v(n)$.}
-    \label{fig:application_roessler_b1}
+      \caption{Darstellung des Signals $y(t)$ und der Vorhersage $y'(t)$.}
+    \label{fig:application_roessler_b2}
 \end{figure}
 
-\section{Vorhersage eines Mackey-Glass-Systems}
+\clearpage
+
+\subsection{Vorhersage eines Mackey-Glass-Systems}
+\label{sec:mackey_glass}
 Als nächste Anwendung wird ein \textit{Mackey-Glass-System}
 \begin{align}
-\label{eq:application_roessler_pde}
+\label{eq:application_mackey_glass_pde}
 \begin{split}
 \dot{x}(t) &= \beta \frac{x(t-\tau)}{1+x(t-\tau)^n}-\gamma x(t)\\
 \end{split}
 \end{align}
-betrachtet, wobei $\tau = 17, n=10, \beta = 0.2$ gewählt wurden. Dies ist eine beliebte Aufgabe im Bereich der Vorhersagen chaotischer Zeitreihen.\\
-Für dieses System wurde in Analogie zu  \citep{caraballo2014} die Vorhersage $x(n) \rightarrow x(n+84)$ betrachtet, wobei die Parameter aus Tabelle \ref{tab:application_mackeyglass} genutzt wurden. Hierfür wurden mittels der \textit{Euler-Diskretisierung} Werte für $0 \leq t \leq 4000$ simuliert, wobei die ersten $2000$ Werte für den Trainings und die anderen für den Test-Vorgang genutzt wurden. Es wurde zur Lösung die \textit{Tikhonov Regularisierung} benutzt.
+betrachtet, wobei $\tau = 17, n=10, \gamma=0.1, \beta = 0.2$ gewählt wurden, um die Ergebnisse abschließend mit den Resultaten von \citep{caraballo2014} vergleichen zu können. Dies ist eine beliebte Aufgabe im Bereich der Vorhersagen chaotischer Zeitreihen.\\
+Um die Resultate mit \citep{caraballo2014} vergleichen zu können, wurde für das System in Analogie die Vorhersage $x(t) \rightarrow x(t+84)$ betrachtet. Dabei wurden die Parameter aus Tabelle \ref{tab:application_mackeyglass} genutzt. Mittels der expliziten \textit{Euler-Diskretisierung} 
+
+\begin{align}
+x(t+1) = x(t) + \Delta_t \cdot \left(\beta \frac{x(t-\tau)}{1+x(t-\tau)^n}-\gamma x(t)  \right)
+\end{align}
+
+sind Werte für $0 \leq t \leq 4000$ simuliert worden, wobei $\Delta_t=\num{1e-2}$ die zeitliche Diskretisierungskonstante ist. Nun sind die ersten $2000$ Werte für den Trainings und die anderen für den Test-Vorgang genutzt worden. Es wurde zur Lösung erneut die \textit{Tikhonov Regularisierung} nach Gleichung \ref{eq:tikhonov} benutzt.
 
 \begin{table}[H]
 	\centering
@@ -94,13 +118,13 @@ Für dieses System wurde in Analogie zu  \citep{caraballo2014} die Vorhersage $x
 \label{tab:application_mackeyglass}
 \end{table}
 
-Interessant ist, dass der Spektralradius größer $1.0$ ist - dies ist möglich, da ein konstanter \textit{Bias} von $1.0$ als weiteres Eingangssignal genutzt wurde.\\
-Eine Darstellung der Ergebnisse ist in Abbildung \ref{fig:application_mackeyglass} zu sehen. Hierbei wurde der \textit{MSE} für die gesamte Trainingsphase als $MSE_{train} = 0.0042$ und der der Testphase als $MSE_{test} = \num{9e-5}$ bestimmt.
+Interessant ist, dass der Spektralradius größer $1.0$ ist. Dies widerspricht nicht direkt den Aussagen aus Abschnitt \ref{sc:theory}, da diese nur für Signale getroffen werden konnten, welche auch null sein können. Um dies auszuschließen ist ein konstanter \textit{Bias} von $1.0$ als weiteres Eingangssignal genutzt worden.\\
+Eine Darstellung der Ergebnisse ist in Abbildung \ref{fig:application_mackeyglass} zu sehen. Der \textit{MSE} wurde für die Trainingsphase als $MSE_{train} = 0.0042$ und für die Testphase als $MSE_{test} = \num{9e-5}$ bestimmt.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width = 0.9 \textwidth]{figures/mackeyglass_pred.pdf}
-    \caption{Graphische Darstellung des Signals $x(t)$ und der Vorhersage $x(t+84)$.}
+    \caption{Darstellung des Signals $x(t)$ und der Vorhersage $x(t+84)$.}
     \label{fig:application_mackeyglass}
 \end{figure}
 
