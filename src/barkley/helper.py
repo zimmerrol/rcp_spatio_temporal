@@ -19,10 +19,8 @@ def generate_uv_data(N, trans, sample_rate=1, Ngrid=100):
     b = 0.06
 
     sim = BarkleySimulation(Nx, Ny, deltaT, epsilon, h, a, b)
-    sim.initialize_one_spiral()
-
-    sim = BarkleySimulation(Nx, Ny, deltaT, epsilon, h, a, b)
-    sim.initialize_one_spiral()
+    #sim.initialize_one_spiral()
+    sim.initialize_random(42, delta_x)
 
     bar = progressbar.ProgressBar(max_value=trans+N, redirect_stdout=True)
 
