@@ -1,9 +1,16 @@
 \section{Nächste Nachbar Vorhersage}
 Das Ziel der \textit{nächsten Nachbar Vorhersage} ist es den funktionalen Zusammenhang $F : X \rightarrow Y$ zu finden, welcher Daten der Menge $X \in \mathbb{R}^n$ auf Elemente aus $Y \in \mathbb{R}^m$ eindeutig abbildet. Hierfür wird angenommen, dass die Funktion $F$ lokal stetig ist. Zudem werden hierfür Daten benötigt, anhand derer der Zusammenhang erlernt werden kann.\\
 Zu Beginn werden Paare $(\vec{x},\vec{y}) \in X \times Y$ aus einem \textit{Trainingsdatensatz} gebildet und eine Suchstruktur über die $x$-Werte gebildet. Nun kann diese Struktur genutzt werden, um für ein gegebenes $\vec{x}$ den wahrscheinlichsten Wert $\vec{y}$ zu suchen. Hierfür werden, unter der Annahme der lokalen Stetigkeit, die Datenpunkte $\vec{x}_1, ..., \vec{x}_k$ aus der zuvor angelegten Suchstruktur ausgewählt, welche den geringsten Abstand $d(\vec{x}, \vec{x_i})$ zu $\vec{x}$ besitzen.\\
-Diesen $k$ Datenpunkten ist jeweils ein eindeutiger Wert $\vec{y}_i$ zuvor zugeordnet werden. Damit kann nun eine Approximation für den zu $\vec{x}$ gehörigen Wert $\vec{y}$ erstellt werden, indem beispielsweise der Mittelwert der $\vec{y}_i$ genutzt wird.\\
+Diesen $k$ Datenpunkten ist jeweils ein eindeutiger Wert $\vec{y}_i$ zuvor zugeordnet werden. Damit kann nun eine Approximation für den zu $\vec{x}$ gehörigen Wert $\vec{y}$ erstellt werden, indem beispielsweise ein gewichteter Mittelwert der $\vec{y}_i$ genutzt wird. Hierzu kann jedem der $k$ nächsten Nachbarn $(\vec{x}_i, \vec{y}_i)$ ein Gewicht $w_i(\vec{x})$ nach
+\begin{align*}
+w_i(\vec{x}) = \frac{||\vec{x}_i-\vec{x}||}{\sum_j^k ||\vec{x}_j-\vec{x}||}
+\end{align*}
+zugeordnet werden. Die dabei auftretende Norm $||\ldots |||$ wird im Folgenden als euklidisch angenommen, sofern keine weiteren Angaben existieren. Somit ergibt sich für die gewichtete Vorhersage
+\begin{align}
+F(\vec{x}) = \vec{y} = \sum^k_i \frac{||\vec{x}_i-\vec{x}||}{\sum_j^k ||\vec{x}_j-\vec{x}||} \vec{y}_i.
+\end{align}
 
-Der Schlüssel in der Bewältigung einer solchen Aufgabe liegt hauptsächlich in der Art und Weise, wie die nächsten Nachbarn gesucht werden. Hierbei werden im Folgenden die beiden Algorithmen $k-d-tree$ und $ball-tree$ ebenso betrachtet wie ein naiver Ansatz. Bei diesem naiven Ansatz (\textit{brute force}) werden die nächsten Nachbarn aus dem unsortierten Trainingsdatensatz durch pures Ausprobieren aller Möglichen Punkte ermittelt.
+Der Schlüssel in der Bewältigung einer solchen Aufgabe liegt hauptsächlich in der Art und Weise, wie die $k$ nächsten Nachbarn gesucht werden. Hierbei werden im Folgenden die beiden Algorithmen \textsc{k-d-tree} und \textsc{ball-tree} ebenso betrachtet wie ein naiver Ansatz. Bei diesem naiven Ansatz (\textit{brute force}) werden die nächsten Nachbarn aus dem unsortierten Trainingsdatensatz durch pures Ausprobieren aller Möglichen Punkte ermittelt.
 
 \subsection{k-d-tree}
 

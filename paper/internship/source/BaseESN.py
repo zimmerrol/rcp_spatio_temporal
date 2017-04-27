@@ -1,10 +1,10 @@
 import numpy as np
 import numpy.random as rnd
-#import pickle
 import dill as pickle
 import scipy as sp
 
 class BaseESN(object):
+    #create new ESN
     def __init__(self, n_input, n_reservoir, n_output,
                 spectral_radius=1.0, noise_level=0.01, input_scaling=None,
                 leak_rate=1.0, sparseness=0.2, random_seed=None,
@@ -69,16 +69,16 @@ class BaseESN(object):
                 self._W[i] = rnd.rand(self.n_reservoir)/2.0
                 #if (i % 1000 == 0):
                     #print(i)
-        
+
             #set sparseness% to zero
             print("aa")
-            mask = rnd.choice(a=[False, True], size=(self.n_reservoir, self.n_reservoir), p=[self.sparseness,1-self.sparseness])      
+            mask = rnd.choice(a=[False, True], size=(self.n_reservoir, self.n_reservoir), p=[self.sparseness,1-self.sparseness])
             self._W[mask] = 0.0
-     
+
             #just calculate the largest EV - hopefully this is the right code to do so...
             _W_eigenvalue = np.max(np.abs(sp.sparse.linalg.eigs(self._W, k=1)[0]))
             #_W_eigenvalue = np.max(np.abs(np.linalg.eig(self._W)[0]))
- 
+
             self._W *= self.spectral_radius / _W_eigenvalue
 
 
