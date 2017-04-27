@@ -2,3 +2,4 @@
 *.dat.npy
 *.log
 cache/*
+cache
