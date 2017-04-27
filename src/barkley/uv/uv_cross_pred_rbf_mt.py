@@ -34,12 +34,14 @@ process.current_process()._config['tempdir'] =  '/dev/shm/' #'/data.bmp/roland/t
 N = 150
 ndata = 10000
 sigma = 5
+sigma_skip = 2
+eff_sigma = int(np.ceil(sigma/sigma_skip))
 ddim = 3
 patch_radius = sigma//2
 trainLength = 9000
 testLength = 1000
 
-m = trainLength//20
+m = trainLength//45
 n = trainLength
 nprime = 1
 samplingDist = n//m
@@ -163,9 +165,11 @@ def predict_frame_pixel(data, def_param=(shared_v_data, shared_u_data)):
 def predict_inner_pixel(data, def_param=(shared_v_data, shared_u_data)):
     y, x = data
     
-    shared_delayed_v_data = create_2d_delay_coordinates(shared_v_data[:, y-patch_radius:y+patch_radius+1, x-patch_radius:x+patch_radius+1], ddim, tau=32)
-    shared_delayed_patched_v_data = np.empty((ndata, 1, 1, ddim*sigma*sigma))
-    shared_delayed_patched_v_data[:, 0, 0] = shared_delayed_v_data.reshape(-1, ddim*sigma*sigma)
+    shared_delayed_v_data = create_2d_delay_coordinates(shared_v_data[:, y-patch_radius:y+patch_radius+1, x-patch_radius:x+patch_radius+1][:, ::sigma_skip, ::sigma_skip], ddim, tau=32)
+    #print(shared_delayed_v_data.shape)
+    #print(ddim*eff_sigma*eff_sigma)
+    shared_delayed_patched_v_data = np.empty((ndata, 1, 1, ddim*eff_sigma*eff_sigma))
+    shared_delayed_patched_v_data[:, 0, 0] = shared_delayed_v_data.reshape(-1, ddim*eff_sigma*eff_sigma)
     
     delayed_patched_v_data_train = shared_delayed_patched_v_data[:trainLength, 0, 0]
     u_data_train = shared_u_data[:trainLength, y, x]
@@ -266,6 +270,9 @@ def mainFunction():
     processProcessResultsThread.join()
 
     print("finished fitting")
+    
+    shared_prediction[shared_prediction > 1.0] = 1.0
+    shared_prediction[shared_prediction < 0.0] = 0.0
     
     diff = (shared_u_data[trainLength:]-shared_prediction)
     mse = np.mean((diff)**2)
