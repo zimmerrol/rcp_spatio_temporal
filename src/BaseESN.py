@@ -2,14 +2,15 @@ import numpy as np
 import numpy.random as rnd
 #import pickle
 import dill as pickle
+import scipy as sp
 
-class BaseESN:
+class BaseESN(object):
     def __init__(self, n_input, n_reservoir, n_output,
                 spectral_radius=1.0, noise_level=0.01, input_scaling=None,
                 leak_rate=1.0, sparseness=0.2, random_seed=None,
                 out_activation=lambda x:x, out_inverse_activation=lambda x:x,
                 weight_generation='naive', bias=1.0, output_bias=1.0, output_input_scaling=1.0,
-                feedback=False):
+                feedback=False, scale_input_matrix=False):
 
                 self.n_input = n_input
                 self.n_reservoir = n_reservoir
@@ -29,7 +30,7 @@ class BaseESN:
                         raise ValueError("Dimension of input_scaling ({0}) does not match the input data dimension ({1})".format(len(input_scaling), n_input))
 
                 self._input_scaling_matrix = np.diag(input_scaling)
-                self._expanded_input_scaling_matrix = np.diag(np.append([1.0],input_scaling))
+                self._expanded_input_scaling_matrix = np.diag(np.append([1.0], input_scaling))
 
                 self.out_activation = out_activation
                 self.out_inverse_activation = out_inverse_activation
@@ -42,7 +43,7 @@ class BaseESN:
                 self.output_input_scaling = output_input_scaling
                 self._create_reservoir(weight_generation, feedback)
 
-    def _create_reservoir(self, weight_generation, feedback=False):
+    def _create_reservoir(self, weight_generation, feedback=False, verbose=False):
         if (weight_generation == 'naive'):
             #random weight matrix from -0.5 to 0.5
             self._W = rnd.rand(self.n_reservoir, self.n_reservoir) - 0.5
@@ -62,17 +63,27 @@ class BaseESN:
             #then change randomly the signs of the matrix
 
             #random weight matrix from 0 to 0.5
+
             self._W = rnd.rand(self.n_reservoir, self.n_reservoir) / 2
 
             #set sparseness% to zero
             mask = rnd.rand(self.n_reservoir, self.n_reservoir) > self.sparseness
             self._W[mask] = 0.0
+   
+            #just calculate the largest EV - hopefully this is the right code to do so...
+            _W_eigenvalue = np.max(np.abs(sp.sparse.linalg.eigs(self._W, k=1)[0]))
+            #_W_eigenvalue = np.max(np.abs(np.linalg.eig(self._W)[0]))
+ 
+            self._W *= self.spectral_radius / _W_eigenvalue
 
-            _W_eigenvalues = np.abs(np.linalg.eig(self._W)[0])
-            self._W *= self.spectral_radius / np.max(_W_eigenvalues)
+            if (verbose):
+                M = self.leak_rate*self._W + (1 - self.leak_rate)*np.identity(n=self._W.shape[0])
+                M_eigenvalue = np.max(np.abs(np.linalg.eig(M)[0]))#np.max(np.abs(sp.sparse.linalg.eigs(M, k=1)[0]))
+                print("eff. spectral radius: {0}".format(M_eigenvalue))
 
             #change random signs
             random_signs = np.power(-1, rnd.random_integers(self.n_reservoir, self.n_reservoir))
+
             self._W = np.multiply(self._W, random_signs)
 
         else:

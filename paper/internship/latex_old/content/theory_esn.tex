@@ -1,4 +1,5 @@
-\section{Theorie}
+\subsection{Theoretischer Hintergrund}
+\label{sc:theory}
 Um die mathematischen Eigenschaften beschreiben zu können, sind zuerst zwei Definitionen nötig \cite{yildiz}.
 
 \begin{definition}[Kompatibler Zustand]
@@ -6,34 +7,34 @@ Sei $S : X \times U \rightarrow X$ ein \textsc{ESN} mit der Zustandsgleichung $\
 \end{definition}
 
 \begin{definition}[Echo State Eigenschaft (ESP)]
-Ein \textsc{ESN} $S : X \times U \rightarrow X$ besitzt die \textit{Echo State Eigenschaft} genau dann wenn eine Nullfolge $(\delta_n)_{n \geq 0}$ existiert, sodass für alle Zustandsfolgen $(\vec{x}_n)_n, (\vec{x'}_n)_n$ die kompatibel mit der Eingangsfolge $(\vec{u}_n)_n$ sind gilt, dass $\forall n \geq 0 ||x_n - x'_n|| < \delta_n$
+Ein \textsc{ESN} $S : X \times U \rightarrow X$ besitzt die \textit{Echo State Eigenschaft} genau dann wenn eine Nullfolge $(\delta_n)_{n \geq 0}$ existiert, sodass für alle Zustandsfolgen $(\vec{x}_n)_n, (\vec{x}'_n)_n$ die kompatibel mit der Eingangsfolge $(\vec{u}_n)_n$ sind gilt, dass $\forall n \geq 0 ||x_n - x'_n|| < \delta_n$
 \end{definition} 
-Dies bedeutet, dass nachdem das Netzwerk lang genug betrieben worden ist, der Zustand nicht mehr von dem beliebig gewähltem Anfangszustand abhängt. Diese Eigenschaft ist für notwendig, damit das \textsc{ESN} Vorhersagen treffen kann \cite{jeagerTut2002}.\\
+Dies bedeutet, dass nachdem das Netzwerk lang genug betrieben worden ist, der Zustand nicht mehr von dem beliebig gewähltem Anfangszustand abhängt. Diese Eigenschaft ist notwendig, damit das \textsc{ESN} Vorhersagen treffen kann \cite{jeagerTut2002}.\\
 
-Nun stellt sich die Frage, wann ein Netzwerk diese Eigenschaft besitzt. Es wird schnell klar, dass dies nur durch die Gewichtsmatrix $\mathbf{W}$ bestimmt wird. Betrachtet man die Zustandsgleichung des Netzwerkes, so lässt sich auf Grund des \textit{Banachschen Fixpunktsatzes} erkennen, dass die \textit{ESP} vorliegt, sobald $||\vec{x}_{n+1} - \vec{x'}_{n+1}|| < ||\vec{x}_n - \vec{x'}_n||$ für zwei kompatible Zustände $\vec{x}_n \neq \vec{x'}_n$ erfüllt ist \cite{jaeger2010}.
-Hier raus ergibt sich, dass die \textit{ESP} vorliegt, wenn 
+Nun stellt sich die Frage, wann ein Netzwerk diese Eigenschaft besitzt. Es wird schnell klar, dass dies nur durch die Gewichtsmatrix $\mathbf{W}$ bestimmt wird. Betrachtet man die Zustandsgleichung des Netzwerkes, so lässt sich auf Grund des \textit{Banachschen Fixpunktsatzes} erkennen, dass die \textit{ESP} vorliegt, sobald $||\vec{x}_{n+1} - \vec{x}'_{n+1}|| < ||\vec{x}_n - \vec{x}'_n||$ für zwei kompatible Zustände $\vec{x}_n \neq \vec{x}'_n$ erfüllt ist \cite{jaeger2010}.
+Hieraus ergibt sich, dass die \textit{ESP} vorliegt, wenn 
 \begin{align}
 \label{eq:theory_old_requirement}
-|1-\alpha(1-\sigma(\mathbf{W}))| < 1
+|1-\alpha(1-\sigma_{max}(\mathbf{W}))| < 1
 \end{align}
-erfüllt ist, wobei $\sigma(\mathbf{W})_{max}$ der größte Singulärwert ist \cite{jaeger2007}.\\
+erfüllt ist, wobei $\sigma_{max}(\mathbf{W})$ der größte Singulärwert ist \cite{jaeger2007}.\\
 Weitergehend ist bekannt, dass für Systeme bei denen der Spektralradius $\rho(\mathbf{W}) > 1$ ist diese Eigenschaft nicht vorliegen kann, sofern $\vec{u}_n = 0$ möglich ist \cite{jaeger2007, jaeger2010}.\\
 
-Hier raus folge lange Zeit die falsche Annahme, dass für Systeme mit $\rho(\mathbf{W}) < 1$ die Eigenschaft garantiert ist. Wie allerdings gezeigt werden konnte, ist dies nicht der Fall. Stattdessen konnte gezeigt werden, dass eine hinreichende Bedingung durch
+Hieraus ergab sich lange Zeit die falsche Annahme, dass für Systeme mit $\rho(\mathbf{W}) < 1$ die Eigenschaft stets garantiert ist. Wie allerdings gezeigt werden konnte, ist dies nicht der Fall \citep{yildiz}. Stattdessen konnte gezeigt werden, dass eine hinreichende Bedingung durch
 \begin{align}
 \label{eq:theory_sufficient_requirement}
 \rho(\alpha |\mathbf{W}|+(1-\alpha) \mathbf{I}) < 1
 \end{align}
-gegeben ist - wobei als Betrag der Matrix hier das elementweise Betragsnehmen gemeint ist. Dies ist äquivalent dazu, dass $\rho(|\mathbf{W}|) < 1$ gilt. Diese Bedingung ist weniger einschränkend als \ref{eq:theory_old_requirement} \cite{yildiz}.\\
+gegeben ist - wobei als Betrag der Matrix hier das elementweise Betragsnehmen gemeint ist. Dies ist äquivalent dazu, dass $\rho(|\mathbf{W}|) < 1$ gilt. Diese Bedingung ist weniger einschränkend als Gleichung (\ref{eq:theory_old_requirement}) \cite{yildiz}.\\
 
-Darauf basierend kann nun eine Methode angegeben werden, um die Gewichtsmatrix $\mathbf{W}$ zu konstruieren:
+Darauf basierend kann nun eine Methode nach \cite{yildiz} angegeben werden, um die Gewichtsmatrix $\mathbf{W}$ zu konstruieren:
 
 \singlespacing
 \begin{enumerate}
 	\item Generiere zufällige Matrix $\mathbf{W}$ mit $\mathbf{|W|} = \mathbf{W}$
-	\item Skaliere $\mathbf{W}$, sodass \ref{eq:theory_sufficient_requirement} erfüllt ist.
+	\item Skaliere $\mathbf{W}$, sodass Gleichung (\ref{eq:theory_sufficient_requirement}) erfüllt ist.
 	\item Wechsel zufällig das Vorzeichen von ungefähr der Hälfte aller Einträge.
 \end{enumerate}
 \onehalfspacing
 
-Statt dieser Vorschrift wurde zuvor oftmals $\mathbf{W}$ zufälliger generiert und anschließend nur $\rho(\mathbf{W})$ skaliert, was mit unter zu instabilen Systemen geführt hat.
+Statt dieser Vorschrift wurde zuvor oftmals $\mathbf{W}$ zufällig generiert und anschließend nur $\rho(\mathbf{W})$ statt $\rho(|\mathbf{W}|)$ skaliert, was mit unter zu instabilen Systemen geführt hat.

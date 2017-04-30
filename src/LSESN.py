@@ -25,7 +25,7 @@ class LSESN(BaseESN):
         trainLength = inputDataList[0].shape[0]-1
 
         #define states' matrix
-        self._X = np.zeros((1 + self.n_input + self.n_reservoir, trialLength*1))
+        X = np.zeros((1 + self.n_input + self.n_reservoir, trialLength*1))
 
 
         for j in range(trialLength):
@@ -37,7 +37,7 @@ class LSESN(BaseESN):
                 u = super(LSESN, self).update(inputDataList[j][t])
 
                 #add valueset to the states' matrix
-            self._X[:,j*1] = np.vstack((self.output_bias, self.output_input_scaling*u, self._x))[:,0]
+            X[:,j*1] = np.vstack((self.output_bias, self.output_input_scaling*u, self._x))[:,0]
 
         #define the target values
         #                                  +1
@@ -45,9 +45,9 @@ class LSESN(BaseESN):
 
         #W_out = Y_target.dot(X.T).dot(np.linalg.inv(X.dot(X.T) + regressionParameter*np.identity(1+reservoirInputCount+reservoirSize)) )
         if (regression_parameter is None):
-            self._W_out = np.dot(Y_target, np.linalg.pinv(self._X))
+            self._W_out = np.dot(Y_target, np.linalg.pinv(X))
         else:
-            self._W_out = np.dot(np.dot(Y_target, self._X.T),np.linalg.inv(np.dot(self._X,self._X.T) + regression_parameter*np.identity(1+self.n_input+self.n_reservoir)))
+            self._W_out = np.dot(np.dot(Y_target, X.T),np.linalg.inv(np.dot(X,X.T) + regression_parameter*np.identity(1+self.n_input+self.n_reservoir)))
 
 
     def predict(self, inputData, update_processor=lambda x:x):

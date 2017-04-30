@@ -35,6 +35,9 @@
 
 \usepackage{amsmath,amssymb} %% zusaetzliche Mathe-Symbole
 
+%für bessere platzierung von bildern etc.
+\usepackage{float}
+
 %added for proofs, theorems etc.
 \usepackage{amsthm}
 \newtheorem{definition}{Definition}
@@ -57,8 +60,18 @@
 %% umfangreiche Pakete fuer Symbole wie \micro, \ohm, \degree, \celsius etc.
 \usepackage{textcomp,gensymb}
 
+\usepackage{mathtools}
+\newcommand{\defeq}{\vcentcolon=}
+\newcommand{\eqdef}{=\vcentcolon}
+
+%to check for dead references
+%\usepackage{refcheck}
+
 %\usepackage{SIunits} %% Korrektes Setzen von Einheiten
-\usepackage{units}   %% Variante fuer Einheiten
+%\usepackage{units}   %% Variante fuer Einheiten
+
+%bessere option?
+\usepackage{siunitx}
 
 %% Hyperlinks im Dokument; muss als eines der letzten Pakete geladen werden
 \usepackage[pdfstartview=FitH,      % Oeffnen mit fit width
@@ -118,20 +131,15 @@
 \mainmatter   %% Anfang Hauptteil
 
 \input{content/introduction.tex}
-\input{content/overview_rnn.tex}
-\input{content/esn.tex}
+\input{content/theory.tex}
+\input{content/experiments.tex}
+\input{content/discussion.tex}
 \input{content/conclusion.tex}
 \input{content/outlook.tex}
+\input{content/acknowledgement.tex}
 
-\nocite{*}
+%\nocite{*}
 
-\begin{align*}
-a = 3
-\end{align*}
-
-\begin{align}
-c = 5
-\end{align}
 %\appendix
 
 \cleardoublepage

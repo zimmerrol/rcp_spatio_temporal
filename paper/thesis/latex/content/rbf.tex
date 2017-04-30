@@ -1,0 +1,53 @@
+\section{Radiale Basisfunktionen}
+Eine weitere Methode um einen solchen funktionalen Zusammenhang $F : X \rightarrow Y$ zu finden, welcher Daten der Menge $X \in \mathbb{R}^n$ auf Elemente aus $Y \in \mathbb{R}^m$ eindeutig abbildet, bieten die \textit{radialen Basisfunktionen} an. Auch hierfür Daten benötigt, anhand derer der Zusammenhang erlernt werden kann. Diese Trainingsdaten sollen im Folgenden aus $N$ Datensätzen bestehen.\\
+
+Bei diesem Ansatz wird die gesuchte Funktion $F$ als Linearkombination aus vielen radialen Funktionen approximiert. Dafür werden $l$ Elemente $\{\vec{x}_i\}, i=1,...,l$ aus den Trainingsdaten ausgewählt und diese als so genannte \textit{Zentren} $\{\vec{z}_i\}$ genutzt. Hiermit lassen sich die Funktionen als $\phi_i(\vec{x}) = \phi(||\vec{x}-\vec{z}_i||), i=1,\ldots ,l$ darstellen \citep{lowe2multi}. Eine mögliche Wahl der Basisfunktionen sind zum Beispiel Gaußfunktionen
+\begin{align*}
+\phi_i(\vec{x}) = \exp \left( - \frac{||\vec{x}-\vec{z}_i||}{\sigma_i^2} \right).
+\end{align*}
+Die Linearkombination führt zu dem Ansatz 
+\begin{align}
+\label{eq:rbf_lincomb}
+\vec{y} = F(\vec{x}) = \sum^l_{i=1} \vec{\omega}_i \phi(||\vec{x} - \vec{z}_i||).
+\end{align}
+Die $\vec{\omega}_i \in \mathbb{R}^m$ stehen hierbei für die \textit{Gewichtsvektoren} der einzelnen Basisfunktionen $\phi_i$ im Rahmen der Linearkombination.\\
+
+Das Ziel besteht jetzt darin die Gewichtsvektoren $\omega_i$ approximativ zu bestimmen. Dafür werden zunächst drei Matrizen definiert, durch die das Problem ausgedrückt werden kann.\\
+Die Matrix $\mathbf{Y} \in \mathbb{R}^{N \times m}$ repräsentiert die Funktionswerte der Abbildung und beinhaltet als Zeilen die $N$ verschiedenen Funktionswerte $\vec{y}_i$ der Trainingsdaten
+\begin{align}
+\mathbf{Y} \defeq
+\begin{pmatrix}
+y_{11} & \ldots  & y_{1m} \\
+\vdots & & \vdots \\
+y_{N1} & \ldots  & y_{Nm} \\
+\end{pmatrix}.
+\end{align}
+Die Matrix $\mathbf{\Omega} \in \mathbb{R}^{l \times m}$ beinhaltet dagegen als Zeilen die Gewichtsvektoren
+\begin{align}
+\mathbf{\Omega} \defeq
+\begin{pmatrix}
+\omega_{11} & \ldots  & \omega_{1m} \\
+\vdots & & \vdots \\
+\omega_{l1} & \ldots  & \omega_{lm} \\
+\end{pmatrix}.
+\end{align}
+Die dritte Matrix $\mathbf{A} \in \mathbb{R}^{N \times m}$ repräsentiert Anwendungen der radialen Basisfunktionen auf die Trainingsdaten 
+\begin{align}
+\mathbf{A} \defeq
+\begin{pmatrix}
+A_{11} & \ldots  & A_{1m} \\
+\vdots & & \vdots \\
+A_{N1} & \ldots  & A_{Nm} \\
+\end{pmatrix},
+\end{align}
+wobei die einzelnen Elemente als $A_{ij} \defeq \phi(|| \vec{x}_i - \vec{y}_j ||)$ definiert sind.\\
+Damit lässt sich das Problem durch
+\begin{align}
+\mathbf{Y} = \mathbf{A} \cdot \mathbf{\Omega}
+\end{align}
+ausdrücken \citep{lowe2multi}. Da die Matrizen $\mathbf{Y}$ und $\mathbf{A}$ konstruiert sind, besteht die Aufgabe lediglich darin die Matrix $\mathbf{\Omega}$ der Gewichte zu ermitteln. Der naheliegende Ansatz, das direkte ermitteln der Inversen $\mathbf{A}^{-1}$ stellt sich dafür aus ungeeignet heraus, da das Problem meistens überkonditioniert ist. Daraus ergibt sich eine schlechtere Voraussage der zukünftigen Funktionswerte. Stattdessen ist es geschickter das Problem als eine lineare Optimierungsaufgabe zu betrachten, bei der der Fehler $||\mathbf{A} \omega_i - \vec{y}_i||^2$ minimiert werden soll.\\
+Durch die Verwendung der \textit{Moore-Penrose Pseudoinversen} $\mathbf{A}'$ wird hierbei zugleich gewährleistet, dass die Lösung ausgewählt wird, die zudem auch die kleinsten Gewichte besitzt. Dies hilft den Effekt des \textit{Overfittings} zu vermeiden \cite{lowe2multi}. Mit diesem Ansatz ergibt sich die Lösung zu
+\begin{align}
+\mathbf{\Omega} = \mathbf{A}' \cdot \mathbf{Y}.
+\end{align}
+Um nun Funktionswerte vorherzusagen wird der Zusammenhang aus \label{eq:rbf_lincomb} für die zuvor ermittelten Gewichte genutzt.

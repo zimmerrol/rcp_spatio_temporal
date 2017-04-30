@@ -161,7 +161,7 @@ if mode == "pred100":
 if mode == "cross":
     print("set up")
     esn = ESN(n_reservoir=500, n_input=1, n_output=1, leak_rate=0.20,
-                spectral_radius=0.70, random_seed=42,
+                spectral_radius=3.00, random_seed=42,
                 weight_generation='advanced', solver="pinv")#0.4
     print("fitting...")
     trainError = esn.fit(inputData=data[:trainLength,0].reshape(trainLength, 1),
@@ -198,7 +198,7 @@ if mode == "cross":
     plt.figure(figsize=(8,3))
     plt.plot(np.linspace(300, 600, 3000), data[trainLength:trainLength+testLength,1]-Y[:,0], 'g', linestyle=":" )
     #plt.title('Fehler von $y(n)$ und $v(n)$ beginndend ab $n=0$')
-    plt.ylim([-1,1])
+    plt.ylim([-0.125, 0.125])
     plt.legend(['Fehler des Vorhersage'], loc="upper center", fancybox=True, shadow=True, ncol=2)
     plt.xlabel("Zeit t")
     plt.ylabel("Differenz $y(t) - y'(t)$")
