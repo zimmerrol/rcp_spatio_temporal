@@ -97,7 +97,7 @@ class BaseESNFHN:
         #self._x = (1.0-self.leak_rate)*self._x + self.leak_rate*np.arctan(np.dot(self._W_input, np.vstack((self.bias, u))) + np.dot(self._W, self._x) + (np.random.rand()-0.5)*self.noise_level)
 
 
-        for i in range(500):
+        for i in range(5):
             self._v = self._v + self.deltaT*(self._v-1.0/3.0*np.power(self._v,3)-self._w + np.dot(self._W_input, np.vstack((self.bias, u))) + np.dot(self._W, self._v))
             self._w = self._w + self.deltaT/self.r*(self._v - self.a - self.b*self._w)
 

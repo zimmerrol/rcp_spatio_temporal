@@ -47,7 +47,7 @@ def testESNFHN():
         #y = (0*np.log(x)+np.sin(x)*np.cos(x)).reshape(20000,1)*2
         y = np.sin(x).reshape(20000,1)
 
-        esn = ESNFHN(n_input=1, n_output=1, n_reservoir=50, random_seed=42, noise_level=0.00001, output_bias=1.0, output_input_scaling=0.0, r=1/.05, deltaT=1e-2, spectral_radius=1.20, sparseness=0.2, solver="pinv", regression_parameters=[1e-2])
+        esn = ESNFHN(n_input=1, n_output=1, n_reservoir=50, random_seed=42, noise_level=0.00001, output_bias=1.0, output_input_scaling=0.0, r=1/.05, deltaT=1e-1, spectral_radius=1.20, sparseness=0.2, solver="pinv", regression_parameters=[1e-2])
         train_error = esn.fit(inputData=y[:5000, :], outputData=y[1:5001,:], transient_quota=0.4) #,
 
         print("mean weigth:" + str(np.mean(np.abs(esn._W_out))))
