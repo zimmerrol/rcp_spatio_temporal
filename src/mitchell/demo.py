@@ -5,32 +5,21 @@ from MitchellSimulation import MitchellSimulation
 from matplotlib.widgets import Button
 from matplotlib.widgets import Slider
 
-def demo_chaotic():
+def demo_mitchell():
     #for chaotic u^3 simulation
     Nx = 150
     Ny = 150
-    deltaT = 1e-3
+    deltaT = 1e-2
     deltaX = 0.1
-    D = 1e-2
+    D = 1e-1
     h = D/deltaX**2#1.0#0.2
     print(h)
     #h = D over delta_x
 
-    return MitchellSimulation(Nx, Ny, deltaT, deltaX, D, D, 0.03, 0.60, 1.50, 1.20, 0.13)
+    #constants according to https://books.google.de/books?id=aB34DAAAQBAJ&pg=PA134&lpg=PA134&dq=mitchell-schaefer+model&source=bl&ots=RVuc3hoJwW&sig=ukfFhjF_COsljaaznv5uB6Cn5V8&hl=de&sa=X&ved=0ahUKEwiozdj8ic7TAhURLVAKHfa3A5wQ6AEIOTAC#v=onepage&q=mitchell-schaefer%20model&f=false
+    return MitchellSimulation(Nx, Ny, deltaT, deltaX, D, D, t_in=0.3, t_out=6.0, t_close=150, t_open=20, v_gate=0.13,)
 
-def demo_oscillating():
-    #for oscillations
-    Nx = 200
-    Ny = 200
-    deltaT = 1e-2
-    epsilon = 0.01
-    h = 1.0#0.2
-    a = 0.75
-    b = 0.002
-
-    return BarkleySimulation(Nx, Ny, deltaT, epsilon, h, a, b)
-
-sim = demo_chaotic()
+sim = demo_mitchell()
 #sim.initialize_two_spirals()
 sim.initialize_random(42, 0.1)
 

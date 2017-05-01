@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
 class MitchellSimulation:
-    def __init__(self, Nx, Ny, deltaT,deltaX, Dx, Dy, t_in, t_out, t_close, t_open, v_gate, boundary_mode = "noflux"):
+    def __init__(self, Nx, Ny, deltaT, deltaX, Dx, Dy, t_in, t_out, t_close, t_open, v_gate, boundary_mode = "noflux"):
         self.Nx = Nx
         self.Ny = Ny
         self.deltaT = deltaT
@@ -28,36 +28,12 @@ class MitchellSimulation:
         self._v = np.random.rand(self.Nx//n, self.Ny//n)
         tmp = np.repeat(self._v, np.ones(len(self._v), dtype=int)*n, axis=0)
         self._v = np.repeat(tmp, np.ones(len(self._v), dtype=int)*n, axis=1)
-        self._v = gaussian_filter(self._v, sigma=3)
+        #self._v = gaussian_filter(self._v, sigma=3)
 
         self._h = np.random.rand(self.Nx//n, self.Ny//n)
         tmp = np.repeat(self._h, np.ones(len(self._h), dtype=int)*n, axis=0)
         self._h = np.repeat(tmp, np.ones(len(self._h), dtype=int)*n, axis=1)
         self._h = gaussian_filter(self._h, sigma=3)
-
-    def initialize_one_spiral(self):
-        self._v = np.zeros((self.Nx, self.Ny))
-        self._h = np.zeros((self.Nx, self.Ny))
-
-        #for one spiral
-        for i in range(self.Nx):
-            for j in range(self.Ny):
-                if (i >= self.Nx//2):
-                    self._v[i, j] = 1.0
-                if (j >= self.Ny//2):
-                    self._h[i, j] = self._a/2.0
-
-    def initialize_two_spirals(self):
-        self._v = np.zeros((self.Nx, self.Ny))
-        self._h = np.zeros((self.Nx, self.Ny))
-
-        #for two spirals
-        for i in range(self.Nx):
-            for j in range(self.Ny):
-                if (i >= self.Nx//3 and i <= self.Nx//3*2):
-                    self._v[i, j] = 1.0
-                if (j >= self.Ny//2):
-                    self._h[i, j] = 1.0/2.0
 
     def _set_boundaries(self, oldFields):
         if (self._boundary_mode == "noflux"):
@@ -88,7 +64,5 @@ class MitchellSimulation:
         denom[mask] = self.t_open
         mask = mask.astype(float)
         self._h += self.deltaT * ((mask - self._h)/denom)
-
-#        print(np.sum(mask))
 
         self._set_boundaries((vOld, hOld))
