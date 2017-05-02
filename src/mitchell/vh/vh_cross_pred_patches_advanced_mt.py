@@ -29,7 +29,10 @@ sigma = 5
 sigma_skip = 2
 eff_sigma = int(np.ceil(sigma/sigma_skip))
 patch_radius = sigma // 2
-n_units = 550
+n_units = 450
+
+from multiprocessing import process
+process.current_process()._config['tempdir'] =  '/dev/shm/'
 
 def setupArrays():
     #TODO: Correct the array dimensions!
@@ -119,7 +122,7 @@ def get_prediction(data, def_param=(shared_training_data, shared_test_data, fram
         #inner point
         esn = ESN(n_input = eff_sigma*eff_sigma, n_output = 1, n_reservoir = n_units,
                     weight_generation = "advanced", leak_rate = 0.70, spectral_radius = 0.8,
-                    random_seed=42, noise_level=0.0001, sparseness=.1, regression_parameters=[6e-6], solver = "lsqr")
+                    random_seed=42, noise_level=0.0001, sparseness=.1, regression_parameters=[3e-6], solver = "lsqr", output_input_scaling=0.01)
 
 
         pred = fit_predict_pixel(y, x, running_index, last_states, output_weights, shared_training_data, shared_test_data, esn, True)
@@ -128,7 +131,7 @@ def get_prediction(data, def_param=(shared_training_data, shared_test_data, fram
         #frame
         esn = ESN(n_input = 1, n_output = 1, n_reservoir = n_units,
                 weight_generation = "advanced", leak_rate = 0.70, spectral_radius = 0.8,
-                random_seed=42, noise_level=0.0001, sparseness=.1, regression_parameters=[6e-6], solver = "lsqr")
+                random_seed=42, noise_level=0.001, sparseness=.1, regression_parameters=[6e-6], solver = "lsqr")
 
         pred = fit_predict_frame_pixel(y, x, running_index, last_states, frame_output_weights, shared_training_data, shared_test_data, esn, True)
 
@@ -161,7 +164,7 @@ def mainFunction():
 
     if (os.path.exists("../cache/raw/{0}_{1}.vh.dat.npy".format(ndata, N)) == False):
         print("generating data...")
-        data = generate_vh_data(ndata, 20000, 5, Ngrid=N) #20000 was 50000
+        data = generate_vh_data(ndata, 20000, 50, Ngrid=N) #20000 was 50000 ndata
         np.save("../cache/raw/{0}_{1}.vh.dat.npy".format(ndata, N), data)
         print("generating finished")
     else:
@@ -202,31 +205,32 @@ def mainFunction():
         frame_output_weights[:] = frame_output_weights_t[:]
         last_states[:] = last_states_t[:]
 
-
     training_data = data[:, :ndata-2000]
     test_data = data[:, ndata-2000:]
 
     shared_training_data[:, :, :, :] = training_data[:, :, :, :]
     shared_test_data[:, :, :, :] = test_data[:, :, :, :]
 
+    prediction[:] = shared_test_data[0]
+
     queue = Queue() # use manager.queue() ?
     print("preparing threads...")
-    pool = Pool(processes=16, initializer=get_prediction_init, initargs=[queue,])
-
-    processProcessResultsThread = Process(target=processThreadResults, args=("processProcessResultsThread", queue, 16, N*N) )
+    pool = Pool(processes=16, initializer=get_prediction_init, initargs=[queue,] )
 
     modifyDataProcessList = []
     jobs = []
     inner_index = 0
     outer_index = 0
-    for y in range(N):
-        for x in range(N):
+    for y in range(N):#N//2-50, N//2+50):
+        for x in range(N):#N//2-50, N//2+50):
             if (y >= patch_radius and y < N-patch_radius and x >= patch_radius and x < N-patch_radius):
                 inner_index += 1
                 jobs.append((y, x, inner_index))
             else:
                 outer_index += 1
                 jobs.append((y, x, outer_index))
+
+    processProcessResultsThread = Process(target=processThreadResults, args=("processProcessResultsThread", queue, 4, len(jobs)) )
 
     print("fitting...")
     processProcessResultsThread.start()
@@ -237,6 +241,7 @@ def mainFunction():
 
     print("finished fitting")
 
+    generate_new = False
     if (generate_new):
         print("saving model...")
 
@@ -249,9 +254,10 @@ def mainFunction():
     diff = (test_data[0]-prediction)
     mse = np.mean((diff)**2)
     print("test error: {0}".format(mse))
-    print("inner test error: {0}".format(np.mean(((test_data[0]-prediction)[patch_radius:N-patch_radius, patch_radius:N-patch_radius])**2)))
+    print("inner test error: {0}".format(np.mean((diff[:,patch_radius:N-patch_radius, patch_radius:N-patch_radius])**2)))
+    print("special test error: {0}".format(np.mean((diff[:,N//2-50:N//2+50, N//2-50:N//2+50])**2)))
 
-    show_results({"Orig" : shared_test_data[0], "Pred" : prediction, "Diff" : diff})
+    show_results({"Orig" : shared_test_data[0], "Pred" : prediction, "Source": shared_test_data[1], "Diff" : diff})
 
 if __name__== '__main__':
     mainFunction()

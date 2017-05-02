@@ -6,11 +6,11 @@ import progressbar
 import dill as pickle
 
 def generate_vh_data(N, trans, sample_rate=1, Ngrid=100):
-    Nx = N
-    Ny = N
+    Nx = Ngrid
+    Ny = Ngrid
     deltaT = 1e-2
     deltaX = 0.1
-    D = 1e-1
+    D = 5e-3
     h = D/deltaX**2
 
     #constants according to https://books.google.de/books?id=aB34DAAAQBAJ&pg=PA134&lpg=PA134&dq=mitchell-schaefer+model&source=bl&ots=RVuc3hoJwW&sig=ukfFhjF_COsljaaznv5uB6Cn5V8&hl=de&sa=X&ved=0ahUKEwiozdj8ic7TAhURLVAKHfa3A5wQ6AEIOTAC#v=onepage&q=mitchell-schaefer%20model&f=false
