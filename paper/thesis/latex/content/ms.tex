@@ -1,0 +1,46 @@
+\section{Mitchell-Schaeffer Modell}
+Das \textit{Mitchell-Schaeffer Modell} ist ebenso wie das \textit{Barkley Modell} ein System aus gekoppelten partiellen Differentialgleichungen. Es ist vorgeschlagen worden, um eine phänomenologisches Beschreibung der Aktionspotentiale auf der Membran von Herzzellen zu liefern. Das Modell wird durch die Membranspannung $v(t)$ und eine Kontrollvariable $h(t)$, welche das Verhalten der beteiligten Ionenkanäle steuert, definiert. Hierbei wird die Spannung als dimensionslose Größe dargestellt, die Werte zwischen $0$ und $1$ annehmen kann \citep{mitchell2003two}.\\
+
+Diese Dynamik wird durch die Gleichungen 
+\begin{equation}
+\begin{gathered}
+\frac{\partial v}{\partial t} = \nabla \cdot (D \nabla v) + \frac{h v^2(1-v)}{\tau_{in}} - \frac{v}{\tau_{out}},\\
+\frac{\partial v}{\partial t} =
+\begin{cases}
+	\frac{1-h}{\tau_{open}},& \text{wenn } v \leq v_{gate}\\
+    \frac{-h}{\tau_{close}},& \text{wenn } v \geq v_{gate}
+\end{cases}
+\end{gathered}
+\end{equation}
+beschrieben. Dabei stehen die Parameter $\tau_{in}, \tau_{out}, \tau_{open}, \tau_{close}$ für Zeitkonstanten, welche die Form des Aktionspotentials modifizieren. Die ersten beiden Konstanten beschreiben die Geschwindigkeit, mit der die Ionen durch die Membran strömen, und die letzten beiden die Geschwindigkeit mit der sich die verantwortlichen Ionenkanäle öffnen beziehungsweise schließen. Zusätzlich stellt die Konstante $v_{gate}$ eine Grenzspannung dar. Beim Über- und Unterschreiten dieser Grenze ändert sich der der jeweilige Zustand der Ionenkanäle , indem $h(t)$ angepasst wird. Im Rahmen dieser Arbeit werden, soweit keine anderen Angaben vorhanden sind, die Parameter durch die Werte aus Tabelle XXX festgesetzt \citep{mitchell2003two}.\\
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|c|c|}
+$\tau_{in}$ & $\tau_{out}$ & $\tau_{open}$ & $\tau_{close}$ & $v_{gate}$ \\ 
+\hline 
+\hline 
+0.3 & 6.0 & 20 & 150 & 0.13 \\ 
+\hline 
+\end{tabular} 
+\label{tab:ms_parameters}
+\caption{Verwendete Zeitkonstaten und Grenzspannung $v_{gate}$ für die Betrachtung des \textit{Mitchell-Schaeffer Modells}}
+\end{table}
+
+Der erste Summand der zeitlichen Ableitung von $v$ beschreibt ein Diffusionsverhalten, welches durch die Diffusionsmatrix $D = \text{diag}(D_x, D_y)$ beschrieben wird. Die Einführung dieser Matrix erlaubt die Verwendung von zwei verschiedenen Diffusionskontanten $D_x, D_y$, welche Richtungsabhängig sind \citep{talbot2013towards}.\\
+
+Die meisten, auf zellulärer Ebene aufgestellten, Gleichungen haben eine hohe Komplexität. Hierdurch werden numerische Berechnungen sehr aufwendig. In der Herleitung dieses Modells sind einige vereinfachende Annahmen eingeflossen, wodurch die Komplexität und somit auch der numerische Aufwand reduziert worden sind. Trotz des phänomenologischen Charakters des \textit{Mitchell-Schaeffer Modells} besitzen die Parameter eine physiologische Interpretation. Zudem ist es in der Lage wichtige Eigenschaften des Aktionspotentials im Vergleich zu anderen Modellen gut wiederzugeben \citep{talbot2013towards}.\\
+
+Analog zu der Betrachtung des \textit{Barkley Modells} sind für die numerische Betrachtung die beiden \textit{PDE}s erneut in einem expliziten Verfahren mittels
+\begin{equation}
+\begin{gathered}
+\frac{\partial v}{\partial t}_{i,j} = D \cdot \Sigma(t)_{i,j} + \frac{h(t)_{i,j} v(t)_{i,j}^2(1-v(t)_{i,j})}{\tau_{in}} - \frac{v(t)_{i,j}}{\tau_{out}}\\
+\frac{\partial h}{\partial t}_{i,j} = \begin{cases}
+	\frac{1-h(t)_{i,j}}{\tau_{open}},& \text{wenn } v(t)_{i,j} \leq v_{gate}\\
+    \frac{-h(t)_{i,j}}{\tau_{close}},& \text{wenn } v(t)_{i,j} \geq v_{gate}
+\end{cases}
+\end{gathered}
+\end{equation}
+diskretisiert worden. Dabei werden im Folgenden die Integrationskonstanten $\Delta x = 0.1, \Delta t = 0.01$ und die Diffusionskonstanten $D_x = D_y = 0.1$ genutzt.\\
+
+TODO: Entgültig für eine oder zwei Diffusionskonstanten entscheiden.

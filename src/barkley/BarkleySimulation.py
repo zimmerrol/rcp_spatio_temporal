@@ -72,7 +72,7 @@ class BarkleySimulation:
         laplace += np.roll(self._u, +1, axis=1)
         laplace += np.roll(self._u, -1, axis=1)
 
-        self._u = self._u + self._deltaT * (f + self._h**2 * laplace)
+        self._u = self._u + self._deltaT * (f + self._h * laplace)
 
         if (chaotic):
             self._v = self._v + self._deltaT * (np.power(uOld, 3) - self._v)

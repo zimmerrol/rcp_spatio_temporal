@@ -11,7 +11,7 @@ def generate_uv_data(N, trans, sample_rate=1, Ngrid=100):
     deltaT = 1e-2
     epsilon = 0.08
     delta_x = 0.1
-    D = 1/50
+    D = 1/25.0
     h = D/delta_x**2
     print("h = {0:4f}".format(h))
     #h = D over delta_x
@@ -45,7 +45,7 @@ def generate_data(N, trans, sample_rate=1, Ngrid=100):
     deltaT = 1e-2
     epsilon = 0.08
     delta_x = 0.1
-    D = 1/50
+    D = 1/25.0
     h = D/delta_x**2
     print("h=" + str(h))
     #h = D over delta_x
