@@ -1,3 +1,20 @@
+import os
+
+id = int(os.getenv("SGE_TASK_ID", 0))
+first = int(os.getenv("SGE_TASK_FIRST", 0))
+last = int(os.getenv("SGE_TASK_LAST", 0))
+print("ID {0}".format(id))
+print("Task %d of %d tasks, starting with %d." % (id, last - first + 1, first))
+
+print("This job was submitted from %s, it is currently running on %s" % (os.getenv("SGE_O_HOST"), os.getenv("HOSTNAME")))
+
+print("NHOSTS: %s, NSLOTS: %s" % (os.getenv("NHOSTS"), os.getenv("NSLOTS")))
+
+import sys
+print(sys.version)
+
+#id=1
+
 # -*- coding: utf-8 -*-
 
 #TODO: Use http://stackoverflow.com/questions/28821910/how-to-get-around-the-pickling-error-of-python-multiprocessing-without-being-in
@@ -26,15 +43,9 @@ from helper import *
 
 N = 150
 ndata = 10000
-sigma = 5
-sigma_skip = 2
-eff_sigma = int(np.ceil(sigma/sigma_skip))
-patch_radius = sigma // 2
-n_units = 450
+ntest = 2000
 
 def mainFunction():
-    global output_weights, frame_output_weights, last_states
-
     if (os.path.exists("../cache/raw/{0}_{1}.vh.dat.npy".format(ndata, N)) == False):
         print("generating data...")
         data = generate_vh_data(ndata, 20000, 50, Ngrid=N) #20000 was 50000 ndata
@@ -54,27 +65,40 @@ def mainFunction():
         print("loading finished")
 
 
-    training_data = data[:, :ndata-2000]
-    test_data = data[:, ndata-2000:]
+    training_data = data[:, :ndata-ntest]
+    test_data = data[:, ndata-ntest:]
+    
+    print(test_data[0].shape)
+    
+    #use mean value as prediciton:
+    mean = np.mean(training_data[0])
+    meanpredmse = np.mean((test_data[0] - mean)**2)
+    
+    #use h as value for v
+    hvpredmse = np.mean((test_data[0] - test_data[1])**2)
+    
+    print("Using the mean of v_train as prediction: ")
+    print("\tMSE = {0}".format(meanpredmse))
+    
+    print("Using the value of h as the v prediction: ")
+    print("\tMSE = {0}".format(hvpredmse))
 
-    """
-    esn = ESN(n_input = eff_sigma*eff_sigma, n_output = 1, n_reservoir = n_units,
-            weight_generation = "advanced", leak_rate = 0.70, spectral_radius = 0.8,
-            random_seed=42, noise_level=0.0001, sparseness=.1, regression_parameters=[3e-6], solver = "lsqr", output_input_scaling=0.01)
-    """
-    #0.2,  0.4, .6, .8, .95,
-    gs = GridSearchP(
-            param_grid={"n_reservoir": [50, 100, 200, 400], "spectral_radius": [ 1.1, 1.2, 1.3, 1.4], "leak_rate": [.05, .1, .2, .7, .9, .95],
-                        "random_seed": [42,41,40,39,38], "regression_parameters": [[5e-1],[5e-2],[5e-3],[5e-4],[5e-5],[5e-6]]},
-            fixed_params={"n_output": 1, "n_input": 1, "noise_level": 0.001, "sparseness": .2, "solver": "lsqr", "weight_generation": "advanced"},
-            esnType=ESN)
-    print("start fitting...")
-    results = gs.fit(training_data[1, :, N//2, N//2].reshape((-1,1)), training_data[0, :, N//2, N//2].reshape((-1,1)), [(test_data[1, :, N//2, N//2].reshape((-1,1)), test_data[0, :, N//2, N//2].reshape((-1,1)))], printfreq=100, verbose=2)
-    print("done:\r\n")
-    print(results)
 
-    print("\r\nBest result (mse =  {0}):\r\n".format(gs._best_mse))
-    print(gs._best_params)
+class ForceIOStream:
+    def __init__(self, stream):
+        self.stream = stream
+
+    def write(self, data):
+        self.stream.write(data)
+        self.stream.flush()
+        if not self.stream.isatty():
+            os.fsync(self.stream.fileno())
+
+    def __getattr__(self, attr):
+        return getattr(self.stream, attr)
 
 if __name__== '__main__':
+    sys.stdout = ForceIOStream(sys.stdout)
+    sys.stderr = ForceIOStream(sys.stderr)
+
     mainFunction()

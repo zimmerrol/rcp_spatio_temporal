@@ -1,3 +1,18 @@
+import os
+
+id = int(os.getenv("SGE_TASK_ID", 0))
+first = int(os.getenv("SGE_TASK_FIRST", 0))
+last = int(os.getenv("SGE_TASK_LAST", 0))
+print("ID {0}".format(id))
+print("Task %d of %d tasks, starting with %d." % (id, last - first + 1, first))
+
+print("This job was submitted from %s, it is currently running on %s" % (os.getenv("SGE_O_HOST"), os.getenv("HOSTNAME")))
+
+print("NHOSTS: %s, NSLOTS: %s" % (os.getenv("NHOSTS"), os.getenv("NSLOTS")))
+
+import sys
+print(sys.version)
+
 # -*- coding: utf-8 -*-
 
 #TODO: Use http://stackoverflow.com/questions/28821910/how-to-get-around-the-pickling-error-of-python-multiprocessing-without-being-in
@@ -25,11 +40,14 @@ from helper import *
 
 N = 150
 ndata = 10000
-sigma = 5
-sigma_skip = 2
+sigma = [1,1,1,1,1,1,1, 3,3,3,3,3,3,3, 5,5,5,5,5,5,5, 5,5,5,5,5,5,5][id-1]
+sigma_skip = [1,1,1,1,1,1,1, 1,1,1,1,1,1,1, 1,1,1,1,1,1,1, 2,2,2,2,2,2,2][id-1]
 eff_sigma = int(np.ceil(sigma/sigma_skip))
 patch_radius = sigma // 2
-n_units = 200
+n_units = [50, 100, 200, 400, 500, 800, 1000, 50, 100, 200, 400, 500, 800, 1000, 50, 100, 200, 400, 500, 800, 1000,50, 100, 200, 400, 500, 800, 1000][id-1]
+
+print("Using parameters:")
+print("\t n_units \t = {0} \n\t sigma \t = {1}\n\t sigma_skip \t = {2}".format(n_units, sigma, sigma_skip))
 
 from multiprocessing import process
 process.current_process()._config['tempdir'] =  '/dev/shm/'
@@ -39,7 +57,7 @@ def setupArrays():
     global shared_training_data_base, shared_test_data_base, prediction_base, last_states_base, output_weights_base, frame_output_weights_base
     global shared_training_data, shared_test_data, prediction, last_states, output_weights, frame_output_weights
 
-    shared_training_data_base = multiprocessing.Array(ctypes.c_double, 2*8000*N*N)
+    shared_training_data_base = multiprocessing.Array(ctypes.c_double, 2*(ndata-2000)*N*N)
     shared_training_data = np.ctypeslib.as_array(shared_training_data_base.get_obj())
     shared_training_data = shared_training_data.reshape(2, -1, N, N)
 
@@ -121,8 +139,8 @@ def get_prediction(data, def_param=(shared_training_data, shared_test_data, fram
     if (y >= patch_radius and y < N-patch_radius and x >= patch_radius and x < N-patch_radius):
         #inner point
         esn = ESN(n_input = eff_sigma*eff_sigma, n_output = 1, n_reservoir = n_units,
-                     leak_rate = 0.7, spectral_radius = 1.1,
-                    random_seed=39, noise_level=0.0001, sparseness=.1, regression_parameters=[0.0005], solver = "lsqr")
+                     leak_rate = 0.5, spectral_radius = 0.9,
+                    random_seed=38, noise_level=0.001, sparseness=.1, regression_parameters=[5e-6], output_input_scaling=0.1, solver = "lsqr")
                     #weight_generation = "advanced",
 
 
@@ -173,7 +191,8 @@ def mainFunction():
         data = np.load("../cache/raw/{0}_{1}.vh.dat.npy".format(ndata, N))
 
         """
-        #switch the entries for the u->v prediction
+        #at the moment we are doing a h -> v cross prediction.
+        #switch the entries for the v -> h prediction
         tmp = data[0].copy()
         data[0] = data[1].copy()
         data[1] = tmp.copy()
@@ -222,8 +241,8 @@ def mainFunction():
     jobs = []
     inner_index = 0
     outer_index = 0
-    for y in range(N//2-25, N//2+25):
-        for x in range(N//2-25, N//2+25):
+    for y in range(N):#//2-25, N//2+25):
+        for x in range(N):#//2-25, N//2+25):
             if (y >= patch_radius and y < N-patch_radius and x >= patch_radius and x < N-patch_radius):
                 inner_index += 1
                 jobs.append((y, x, inner_index))
@@ -258,7 +277,12 @@ def mainFunction():
     print("inner test error: {0}".format(np.mean((diff[:,patch_radius:N-patch_radius, patch_radius:N-patch_radius])**2)))
     print("special test error: {0}".format(np.mean((diff[:,N//2-25:N//2+25, N//2-25:N//2+25])**2)))
 
-    show_results({"Orig" : shared_test_data[0], "Pred" : prediction, "Source": shared_test_data[1], "Diff" : diff})
+    viewData = [("Orig", shared_test_data[0]), ("Pred", prediction), ("Source", shared_test_data[1]), ("Diff", diff)]
+    f = open("../cache/viewdata/esn_viewdata_{0}_{1}_{2}.dat".format(n_units, sigma, sigma_skip), "wb")
+    pickle.dump(viewData, f)
+    f.close()
+
+    #show_results({"Orig" : shared_test_data[0], "Pred" : prediction, "Source": shared_test_data[1], "Diff" : diff})
 
 if __name__== '__main__':
     mainFunction()

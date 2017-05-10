@@ -14,13 +14,10 @@ sys.path.insert(0, grandparentdir)
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-from BarkleySimulation import BarkleySimulation
-from ESN import ESN
 import progressbar
 import dill as pickle
 from scipy.spatial import KDTree
 from sklearn.neighbors import NearestNeighbors as NN
-from sklearn.neighbors import LSHForest
 from helper import *
 
 from multiprocessing import Process, Queue, Manager, Pool #we require Pathos version >=0.2.6. Otherwise we will get an "EOFError: Ran out of input" exception
@@ -33,15 +30,26 @@ from multiprocessing import process
 process.current_process()._config['tempdir'] =  '/dev/shm/' #'/data.bmp/roland/temp/'
 
 N = 150
-ndata = 91000
-sigma = 7
-sigma_skip = 3
+ndata = 30000
+sigma = 5
+sigma_skip = 2
 eff_sigma = int(np.ceil(sigma/sigma_skip))
 ddim = 3
 patch_radius = sigma//2
-trainLength = 90000
+trainLength = 29000
 testLength = 1000
-k = 4
+
+m = trainLength//50
+n = trainLength
+nprime = 1
+samplingDist = n//m
+
+def rbf(xi, yi, sigmam):
+    return np.exp(-np.sum((xi-yi)**2)/(2*sigmam**2))
+
+def rbf_vec(xi, yi, sigmam):
+    xi = np.tile(xi, (len(yi),1))
+    return np.exp(-np.sum((xi-yi)**2, axis=1)/(2*sigmam**2))
 
 def setupArrays():
     global shared_v_data_base, shared_u_data_base, shared_prediction_base
@@ -83,14 +91,14 @@ def create_0d_delay_coordinates(data, delay_dimension, tau):
 
 def generate_data(N, trans, sample_rate, Ngrid):
     data = None
-    if (os.path.exists("../cache/raw/{0}_{1}.uv.dat.npy".format(N, Ngrid)) == False):
+    if (os.path.exists("../cache/raw/{0}_{1}.vh.dat.npy".format(N, Ngrid)) == False):
         print("generating data...")
-        data = generate_uv_data(N, 50000, 5, Ngrid=Ngrid)
-        np.save("../cache/raw/{0}_{1}.uv.dat.npy".format(N, Ngrid), data)
+        data = generate_vh_data(N, 20000, 50, Ngrid=Ngrid)
+        np.save("../cache/raw/{0}_{1}.vh.dat.npy".format(N, Ngrid), data)
         print("generating finished")
     else:
         print("loading data...")
-        data = np.load("../cache/raw/{0}_{1}.uv.dat.npy".format(N, Ngrid))
+        data = np.load("../cache/raw/{0}_{1}.vh.dat.npy".format(N, Ngrid))
         print("loading finished")
         
     return data
@@ -107,7 +115,7 @@ def get_prediction(data):
     
 def predict_frame_pixel(data, def_param=(shared_v_data, shared_u_data)):
     y, x = data
-       
+   
     shared_delayed_v_data = create_0d_delay_coordinates(shared_v_data[:, y, x], ddim, tau=32)
    
     delayed_patched_v_data_train = shared_delayed_v_data[:trainLength]
@@ -122,28 +130,33 @@ def predict_frame_pixel(data, def_param=(shared_v_data, shared_u_data)):
     flat_v_data_test = delayed_patched_v_data_test.reshape(-1, ddim)
     flat_u_data_test = u_data_test.reshape(-1,1)
 
-    neigh = NN(k, n_jobs=26) #algorithm = 'ball_tree'
-    #neigh = LSHForest(n_estimators=25, n_candidates=200, n_neighbors=k)
-    
-    neigh.fit(flat_v_data_train)
+    samplingPoints = flat_v_data_train[0::samplingDist]
+    sigmam = np.ones(m)*5
 
-    distances, indices = neigh.kneighbors(flat_v_data_test)
-    
-    with np.errstate(divide='ignore'):
-        weights = np.divide(1.0, distances)
+    #construct matrices
+    A = np.empty((n, m))
+    F = np.empty((n, nprime))
+    L = None
 
-    infinity_mask = np.isinf(weights)
-    infinity_row_mask = np.any(infinity_mask, axis=1)
-    weights[infinity_row_mask] = infinity_mask[infinity_row_mask]
+    #construct target matrix F
+    #F = flat_u_data_train.copy()
 
-    denominator = np.repeat(np.sum(weights, axis=1),k).reshape((-1,k))
-    weights /= denominator
+    #construct trainig matrix A
+    for i in range(n):
+        A[i] = rbf_vec(flat_v_data_train[i], samplingPoints, sigmam)
 
-    pred = 0
-    for i in range(k):
-        pred += np.multiply(weights[:, i, np.newaxis], flat_u_data_train[indices[:, i]])
+    #calculate the resulting weights L
+    APINV = np.linalg.pinv(A)
+    L = np.dot(APINV, flat_u_data_train) #F
 
-    pred = pred.ravel()#((flat_u_data_train[indices[:, 0]] + flat_u_data_train[indices[:, 1]])/2.0).ravel()
+    Lt = L.T
+
+    flat_prediction = np.zeros((testLength, nprime))
+
+    for i in range(0, flat_prediction.shape[0]):
+        flat_prediction[i] = np.dot(Lt, rbf_vec(flat_v_data_test[i], samplingPoints, sigmam))
+
+    pred = flat_prediction.ravel()
     
     return pred    
     
@@ -151,6 +164,8 @@ def predict_inner_pixel(data, def_param=(shared_v_data, shared_u_data)):
     y, x = data
     
     shared_delayed_v_data = create_2d_delay_coordinates(shared_v_data[:, y-patch_radius:y+patch_radius+1, x-patch_radius:x+patch_radius+1][:, ::sigma_skip, ::sigma_skip], ddim, tau=32)
+    #print(shared_delayed_v_data.shape)
+    #print(ddim*eff_sigma*eff_sigma)
     shared_delayed_patched_v_data = np.empty((ndata, 1, 1, ddim*eff_sigma*eff_sigma))
     shared_delayed_patched_v_data[:, 0, 0] = shared_delayed_v_data.reshape(-1, ddim*eff_sigma*eff_sigma)
     
@@ -165,31 +180,36 @@ def predict_inner_pixel(data, def_param=(shared_v_data, shared_u_data)):
 
     flat_v_data_test = delayed_patched_v_data_test.reshape(-1, shared_delayed_patched_v_data.shape[3])
     flat_u_data_test = u_data_test.reshape(-1,1)
-
-    neigh = NN(k, n_jobs=1)
-    #neigh = LSHForest(n_estimators=25, n_candidates=20, n_neighbors=k)
-
-    neigh.fit(flat_v_data_train)
     
-    distances, indices = neigh.kneighbors(flat_v_data_test)
+    samplingPoints = flat_v_data_train[0::samplingDist]
+    sigmam = np.ones(m)*5
 
-    with np.errstate(divide='ignore'):
-        weights = np.divide(1.0, distances)
+    #construct matrices
+    A = np.empty((n, m))
+    F = np.empty((n, nprime))
+    L = None
 
-    infinity_mask = np.isinf(weights)
-    infinity_row_mask = np.any(infinity_mask, axis=1)
-    weights[infinity_row_mask] = infinity_mask[infinity_row_mask]
+    #construct target matrix F
+    #F = flat_u_data_train.copy()
 
-    denominator = np.repeat(np.sum(weights, axis=1),k).reshape((-1,k))
-    weights /= denominator
+    #construct trainig matrix A
+    for i in range(n):
+        A[i] = rbf_vec(flat_v_data_train[i], samplingPoints, sigmam)
 
-    pred = 0
-    for i in range(k):
-        pred += np.multiply(weights[:, i, np.newaxis], flat_u_data_train[indices[:, i]])
-    pred = pred.ravel()
+    #calculate the resulting weights L
+    APINV = np.linalg.pinv(A)
+    L = np.dot(APINV, flat_u_data_train) #F
+
+    Lt = L.T
+
+    flat_prediction = np.zeros((testLength, nprime))
+
+    for i in range(0, flat_prediction.shape[0]):
+        flat_prediction[i] = np.dot(Lt, rbf_vec(flat_v_data_test[i], samplingPoints, sigmam))
+
+    pred = flat_prediction.ravel()
     
-    return pred
-   
+    return pred       
 
 def processThreadResults(threadname, q, numberOfWorkers, numberOfResults, def_param=(shared_prediction, shared_u_data)):
     global prediction
@@ -223,21 +243,21 @@ def mainFunction():
     delayed_patched_v_data = None
     u_data = None
     print("generating data...")
-    u_data_t, v_data_t = generate_data(ndata, 20000, 5, Ngrid=N)#20000 was 50000 #, delay_dimension=ddim, patch_size=sigma)
+    u_data_t, v_data_t = generate_data(ndata, 50000, 5, Ngrid=N)#, delay_dimension=ddim, patch_size=sigma)
     shared_v_data[:] = v_data_t[:]
     shared_u_data[:] = u_data_t[:]
     print("generation finished")
 
     queue = Queue() # use manager.queue() ?
     print("preparing threads...")
-    pool = Pool(processes=16, initializer=get_prediction_init, initargs=[queue,]) #16
+    pool = Pool(processes=16, initializer=get_prediction_init, initargs=[queue,])
 
-    processProcessResultsThread = Process(target=processThreadResults, args=("processProcessResultsThread", queue, 16, N*N) )
+    processProcessResultsThread = Process(target=processThreadResults, args=("processProcessResultsThread", queue, 16, N*N)) #*N
 
     modifyDataProcessList = []
     jobs = []
     for y in range(N):
-        for x in range(N):
+        for x in range(N): #N
                 jobs.append((y, x))
 
     print("fitting...")
@@ -248,6 +268,9 @@ def mainFunction():
     processProcessResultsThread.join()
 
     print("finished fitting")
+    
+    shared_prediction[shared_prediction > 1.0] = 1.0
+    shared_prediction[shared_prediction < 0.0] = 0.0
     
     diff = (shared_u_data[trainLength:]-shared_prediction)
     mse = np.mean((diff)**2)
@@ -261,3 +284,4 @@ def mainFunction():
 
 if __name__== '__main__':
     mainFunction()
+

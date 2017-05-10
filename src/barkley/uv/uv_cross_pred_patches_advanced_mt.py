@@ -120,7 +120,7 @@ def get_prediction(data, def_param=(shared_training_data, shared_test_data, fram
         #inner point
         esn = ESN(n_input = eff_sigma*eff_sigma, n_output = 1, n_reservoir = n_units,
                     weight_generation = "advanced", leak_rate = 0.70, spectral_radius = 0.8,
-                    random_seed=42, noise_level=0.0001, sparseness=.1, regression_parameters=[6e-6], solver = "lsqr")
+                    random_seed=42, noise_level=0.0001, sparseness=.1, regression_parameters=[5e-7], solver = "lsqr")
 
 
         pred = fit_predict_pixel(y, x, running_index, last_states, output_weights, shared_training_data, shared_test_data, esn, True)
@@ -129,7 +129,7 @@ def get_prediction(data, def_param=(shared_training_data, shared_test_data, fram
         #frame
         esn = ESN(n_input = 1, n_output = 1, n_reservoir = n_units,
                 weight_generation = "advanced", leak_rate = 0.70, spectral_radius = 0.8,
-                random_seed=42, noise_level=0.0001, sparseness=.1, regression_parameters=[6e-6], solver = "lsqr")
+                random_seed=42, noise_level=0.0001, sparseness=.1, regression_parameters=[5e-7], solver = "lsqr")
 
         pred = fit_predict_frame_pixel(y, x, running_index, last_states, frame_output_weights, shared_training_data, shared_test_data, esn, True)
 

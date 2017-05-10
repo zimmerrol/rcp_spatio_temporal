@@ -3,6 +3,7 @@ import itertools
 from ESN import ESN
 import operator
 import progressbar
+import sys
 
 from multiprocessing import Process, Queue, Manager, Pool #we require Pathos version >=0.2.6. Otherwise we will get an "EOFError: Ran out of input" exception
 import multiprocessing
@@ -16,24 +17,28 @@ class GridSearchP:
     def _get_score(data):
         params, fixed_params, trainingInput, trainingOutput, testingDataSequence, esnType = data
 
+        
         output_postprocessor = lambda x:x
 
-        esn = esnType(**params, **fixed_params)
-        training_acc = esn.fit(trainingInput, trainingOutput)
+        try:
+            esn = esnType(**params, **fixed_params)
+            training_acc = esn.fit(trainingInput, trainingOutput)
 
-        current_state = esn._x
+            current_state = esn._x
 
-        test_mse = []
-        for (testInput, testOutput) in testingDataSequence:
-            esn._x = current_state
-            out_pred = output_postprocessor(esn.predict(testInput))
-            test_mse.append(np.mean((testOutput - out_pred)**2))
+            test_mse = []
+            for (testInput, testOutput) in testingDataSequence:
+                esn._x = current_state
+                out_pred = output_postprocessor(esn.predict(testInput))
+                test_mse.append(np.mean((testOutput - out_pred)**2))
 
-        test_mse = np.mean(test_mse)
-
-        dat = (params, training_acc, test_mse)
+            test_mse = np.mean(test_mse)
+        except:
+            print("Unexpected error:", sys.exc_info()[0])        
+        
+        dat = (test_mse, training_acc, params)
         GridSearchP._get_score.q.put(dat)
-
+        
         return dat
 
     def _get_score_init(q):
@@ -42,10 +47,15 @@ class GridSearchP:
     def processThreadResults(threadname, q, numberOfWorkers, numberOfResults, verbose):
         if (verbose == 0):
             return
-
-        bar = progressbar.ProgressBar(max_value=numberOfResults, redirect_stdout=True)
-        bar.update(0)
+            
+        if (verbose == 1):
+            bar = progressbar.ProgressBar(max_value=numberOfResults, redirect_stdout=True)
+            bar.update(0)
         finishedResults = 0
+        
+        print_step = numberOfResults//200
+        
+        print(print_step)
 
         while True:
             if (finishedResults == numberOfResults):
@@ -54,9 +64,15 @@ class GridSearchP:
             newData = q.get()
             finishedResults += 1
 
-            bar.update(finishedResults)
-
-        bar.finish()
+            if (verbose == 1):
+                bar.update(finishedResults)
+            else:
+                if (finishedResults % print_step == 0):
+                    print("{0}/{1}".format(finishedResults, numberOfResults))
+                    sys.stdout.flush()
+                        
+        if (verbose == 1):
+            bar.finish()
 
     def fit(self, trainingInput, trainingOutput, testingDataSequence, output_postprocessor = lambda x: x, printfreq=None, n_jobs=1, verbose=0):
         def enumerate_params():
@@ -78,6 +94,8 @@ class GridSearchP:
         pool.close()
 
         processProcessResultsThread.join()
+        
+        print(results)
 
         res = min(results, key=operator.itemgetter(0))
 
