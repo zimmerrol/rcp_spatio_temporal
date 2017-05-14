@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from BarkleySimulation import BarkleySimulation
 from ESN import ESN
+from RBF import *
 import progressbar
 import dill as pickle #we require version >=0.2.6. Otherwise we will get an "EOFError: Ran out of input" exception
 import copy
@@ -30,11 +31,11 @@ N = 150
 ndata = 10000
 testLength = 2000
 trainLength = ndata - testLength
-sigma = 5
+sigma = 31
 sigma_skip = 2
 eff_sigma = int(np.ceil(sigma/sigma_skip))
 patch_radius = sigma // 2
-n_units = 50
+n_units = 100
 
 def setupArrays():
     #TODO: Correct the array dimensions!
@@ -55,37 +56,43 @@ def setupArrays():
 
 setupArrays()
 
-def fit_predict_pixel(y, x, running_index, training_data, test_data, esn, generate_new):
+def fit_predict_pixel(y, x, running_index, training_data, test_data, generate_new):
     training_data_in = training_data[1][:, y - patch_radius:y + patch_radius+1, x - patch_radius:x + patch_radius+1][:, ::sigma_skip, ::sigma_skip].reshape(-1, eff_sigma*eff_sigma)
     training_data_out = training_data[0][:, y, x].reshape(-1, 1)
 
     test_data_in = test_data[1][:, y - patch_radius:y + patch_radius+1, x - patch_radius:x + patch_radius+1][:, ::sigma_skip, ::sigma_skip].reshape(-1, eff_sigma*eff_sigma)
     test_data_out = test_data[0][:, y, x].reshape(-1, 1)
 
-    train_error = esn.fit(training_data_in, training_data_out, verbose=0)
+    rbf = RBF(sigma=5.0)
+    rbf.fit(training_data_in, training_data_out, basisQuota=0.02)
+    pred = rbf.predict(test_data_in)
+    pred = pred.ravel()
 
-    pred = esn.predict(test_data_in, verbose=0)
-    #pred[pred>1.0] = 1.0
-    #pred[pred<0.0] = 0.0
-
-    return pred[:,0]
-
-def fit_predict_frame_pixel(y, x, running_index, training_data, test_data, esn, generate_new):
-    ind_y, ind_x = y, x
-
-    training_data_in = training_data[1][:, ind_y, ind_x].reshape(-1, 1*1)
-    training_data_out = training_data[0][:, y, x].reshape(-1, 1*1)
-
-    test_data_in = test_data[1][:, ind_y, ind_x].reshape(-1, 1*1)
-    test_data_out = test_data[0][:, y, x].reshape(-1, 1*1)
-
-    train_error = esn.fit(training_data_in, training_data_out, verbose=0)
-
-    pred = esn.predict(test_data_in, verbose=0)
     pred[pred>1.0] = 1.0
     pred[pred<0.0] = 0.0
 
-    return pred[:, 0]
+    return pred
+
+def fit_predict_frame_pixel(y, x, running_index, training_data, test_data, generate_new):
+    ind_y, ind_x = y, x
+
+    min_border_distance = np.min([y, x, N-1-y, N-1-x])
+
+    training_data_in = training_data[1][:, y - min_border_distance:y + min_border_distance+1, x - min_border_distance:x + min_border_distance+1].reshape(-1, int((2*min_border_distance+1)**2))
+    training_data_out = training_data[0][:, y, x].reshape(-1, 1)
+
+    test_data_in = test_data[1][:, y - min_border_distance:y + min_border_distance+1, x - min_border_distance:x + min_border_distance+1].reshape(-1, int((2*min_border_distance+1)**2))
+    test_data_out = test_data[0][:, y, x].reshape(-1, 1)
+
+    rbf = RBF(sigma=5.0)
+    rbf.fit(training_data_in, training_data_out, basisQuota=0.02)
+    pred = rbf.predict(test_data_in)
+    pred = pred.ravel()
+
+    pred[pred>1.0] = 1.0
+    pred[pred<0.0] = 0.0
+
+    return pred
 
 def get_prediction_init(q):
     get_prediction.q = q
@@ -99,20 +106,11 @@ def get_prediction(data, def_param=(shared_training_data, shared_test_data)):
     pred = None
     if (y >= patch_radius and y < N-patch_radius and x >= patch_radius and x < N-patch_radius):
         #inner point
-        esn = ESN(n_input = eff_sigma*eff_sigma, n_output = 1, n_reservoir = n_units,
-                    weight_generation = "advanced", leak_rate = 0.70, spectral_radius = 0.8,
-                    random_seed=42, noise_level=0.0001, sparseness=.1, regression_parameters=[5e-7], solver = "lsqr")
-
-
-        pred = fit_predict_pixel(y, x, running_index, shared_training_data, shared_test_data, esn, True)
+        pred = fit_predict_pixel(y, x, running_index, shared_training_data, shared_test_data, True)
 
     else:
         #frame
-        esn = ESN(n_input = 1, n_output = 1, n_reservoir = n_units,
-                weight_generation = "advanced", leak_rate = 0.70, spectral_radius = 0.8,
-                random_seed=42, noise_level=0.0001, sparseness=.1, regression_parameters=[5e-7], solver = "lsqr")
-
-        pred = fit_predict_frame_pixel(y, x, running_index, shared_training_data, shared_test_data, esn, True)
+        pred = fit_predict_frame_pixel(y, x, running_index, shared_training_data, shared_test_data, True)
 
     get_prediction.q.put((y, x, pred))
 
@@ -161,10 +159,10 @@ def mainFunction():
     print("blurring...")
 
     for t in range(trainLength):
-        shared_training_data[1, t, :, :] = gaussian_filter(training_data[t], sigma=8.0)
+        shared_training_data[1, t, :, :] = gaussian_filter(training_data[t], sigma=9.0)
 
     for t in range(testLength):
-        shared_test_data[1, t, :, :] = gaussian_filter(test_data[t], sigma=8.0)
+        shared_test_data[1, t, :, :] = gaussian_filter(test_data[t], sigma=9.0)
 
     show_results([("Orig", shared_training_data[0]), ("Blurred", shared_training_data[1])])
 
@@ -172,18 +170,18 @@ def mainFunction():
 
     queue = Queue() # use manager.queue() ?
     print("preparing threads...")
-    pool = Pool(processes=1, initializer=get_prediction_init, initargs=[queue,])
+    pool = Pool(processes=26, initializer=get_prediction_init, initargs=[queue,])
 
     modifyDataProcessList = []
     jobs = []
     index = 0
 
-    for y in range(40,45):#N):
-        for x in range(40,45):#N):
+    for y in range(N):
+        for x in range(N):
             jobs.append((y, x, index))
 
     print("fitting...")
-    processProcessResultsThread = Process(target=processThreadResults, args=("processProcessResultsThread", queue, 16, len(jobs)) )
+    processProcessResultsThread = Process(target=processThreadResults, args=("processProcessResultsThread", queue, 26, len(jobs)) )
     processProcessResultsThread.start()
     results = pool.map(get_prediction, jobs)
     pool.close()
@@ -195,7 +193,7 @@ def mainFunction():
     diff = (test_data-prediction)
     mse = np.mean((diff)**2)
     print("test error: {0}".format(mse))
-    print("inner test error: {0}".format(np.mean(((test_data[0]-prediction)[patch_radius:N-patch_radius, patch_radius:N-patch_radius])**2)))
+    print("inner test error: {0}".format(np.mean((diff[:, patch_radius:N-patch_radius, patch_radius:N-patch_radius])**2)))
 
     show_results([("Source", shared_test_data[1]), ("Orig", shared_test_data[0]), ("Pred", prediction), ("Diff", diff)])
 

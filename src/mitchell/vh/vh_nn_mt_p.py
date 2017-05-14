@@ -38,6 +38,7 @@ import dill as pickle
 from scipy.spatial import KDTree
 from sklearn.neighbors import NearestNeighbors as NN
 from helper import *
+from helper_mitchellschaeffer import *
 
 from multiprocessing import Process, Queue, Manager, Pool #we require Pathos version >=0.2.6. Otherwise we will get an "EOFError: Ran out of input" exception
 #from pathos.multiprocessing import Pool
@@ -48,12 +49,14 @@ from multiprocessing import process
 
 process.current_process()._config['tempdir'] =  '/dev/shm/' #'/data.bmp/roland/temp/'
 
+id = 18
+
 N = 150
 ndata = 30000
-sigma = [3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7][id-1]
-sigma_skip = [1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3][id-1]
+sigma = [3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7][id-1]
+sigma_skip = [1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3][id-1]
 eff_sigma = int(np.ceil(sigma/sigma_skip))
-ddim = [3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5,  3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5,  3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5][id-1]
+ddim = [3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5,  3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5,  3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5,  3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5][id-1]
 k = [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,  3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,  5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5][id-1]
 patch_radius = sigma//2
 trainLength = 28000
@@ -120,6 +123,7 @@ def generate_data(N, trans, sample_rate, Ngrid):
         data[1] = tmp.copy()
         
         
+        
     return data
 
 def get_prediction(data):
@@ -149,13 +153,28 @@ def predict_frame_pixel(data, def_param=(shared_h_data, shared_v_data)):
     flat_h_data_test = delayed_patched_h_data_test.reshape(-1, ddim)
     flat_v_data_test = v_data_test.reshape(-1,1)
 
-    neigh = NN(2, n_jobs=1)#n_jobs=26
+    neigh = NN(k, n_jobs=1, algorithm='kd_tree')#n_jobs=26
 
     neigh.fit(flat_h_data_train)
 
     distances, indices = neigh.kneighbors(flat_h_data_test)
 
-    pred = ((flat_v_data_train[indices[:, 0]] + flat_v_data_train[indices[:, 1]])/2.0).ravel()
+    with np.errstate(divide='ignore'):
+        weights = np.divide(1.0, distances)
+
+    infinity_mask = np.isinf(weights)
+    infinity_row_mask = np.any(infinity_mask, axis=1)
+    weights[infinity_row_mask] = infinity_mask[infinity_row_mask]
+
+    denominator = np.repeat(np.sum(weights, axis=1),k).reshape((-1,k))
+    weights /= denominator
+
+    pred = 0
+    for i in range(k):
+        pred += np.multiply(weights[:, i, np.newaxis], flat_v_data_train[indices[:, i]])
+    pred = pred.ravel()
+
+    #pred = ((flat_v_data_train[indices[:, 0]] + flat_v_data_train[indices[:, 1]])/2.0).ravel()
     
     return pred    
     
@@ -178,7 +197,7 @@ def predict_inner_pixel(data, def_param=(shared_h_data, shared_v_data)):
     flat_h_data_test = delayed_patched_h_data_test.reshape(-1, shared_delayed_patched_h_data.shape[3])
     flat_v_data_test = v_data_test.reshape(-1,1)
 
-    neigh = NN(k, n_jobs=1) #n_jobs=26
+    neigh = NN(k, n_jobs=1, algorithm='kd_tree') #n_jobs=26
 
     neigh.fit(flat_h_data_train)
 
@@ -243,9 +262,9 @@ def mainFunction():
 
     queue = Queue() # use manager.queue() ?
     ###print("preparing threads...")
-    pool = Pool(processes=32, initializer=get_prediction_init, initargs=[queue,])
+    pool = Pool(processes=16, initializer=get_prediction_init, initargs=[queue,])
 
-    processProcessResultsThread = Process(target=processThreadResults, args=("processProcessResultsThread", queue, 32, N*N) )
+    processProcessResultsThread = Process(target=processThreadResults, args=("processProcessResultsThread", queue, 16, N*N) )
 
     modifyDataProcessList = []
     jobs = []
@@ -265,10 +284,10 @@ def mainFunction():
     diff = (shared_v_data[trainLength:]-shared_prediction)
     mse = np.mean((diff)**2)
     print("test error: {0}".format(mse))
-    print("inner test error: {0}".format(np.mean(((shared_v_data[trainLength:]-shared_prediction)[patch_radius:N-patch_radius, patch_radius:N-patch_radius])**2)))
+    print("inner test error: {0}".format(np.mean((diff[:, patch_radius:N-patch_radius, patch_radius:N-patch_radius])**2)))
 
     viewData = [("Orig", shared_v_data[trainLength:]), ("Pred", shared_prediction), ("Source", shared_h_data[trainLength:]), ("Diff", diff)]
-    f = open("../cache/viewdata/vtoh/nn_viewdata_{0}_{1}_{2}_{3}.dat".format(ndata, sigma, sigma_skip, ddim), "wb")
+    f = open("../cache/viewdata/htov/nn_viewdata_{0}_{1}_{2}_{3}_{4}.dat".format(ndata, sigma, sigma_skip, ddim, k), "wb")
     pickle.dump(viewData, f)
     f.close()
 

@@ -1,20 +1,3 @@
-import os
-
-id = int(os.getenv("SGE_TASK_ID", 0))
-first = int(os.getenv("SGE_TASK_FIRST", 0))
-last = int(os.getenv("SGE_TASK_LAST", 0))
-print("ID {0}".format(id))
-print("Task %d of %d tasks, starting with %d." % (id, last - first + 1, first))
-
-print("This job was submitted from %s, it is currently running on %s" % (os.getenv("SGE_O_HOST"), os.getenv("HOSTNAME")))
-
-print("NHOSTS: %s, NSLOTS: %s" % (os.getenv("NHOSTS"), os.getenv("NSLOTS")))
-
-import sys
-print(sys.version)
-
-#id=1
-
 # -*- coding: utf-8 -*-
 
 #TODO: Use http://stackoverflow.com/questions/28821910/how-to-get-around-the-pickling-error-of-python-multiprocessing-without-being-in
@@ -37,9 +20,9 @@ from multiprocessing import Process, Queue, Manager, Pool #we require Pathos ver
 #from pathos.multiprocessing import Pool
 import multiprocessing
 import ctypes
-from GridSearchP import GridSearchP
 
 from helper import *
+from helper_mitchellschaeffer import *
 
 N = 150
 ndata = 10000
@@ -55,30 +38,46 @@ def mainFunction():
         print("loading data...")
         data = np.load("../cache/raw/{0}_{1}.vh.dat.npy".format(ndata, N))
 
-        """
-        #switch the entries for the u->v prediction
+        
+        #at the moment we are doing a h -> v cross prediction.
+        #switch the entries for the v -> h prediction
         tmp = data[0].copy()
         data[0] = data[1].copy()
         data[1] = tmp.copy()
-        """
+        
 
         print("loading finished")
 
+
+  
 
     training_data = data[:, :ndata-ntest]
     test_data = data[:, ndata-ntest:]
     
     print(test_data[0].shape)
+   
+    print(np.mean(test_data[0]))
     
     #use mean value as prediciton:
     mean = np.mean(training_data[0])
     meanpredmse = np.mean((test_data[0] - mean)**2)
+    
+    diff = np.abs(test_data[0] - mean)
+    #diff[diff < 0.04] = 0.0
+    #diff[diff > 0.04] = 1.0
+    
+    print(np.mean(np.multiply(diff, diff)))
+    
+    show_results([("test", test_data[0]), ("error", diff)])
+    
+    print("mean value: {0}".format(mean))
     
     #use h as value for v
     hvpredmse = np.mean((test_data[0] - test_data[1])**2)
     
     print("Using the mean of v_train as prediction: ")
     print("\tMSE = {0}".format(meanpredmse))
+    print("\tmedian of SE = {0}".format(np.median((test_data[0] - mean)**2)))
     
     print("Using the value of h as the v prediction: ")
     print("\tMSE = {0}".format(hvpredmse))

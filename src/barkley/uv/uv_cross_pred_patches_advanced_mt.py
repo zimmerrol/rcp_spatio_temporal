@@ -30,7 +30,7 @@ sigma = 5
 sigma_skip = 2
 eff_sigma = int(np.ceil(sigma/sigma_skip))
 patch_radius = sigma // 2
-n_units = 550
+n_units = 50#550
 
 def setupArrays():
     #TODO: Correct the array dimensions!
