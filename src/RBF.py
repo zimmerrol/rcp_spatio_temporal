@@ -1,8 +1,9 @@
 import numpy as np
 
 class RBF(object):
-    def __init__(self, sigma=5.0):
-        self.sigma = sigma
+    def __init__(self, sigma=5.0, basisQuota = 0.05):
+        self._sigma = sigma
+        self._basisQuota = basisQuota
 
     def rbf(xi, yi, sigmam):
         return np.exp(-np.sum((xi-yi)**2)/(2*sigmam**2))
@@ -11,20 +12,20 @@ class RBF(object):
         xi = np.tile(xi, (len(yi),1))
         return np.exp(-np.sum((xi-yi)**2, axis=1)/(2*sigmam**2))
 
-    def fit(self, x, y, basisQuota = 0.05):
+    def fit(self, x, y):
         self._nprime = y.shape[1]
-        
+
         n = len(x)
-    
+
         #m is the numberOfSamplingPoints
-        m = int(basisQuota*len(x))
+        m = int(self._basisQuota*len(x))
 
         #according to http://stackoverflow.com/questions/9873626/choose-m-evenly-spaced-elements-from-a-sequence-of-length-n
         createEqualSpacedIndices = lambda m, n: [i*n//m + n//(2*m) for i in range(m)]
 
 
         self._samplingPoints = x[createEqualSpacedIndices(m, len(x))]
-        self._sigmam = np.ones(m)*self.sigma
+        self._sigmam = np.ones(m)*self._sigma
 
         #construct matrices
         A = np.empty((n, m))
