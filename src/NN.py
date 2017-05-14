@@ -7,7 +7,7 @@ class NN(object):
         self._n_jobs = n_jobs
 
     def fit(self, x, y):
-      self._neigh = NearestNeighbors(k, self._n_jobs=1, algorithm='kd_tree')
+      self._neigh = NearestNeighbors(self._k, self._n_jobs, algorithm='kd_tree')
       self._y = y
       self._neigh.fit(x)
 

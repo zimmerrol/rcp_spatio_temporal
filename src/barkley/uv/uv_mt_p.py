@@ -5,20 +5,23 @@ grandparentdir = os.path.dirname(parentdir)
 sys.path.insert(0, parentdir)
 sys.path.insert(0, grandparentdir)
 
-
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import progressbar
 import dill as pickle
-from scipy.spatial import KDTree
-from sklearn.neighbors import NearestNeighbors as NN
-from helper import *
-from barkley_helper import *
+
+from ESN import *
+from RBF import *
+from NN import *
+
 from multiprocessing import Process, Queue, Manager, Pool #we require Pathos version >=0.2.6. Otherwise we will get an "EOFError: Ran out of input" exception
 import multiprocessing
 import ctypes
 from multiprocessing import process
+
+from helper import *
+from barkley_helper import *
 import argparse
 
 
@@ -36,6 +39,8 @@ trainLength = 28000
 testLength = 2000
 
 def parseArguments():
+    global id, predictionMode, reverseDirection
+
     id = int(os.getenv("SGE_TASK_ID", 0))
 
     parser = argparse.ArgumentParser(description='')
@@ -44,12 +49,12 @@ def parseArguments():
     args = parser.parse_args()
 
     reverseDirection = args.direction[0] != "vu"
-    if args.mode not in ["ESN", "NN", "RBF"]:
-        raise ValueError("No valid predictionMode choosen! (Value is now: {0})".format(predictionMode))
+    if args.mode[0] not in ["ESN", "NN", "RBF"]:
+        raise ValueError("No valid predictionMode choosen! (Value is now: {0})".format(args.mode[0]))
     else:
-        predictionMode = args.mode
+        predictionMode = args.mode[0]
 
-    print("Prediction: {0}".format("u -> v" if reverseDirection else "v -> u"))
+    print("Prediction via {0}: {1}".format(predictionMode, "u -> v" if reverseDirection else "v -> u"))
 parseArguments()
 
 def setupArrays():
@@ -181,19 +186,26 @@ def get_prediction(data):
 def predict_frame_pixel(data, predicter, def_param=(shared_v_data, shared_u_data)):
     y, x = data
 
-    delayed_v_data = create_0d_delay_coordinates(shared_v_data[:, y, x], ddim, tau=32)
+    if (predictionMode in ["NN", "RBF"]):
+        delayed_v_data = create_0d_delay_coordinates(shared_v_data[:, y, x], ddim, tau=32)
 
-    delayed_patched_v_data_train = delayed_v_data[:trainLength]
-    u_data_train = shared_u_data[:trainLength, y, x]
+        delayed_patched_v_data_train = delayed_v_data[:trainLength]
+        u_data_train = shared_u_data[:trainLength, y, x]
 
-    delayed_patched_v_data_test = delayed_v_data[trainLength:trainLength+testLength]
-    u_data_test = shared_u_data[trainLength:trainLength+testLength, y, x]
+        delayed_patched_v_data_test = delayed_v_data[trainLength:trainLength+testLength]
+        u_data_test = shared_u_data[trainLength:trainLength+testLength, y, x]
 
-    flat_v_data_train = delayed_patched_v_data_train.reshape(-1, ddim)
-    flat_u_data_train = u_data_train.reshape(-1,1)
+        flat_v_data_train = delayed_patched_v_data_train.reshape(-1, ddim)
+        flat_u_data_train = u_data_train.reshape(-1,1)
 
-    flat_v_data_test = delayed_patched_v_data_test.reshape(-1, ddim)
-    flat_u_data_test = u_data_test.reshape(-1,1)
+        flat_v_data_test = delayed_patched_v_data_test.reshape(-1, ddim)
+        flat_u_data_test = u_data_test.reshape(-1,1)
+    else:
+        flat_v_data_train = shared_v_data[:trainLength, y, x].reshape(-1, 1*1)
+        flat_u_data_train = shared_u_data[:trainLength, y, x].reshape(-1, 1*1)
+
+        flat_v_data_test = shared_v_data[trainLength:, y, x].reshape(-1, 1*1)
+        flat_u_data_test = shared_u_data[trainLength:, y, x].reshape(-1, 1*1)
 
     predicter.fit(flat_v_data_train, flat_u_data_train)
     pred = predicter.predict(flat_v_data_test)
@@ -204,21 +216,29 @@ def predict_frame_pixel(data, predicter, def_param=(shared_v_data, shared_u_data
 def predict_inner_pixel(data, predicter, def_param=(shared_v_data, shared_u_data)):
     y, x = data
 
-    delayed_v_data = create_2d_delay_coordinates(shared_v_data[:, y-patch_radius:y+patch_radius+1, x-patch_radius:x+patch_radius+1][:, ::sigma_skip, ::sigma_skip], ddim, tau=119)
-    delayed_patched_v_data = np.empty((ndata, 1, 1, ddim*eff_sigma*eff_sigma))
-    delayed_patched_v_data[:, 0, 0] = delayed_v_data.reshape(-1, ddim*eff_sigma*eff_sigma)
+    if (predictionMode in ["NN", "RBF"]):
+        delayed_v_data = create_2d_delay_coordinates(shared_v_data[:, y-patch_radius:y+patch_radius+1, x-patch_radius:x+patch_radius+1][:, ::sigma_skip, ::sigma_skip], ddim, tau=119)
+        delayed_patched_v_data = np.empty((ndata, 1, 1, ddim*eff_sigma*eff_sigma))
+        delayed_patched_v_data[:, 0, 0] = delayed_v_data.reshape(-1, ddim*eff_sigma*eff_sigma)
 
-    delayed_patched_v_data_train = delayed_patched_v_data[:trainLength, 0, 0]
-    u_data_train = shared_u_data[:trainLength, y, x]
+        delayed_patched_v_data_train = delayed_patched_v_data[:trainLength, 0, 0]
+        u_data_train = shared_u_data[:trainLength, y, x]
 
-    delayed_patched_v_data_test = delayed_patched_v_data[trainLength:trainLength+testLength, 0, 0]
-    u_data_test = shared_u_data[trainLength:trainLength+testLength, y, x]
+        delayed_patched_v_data_test = delayed_patched_v_data[trainLength:trainLength+testLength, 0, 0]
+        u_data_test = shared_u_data[trainLength:trainLength+testLength, y, x]
 
-    flat_v_data_train = delayed_patched_v_data_train.reshape(-1, delayed_patched_v_data.shape[3])
-    flat_u_data_train = u_data_train.reshape(-1,1)
+        flat_v_data_train = delayed_patched_v_data_train.reshape(-1, delayed_patched_v_data.shape[3])
+        flat_u_data_train = u_data_train.reshape(-1,1)
 
-    flat_v_data_test = delayed_patched_v_data_test.reshape(-1, delayed_patched_v_data.shape[3])
-    flat_u_data_test = u_data_test.reshape(-1,1)
+        flat_v_data_test = delayed_patched_v_data_test.reshape(-1, delayed_patched_v_data.shape[3])
+        flat_u_data_test = u_data_test.reshape(-1,1)
+
+    else:
+        flat_v_data_train = shared_v_data[:trainLength, y - patch_radius:y + patch_radius+1, x - patch_radius:x + patch_radius+1][:, ::sigma_skip, ::sigma_skip].reshape(-1, eff_sigma*eff_sigma)
+        flat_u_data_train = shared_u_data[:trainLength, y, x].reshape(-1, 1)
+
+        flat_v_data_test = shared_v_data[trainLength:, y - patch_radius:y + patch_radius+1, x - patch_radius:x + patch_radius+1][:, ::sigma_skip, ::sigma_skip].reshape(-1, eff_sigma*eff_sigma)
+        flat_u_data_test = shared_u_data[trainLength:, y, x].reshape(-1, 1)
 
     predicter.fit(flat_v_data_train, flat_u_data_train)
     pred = predicter.predict(flat_v_data_test)
@@ -269,8 +289,8 @@ def mainFunction():
 
     modifyDataProcessList = []
     jobs = []
-    for y in range(N):
-        for x in range(N):
+    for y in range(10):#N):
+        for x in range(10):#N):
                 jobs.append((y, x))
 
     ###print("fitting...")
@@ -283,6 +303,9 @@ def mainFunction():
 
     ###print("finished fitting")
 
+    prediction[prediction < 0.0] = 0.0
+    prediction[prediction > 1.0] = 1.0
+
     diff = (shared_u_data[trainLength:]-shared_prediction)
     mse = np.mean((diff)**2)
     print("test error: {0}".format(mse))
@@ -290,7 +313,10 @@ def mainFunction():
 
     viewData = [("Orig", shared_u_data[trainLength:]), ("Pred", shared_prediction), ("Source", shared_v_data[trainLength:]), ("Diff", diff)]
     directionName = "utov" if reverseDirection else "vtou"
-    f = open("../cache/viewdata/{0}/{1}_viewdata_{2}_{3}_{4}_{5}_{6}.dat".format(directionName, predictionMode.lower(), ndata, sigma, sigma_skip, ddim, k), "wb")
+    if (predictionMode in ["NN", "RBF"]):
+        f = open("../cache/viewdata/{0}/{1}_viewdata_{2}_{3}_{4}_{5}_{6}.dat".format(directionName, predictionMode.lower(), ndata, sigma, sigma_skip, ddim, k), "wb")
+    else:
+        f = open("../cache/viewdata/{0}/{1}_viewdata_{2}_{3}_{4}_{5}_{6}.dat".format(directionName, predictionMode.lower(), ndata, sigma, sigma_skip, regression_parameter, n_units), "wb")
     pickle.dump(viewData, f)
     f.close()
 
