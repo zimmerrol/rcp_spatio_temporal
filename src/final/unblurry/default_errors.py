@@ -4,6 +4,8 @@ parentdir = os.path.dirname(currentdir)
 grandparentdir = os.path.dirname(parentdir)
 sys.path.insert(0, parentdir)
 sys.path.insert(0, grandparentdir)
+sys.path.insert(0, os.path.join(grandparentdir, "barkley"))
+sys.path.insert(0, os.path.join(grandparentdir, "mitchell"))
 
 import os
 import numpy as np
@@ -12,7 +14,9 @@ from BarkleySimulation import BarkleySimulation
 import progressbar
 
 from helper import *
-from barkley_helper import *
+import barkley_helper as bh
+import mitchell_helper as mh
+import argparse
 from scipy.ndimage.filters import gaussian_filter
 
 N = 150
@@ -21,16 +25,27 @@ trainLength = 8000
 testLength = ndata-trainLength
 data = None
 
-if (os.path.exists("../cache/raw/{0}_{1}.dat.npy".format(ndata, N)) == False):
-    print("generating data...")
-    data = generate_data(ndata, 20000, 5, Ngrid=N) #20000 was 50000
-    np.save("../cache/raw/{0}_{1}.uv.dat.npy".format(ndata, N), data)
-    print("generating finished")
-else:
-    print("loading data...")
-    data = np.load("../cache/raw/{0}_{1}.dat.npy".format(ndata, N))
+parser = argparse.ArgumentParser(description='')
+parser.add_argument('direction', default="u", nargs=1, type=str, help="u: unblur u, v: unblurr v")
+args = parser.parse_args()
 
-    print("loading finished")
+if args.direction[0] not in ["u", "v"]:
+    raise ValueError("No valid direction choosen! (Value is now: {0})".format(args.direction[0]))
+else:
+    direction = args.direction[0]
+
+if (direction == "u"):
+    if (os.path.exists("../../cache/barkley/raw/{0}_{1}.dat.npy".format(ndata, N)) == False):
+        data = bh.generate_data(ndata, 20000, 5, Ngrid=N)
+        np.save("../../cache/barkley/raw/{0}_{1}.dat.npy".format(ndata, N), data)
+    else:
+        data = np.load("../../cache/barkley/raw/{0}_{1}.dat.npy".format(ndata, N))
+else:
+    if (os.path.exists("../../cache/mitchell/raw/{0}_{1}.dat.npy".format(ndata, N)) == False):
+        data = mh.generate_data(ndata, 20000, 50, Ngrid=N)
+        np.save("../../cache/mitchell/raw/{0}_{1}.dat.npy".format(ndata, N), data)
+    else:
+        data = np.load("../../cache/mitchell/raw/{0}_{1}.dat.npy".format(ndata, N))
 
 training_data = np.empty((2, trainLength, N,N))
 test_data = np.empty((2, testLength, N,N))
@@ -51,9 +66,8 @@ meanpredmse = np.mean((test_data[0] - mean)**2)
 #use h as value for v
 hvpredmse = np.mean((test_data[0] - test_data[1])**2)
 
-print("Using the mean of u_train as prediction: ")
+print("Using the mean of target_train as target_test prediction: ")
 print("\tMSE = {0}".format(meanpredmse))
 
-print("Using the value of u_{test, blurred} as the h prediction: ")
+print("Using the value of source_test as the target_test prediction: ")
 print("\tMSE = {0}".format(hvpredmse))
-

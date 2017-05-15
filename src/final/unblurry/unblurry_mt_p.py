@@ -10,6 +10,7 @@ sys.path.insert(0, os.path.join(grandparentdir, "mitchell"))
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
+from scipy.ndimage.filters import gaussian_filter
 import progressbar
 import dill as pickle
 
@@ -27,20 +28,28 @@ import barkley_helper as bh
 import mitchell_helper as mh
 import argparse
 
-
-#get V animation data -> [N, 150, 150]
-#create 2d delay coordinates -> [N, 150, 150, d]
-#create new dataset with small data groups -> [N, 150, 150, d*sigma*sigma]
-#create d*sigma*sigma-k tree from this data
-#search nearest neighbours (1 or 2) and predict new U value
-
-process.current_process()._config['tempdir'] =  '/dev/shm/' #'/data.bmp/roland/temp/'
-
-tau = {"uv" : 32, "vu" : 32,  "vh" : 119, "hv" : 119}
+tau = {"u" : 32, "v" : 119}
 N = 150
-ndata = 30000
-trainLength = 28000
+ndata = 10000
 testLength = 2000
+trainLength = ndata - testLength
+
+def setup_arrays():
+    global shared_input_data_base, shared_output_data_base, prediction_base
+    global shared_input_data, shared_output_data, prediction
+
+    shared_input_data_base = multiprocessing.Array(ctypes.c_double, ndata*N*N)
+    shared_input_data = np.ctypeslib.as_array(shared_input_data_base.get_obj())
+    shared_input_data = shared_input_data.reshape(ndata, N, N)
+
+    shared_output_data_base = multiprocessing.Array(ctypes.c_double, ndata*N*N)
+    shared_output_data = np.ctypeslib.as_array(shared_output_data_base.get_obj())
+    shared_output_data = shared_output_data.reshape(ndata, N, N)
+
+    prediction_base = multiprocessing.Array(ctypes.c_double, testLength*N*N)
+    prediction = np.ctypeslib.as_array(prediction_base.get_obj())
+    prediction = prediction.reshape(testLength, N, N)
+setup_arrays()
 
 def parse_arguments():
     global id, predictionMode, direction
@@ -49,10 +58,10 @@ def parse_arguments():
 
     parser = argparse.ArgumentParser(description='')
     parser.add_argument('mode', nargs=1, type=str, help="Can be: NN, RBF, ESN")
-    parser.add_argument('direction', default="vu", nargs=1, type=str, help="vu: v -> u, uv: u -> v, hv: h -> v, vh: v -> h")
+    parser.add_argument('direction', default="u", nargs=1, type=str, help="u: unblur u, v: unblurr v")
     args = parser.parse_args()
 
-    if args.direction[0] not in ["vu", "uv", "hv", "vh"]:
+    if args.direction[0] not in ["u", "v"]:
         raise ValueError("No valid direction choosen! (Value is now: {0})".format(args.direction[0]))
     else:
         direction = args.direction[0]
@@ -62,27 +71,8 @@ def parse_arguments():
     else:
         predictionMode = args.mode[0]
 
-    print("Prediction via {0}: {1}".format(predictionMode, direction))
+    print("Prediction via {0}".format(predictionMode))
 parse_arguments()
-
-def setup_arrays():
-    global shared_input_data_base, shared_output_data_base, shared_prediction_base
-    global shared_input_data, shared_output_data, shared_prediction
-
-    ###print("setting up arrays...")
-    shared_input_data_base = multiprocessing.Array(ctypes.c_double, ndata*N*N)
-    shared_input_data = np.ctypeslib.as_array(shared_input_data_base.get_obj())
-    shared_input_data = shared_input_data.reshape(-1, N, N)
-
-    shared_output_data_base = multiprocessing.Array(ctypes.c_double, ndata*N*N)
-    shared_output_data = np.ctypeslib.as_array(shared_output_data_base.get_obj())
-    shared_output_data = shared_output_data.reshape(-1, N, N)
-
-    shared_prediction_base = multiprocessing.Array(ctypes.c_double, testLength*N*N)
-    shared_prediction = np.ctypeslib.as_array(shared_prediction_base.get_obj())
-    shared_prediction = shared_prediction.reshape(-1, N, N)
-    ###print("setting up finished")
-setup_arrays()
 
 def setup_constants():
     global k, ddim, sigma, sigma_skip, eff_sigma, patch_radius, n_units, regression_parameter
@@ -120,34 +110,33 @@ setup_constants()
 def generate_data(N, trans, sample_rate, Ngrid):
     data = None
 
-    if (direction in ["uv", "vu"]):
-        if (os.path.exists("../../cache/barkley/raw/{0}_{1}.uv.dat.npy".format(N, Ngrid)) == False):
-            data = bh.generate_uv_data(N, 50000, 5, Ngrid=Ngrid)
-            np.save("../../cache/barkley/raw/{0}_{1}.uv.dat.npy".format(N, Ngrid), data)
+    if (direction == "u"):
+        if (os.path.exists("../../cache/barkley/raw/{0}_{1}.dat.npy".format(N, Ngrid)) == False):
+            data = bh.generate_data(N, 20000, 5, Ngrid=Ngrid)
+            np.save("../../cache/barkley/raw/{0}_{1}.dat.npy".format(N, Ngrid), data)
         else:
-            data = np.load("../../cache/barkley/raw/{0}_{1}.uv.dat.npy".format(N, Ngrid))
+            data = np.load("../../cache/barkley/raw/{0}_{1}.dat.npy".format(N, Ngrid))
     else:
-        if (os.path.exists("../../cache/mitchell/raw/{0}_{1}.vh.dat.npy".format(N, Ngrid)) == False):
-            data = mh.generate_vh_data(N, 20000, 50, Ngrid=Ngrid)
-            np.save("../../cache/mitchell/raw/{0}_{1}.vh.dat.npy".format(N, Ngrid), data)
+        if (os.path.exists("../../cache/mitchell/raw/{0}_{1}.dat.npy".format(N, Ngrid)) == False):
+            data = mh.generate_data(N, 20000, 50, Ngrid=Ngrid)
+            np.save("../../cache/mitchell/raw/{0}_{1}.dat.npy".format(N, Ngrid), data)
         else:
-            data = np.load("../../cache/mitchell/raw/{0}_{1}.vh.dat.npy".format(N, Ngrid))
+            data = np.load("../../cache/mitchell/raw/{0}_{1}.dat.npy".format(N, Ngrid))
 
-    #at the moment we are doing a u -> v / v -> h cross prediction.
-    if (direction in ["vu", "hv"]):
-        #switch the entries for the v -> u / h -> v prediction
-        tmp = data[0].copy()
-        data[0] = data[1].copy()
-        data[1] = tmp.copy()
+    shared_input_data[:] = data[:]
 
-    shared_input_data[:] = data[0]
-    shared_output_data[:] = data[1]
+    print("blurring...")
+    for t in range(ndata):
+        shared_output_data[t, :, :] = gaussian_filter(shared_output_data[t], sigma=9.0)
+    show_results([("Blurred", shared_input_data[:trainLength]), ("Orig", shared_output_data[:trainLength])])
+    print("blurring finished")
 
 def prepare_predicter(y, x):
     if (predictionMode == "ESN"):
         if (y < patch_radius or y >= N-patch_radius or x < patch_radius or x >= N-patch_radius):
             #frame
             min_border_distance = np.min([y, x, N-1-y, N-1-x])
+
             predicter = ESN(n_input = int((2*min_border_distance+1)**2), n_output = 1, n_reservoir = n_units,
                     weight_generation = "advanced", leak_rate = 0.70, spectral_radius = 0.8,
                     random_seed=42, noise_level=0.0001, sparseness=.1, regression_parameters=[regression_parameter], solver = "lsqr")
@@ -165,19 +154,6 @@ def prepare_predicter(y, x):
         raise ValueError("No valid predictionMode choosen! (Value is now: {0})".format(predictionMode))
 
     return predicter
-
-def get_prediction(data):
-    y, x = data
-
-    predicter = prepare_predicter(y, x)
-    pred = None
-    if (y < patch_radius or y >= N-patch_radius or x < patch_radius or x >= N-patch_radius):
-        #frame
-        pred = fit_predict_frame_pixel(y, x, predicter)
-    else:
-        #inner
-        pred = fit_predict_inner_pixel(y, x, predicter)
-    get_prediction.q.put((y, x, pred))
 
 def prepare_fit_data(y, x, pr, skip, def_param=(shared_input_data, shared_output_data)):
     if (predictionMode in ["NN", "RBF"]):
@@ -202,7 +178,16 @@ def prepare_fit_data(y, x, pr, skip, def_param=(shared_input_data, shared_output
 
     return training_data_in, test_data_in, training_data_out, test_data_out
 
-def fit_predict_frame_pixel(y, x, predicter, def_param=(shared_input_data, shared_output_data)):
+def fit_predict_pixel(y, x, running_index, predicter):
+    training_data_in, test_data_in, training_data_out, test_data_out = prepare_fit_data(y, x, patch_radius, sigma_skip)
+
+    predicter.fit(training_data_in, training_data_out)
+    pred = predicter.predict(test_data_in)
+    pred = pred.ravel()
+
+    return pred
+
+def fit_predict_frame_pixel(y, x, running_index, predicter):
     min_border_distance = np.min([y, x, N-1-y, N-1-x])
     training_data_in, test_data_in, training_data_out, test_data_out = prepare_fit_data(y, x, min_border_distance, 1)
 
@@ -212,16 +197,25 @@ def fit_predict_frame_pixel(y, x, predicter, def_param=(shared_input_data, share
 
     return pred
 
-def fit_predict_inner_pixel(y, x, predicter, def_param=(shared_input_data, shared_output_data)):
-    training_data_in, test_data_in, training_data_out, test_data_out = prepare_fit_data(y, x, patch_radius, sigma_skip)
+def get_prediction_init(q):
+    get_prediction.q = q
 
-    predicter.fit(training_data_in, training_data_out)
-    pred = predicter.predict(test_data_in)
-    pred = pred.ravel()
+def get_prediction(data):
+    y, x, running_index = data
 
-    return pred
+    predicter = prepare_predicter(y, x)
+    pred = None
+    if (y >= patch_radius and y < N-patch_radius and x >= patch_radius and x < N-patch_radius):
+        #inner point
+        pred = fit_predict_pixel(y, x, running_index, predicter)
 
-def process_thread_results(q, numberOfResults, def_param=(shared_prediction, shared_output_data)):
+    else:
+        #frame
+        pred = fit_predict_frame_pixel(y, x, running_index, predicter)
+
+    get_prediction.q.put((y, x, pred))
+
+def process_thread_results(q, numberOfResults):
     global prediction
 
     bar = progressbar.ProgressBar(max_value=numberOfResults, redirect_stdout=True, poll_interval=0.0001)
@@ -238,60 +232,46 @@ def process_thread_results(q, numberOfResults, def_param=(shared_prediction, sha
         finishedResults += 1
         ind_y, ind_x, data = newData
 
-        shared_prediction[:, ind_y, ind_x] = data
+        prediction[:, ind_y, ind_x] = data
 
         bar.update(finishedResults)
 
-def get_prediction_init(q):
-    get_prediction.q = q
-
 def mainFunction():
-    if (trainLength +testLength > ndata):
-        print("Please adjust the trainig and testing phase length!")
-        exit()
+    global shared_training_data, shared_test_data
 
-    ###print("generating data...")
     generate_data(ndata, 20000, 50, Ngrid=N)
-    ###print("generation finished")
 
     queue = Queue() # use manager.queue() ?
-    ###print("preparing threads...")
+    print("preparing threads...")
     pool = Pool(processes=16, initializer=get_prediction_init, initargs=[queue,])
 
     modifyDataProcessList = []
     jobs = []
-    for y in range(10):#N):
-        for x in range(10):#N):
-                jobs.append((y, x))
+    index = 0
 
-    ###print("fitting...")
-    processProcessResultsThread = Process(target=process_thread_results, args=(queue, len(jobs)))
+    for y in range(N):
+        for x in range(N):
+            jobs.append((y, x, index))
+
+    print("fitting...")
+    processProcessResultsThread = Process(target=process_thread_results, args=(queue, len(jobs)) )
     processProcessResultsThread.start()
     results = pool.map(get_prediction, jobs)
     pool.close()
 
     processProcessResultsThread.join()
 
-    ###print("finished fitting")
+    print("finished fitting")
 
-    shared_prediction[shared_prediction < 0.0] = 0.0
-    shared_prediction[shared_prediction > 1.0] = 1.0
+    prediction[prediction < 0.0] = 0.0
+    prediction[prediction > 1.0] = 1.0
 
-    diff = (shared_output_data[trainLength:]-shared_prediction)
+    diff = (shared_output_data[trainLength:]-prediction)
     mse = np.mean((diff)**2)
     print("test error: {0}".format(mse))
     print("inner test error: {0}".format(np.mean((diff[:, patch_radius:N-patch_radius, patch_radius:N-patch_radius])**2)))
 
-    viewData = [("Orig", shared_output_data[trainLength:]), ("Pred", shared_prediction), ("Source", shared_input_data[trainLength:]), ("Diff", diff)]
-    directionName = "utov" if reverseDirection else "vtou"
-    if (predictionMode in ["NN", "RBF"]):
-        f = open("../cache/viewdata/{0}/{1}_viewdata_{2}_{3}_{4}_{5}_{6}.dat".format(directionName, predictionMode.lower(), ndata, sigma, sigma_skip, ddim, k), "wb")
-    else:
-        f = open("../cache/viewdata/{0}/{1}_viewdata_{2}_{3}_{4}_{5}_{6}.dat".format(directionName, predictionMode.lower(), ndata, sigma, sigma_skip, regression_parameter, n_units), "wb")
-    pickle.dump(viewData, f)
-    f.close()
-
-    print("done")
+    show_results([("Source", shared_input_data[trainLength:]), ("Orig", shared_output_data[trainLength:]), ("Pred", prediction), ("Diff", diff)])
 
 if __name__== '__main__':
     mainFunction()

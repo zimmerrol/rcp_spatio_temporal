@@ -11,6 +11,15 @@ def create_2d_delay_coordinates(data, delay_dimension, tau):
 
     return result
 
+def create_1d_delay_coordinates(data, delay_dimension, tau):
+    result = np.repeat(data[:, :, np.newaxis], repeats=delay_dimension, axis=2)
+
+    for n in range(1, delay_dimension):
+        result[:, :, n] = np.roll(result[:, :, n], n*tau, axis=0)
+    result[0:delay_dimension-1,:,:] = 0
+
+    return result
+
 def create_0d_delay_coordinates(data, delay_dimension, tau):
     result = np.repeat(data[:, np.newaxis], repeats=delay_dimension, axis=1)
 
