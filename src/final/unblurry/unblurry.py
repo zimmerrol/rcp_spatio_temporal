@@ -22,7 +22,8 @@ import ctypes
 from multiprocessing import process
 
 from helper import *
-from barkley_helper import *
+import barkley_helper import as bh
+import mitchell_helper as mh
 import argparse
 
 N = 150
@@ -30,7 +31,7 @@ ndata = 10000
 testLength = 2000
 trainLength = ndata - testLength
 
-def setupArrays():
+def setup_arrays():
     global shared_input_data_base, shared_output_data_base, prediction_base
     global shared_input_data, shared_output_data, prediction
 
@@ -45,16 +46,22 @@ def setupArrays():
     prediction_base = multiprocessing.Array(ctypes.c_double, testLength*N*N)
     prediction = np.ctypeslib.as_array(prediction_base.get_obj())
     prediction = prediction.reshape(testLength, N, N)
-setupArrays()
+setup_arrays()
 
-def parseArguments():
+def parse_arguments():
     global id, predictionMode, reverseDirection
 
     id = int(os.getenv("SGE_TASK_ID", 0))
 
     parser = argparse.ArgumentParser(description='')
     parser.add_argument('mode', nargs=1, type=str, help="Can be: NN, RBF, ESN")
+    parser.add_argument('direction', default="u", nargs=1, type=str, help="u: unblur u, v: unblurr v")
     args = parser.parse_args()
+
+    if args.direction[0] not in ["u", "v"]:
+        raise ValueError("No valid direction choosen! (Value is now: {0})".format(args.direction[0]))
+    else:
+        direction = args.direction[0]
 
     if args.mode[0] not in ["ESN", "NN", "RBF"]:
         raise ValueError("No valid predictionMode choosen! (Value is now: {0})".format(args.mode[0]))
@@ -62,9 +69,9 @@ def parseArguments():
         predictionMode = args.mode[0]
 
     print("Prediction via {0}".format(predictionMode))
-parseArguments()
+parse_arguments()
 
-def setupConstants():
+def setup_constants():
     global k, ddim, sigma, sigma_skip, eff_sigma, patch_radius, n_units, regression_parameter
 
     print("Using parameters:")
@@ -95,9 +102,9 @@ def setupConstants():
 
     eff_sigma = int(np.ceil(sigma/sigma_skip))
     patch_radius = sigma//2
-setupConstants()
+setup_constants()
 
-def preparePredicter(y, x):
+def prepare_predicter(y, x):
     if (predictionMode == "ESN"):
         if (y < patch_radius or y >= N-patch_radius or x < patch_radius or x >= N-patch_radius):
             #frame
@@ -121,7 +128,7 @@ def preparePredicter(y, x):
 
     return predicter
 
-def prepareFitData(y, x, pr, skip, def_param=(shared_input_data, shared_output_data)):
+def prepare_fit_data(y, x, pr, skip, def_param=(shared_input_data, shared_output_data)):
     if (predictionMode in ["NN", "RBF"]):
         delayed_patched_input_data = create_2d_delay_coordinates(shared_input_data[:, y-pr:y+pr+1, x-pr:x+pr+1][:, ::skip, ::skip], ddim, tau=119)
         delayed_patched_input_data = delayed_patched_input_data.reshape(ndata, -1)
@@ -145,7 +152,7 @@ def prepareFitData(y, x, pr, skip, def_param=(shared_input_data, shared_output_d
     return training_data_in, test_data_in, training_data_out, test_data_out
 
 def fit_predict_pixel(y, x, running_index, predicter):
-    training_data_in, test_data_in, training_data_out, test_data_out = prepareFitData(y, x, patch_radius, sigma_skip)
+    training_data_in, test_data_in, training_data_out, test_data_out = prepare_fit_data(y, x, patch_radius, sigma_skip)
 
     predicter.fit(training_data_in, training_data_out)
     pred = predicter.predict(test_data_in)
@@ -155,7 +162,7 @@ def fit_predict_pixel(y, x, running_index, predicter):
 
 def fit_predict_frame_pixel(y, x, running_index, predicter):
     min_border_distance = np.min([y, x, N-1-y, N-1-x])
-    training_data_in, test_data_in, training_data_out, test_data_out = prepareFitData(y, x, min_border_distance, 1)
+    training_data_in, test_data_in, training_data_out, test_data_out = prepare_fit_data(y, x, min_border_distance, 1)
 
     predicter.fit(training_data_in, training_data_out)
     pred = predicter.predict(test_data_in)
@@ -169,7 +176,7 @@ def get_prediction_init(q):
 def get_prediction(data):
     y, x, running_index = data
 
-    predicter = preparePredicter(y, x)
+    predicter = prepare_predicter(y, x)
     pred = None
     if (y >= patch_radius and y < N-patch_radius and x >= patch_radius and x < N-patch_radius):
         #inner point
@@ -181,7 +188,7 @@ def get_prediction(data):
 
     get_prediction.q.put((y, x, pred))
 
-def processThreadResults(threadname, q, numberOfWorkers, numberOfResults):
+def process_thread_results(q, numberOfResults):
     global prediction
 
     bar = progressbar.ProgressBar(max_value=numberOfResults, redirect_stdout=True, poll_interval=0.0001)
@@ -202,20 +209,21 @@ def processThreadResults(threadname, q, numberOfWorkers, numberOfResults):
 
         bar.update(finishedResults)
 
-
 def mainFunction():
     global shared_training_data, shared_test_data
 
-    if (os.path.exists("../cache/raw/{0}_{1}.dat.npy".format(ndata, N)) == False):
-        print("generating data...")
-        data = generate_data(ndata, 20000, 5, Ngrid=N) #20000 was 50000
-        np.save("../cache/raw/{0}_{1}.uv.dat.npy".format(ndata, N), data)
-        print("generating finished")
+    if (direction == "u"):
+        if (os.path.exists("../../cache/barkley/raw/{0}_{1}.dat.npy".format(N, Ngrid)) == False):
+            data = bh.generate_data(N, 20000, 5, Ngrid=Ngrid)
+            np.save("../../cache/barkley/raw/{0}_{1}.dat.npy".format(N, Ngrid), data)
+        else:
+            data = np.load("../../cache/barkley/raw/{0}_{1}.dat.npy".format(N, Ngrid))
     else:
-        print("loading data...")
-        data = np.load("../cache/raw/{0}_{1}.dat.npy".format(ndata, N))
-
-        print("loading finished")
+        if (os.path.exists("../../cache/mitchell/raw/{0}_{1}.dat.npy".format(N, Ngrid)) == False):
+            data = mh.generate_data(N, 20000, 50, Ngrid=Ngrid)
+            np.save("../../cache/mitchell/raw/{0}_{1}.dat.npy".format(N, Ngrid), data)
+        else:
+            data = np.load("../../cache/mitchell/raw/{0}_{1}.dat.npy".format(N, Ngrid))
 
     shared_output_data[:, :, :] = data[:]
 
@@ -241,7 +249,7 @@ def mainFunction():
             jobs.append((y, x, index))
 
     print("fitting...")
-    processProcessResultsThread = Process(target=processThreadResults, args=("processProcessResultsThread", queue, 26, len(jobs)) )
+    processProcessResultsThread = Process(target=process_thread_results, args=(queue, len(jobs)) )
     processProcessResultsThread.start()
     results = pool.map(get_prediction, jobs)
     pool.close()

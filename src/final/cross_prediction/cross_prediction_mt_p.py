@@ -4,6 +4,8 @@ parentdir = os.path.dirname(currentdir)
 grandparentdir = os.path.dirname(parentdir)
 sys.path.insert(0, parentdir)
 sys.path.insert(0, grandparentdir)
+sys.path.insert(0, os.path.join(grandparentdir, "barkley"))
+sys.path.insert(0, os.path.join(grandparentdir, "mitchell"))
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -21,7 +23,8 @@ import ctypes
 from multiprocessing import process
 
 from helper import *
-from barkley_helper import *
+import barkley_helper import as bh
+import mitchell_helper as mh
 import argparse
 
 
@@ -38,26 +41,30 @@ ndata = 30000
 trainLength = 28000
 testLength = 2000
 
-def parseArguments():
+def parse_arguments():
     global id, predictionMode, reverseDirection
 
     id = int(os.getenv("SGE_TASK_ID", 0))
 
     parser = argparse.ArgumentParser(description='')
     parser.add_argument('mode', nargs=1, type=str, help="Can be: NN, RBF, ESN")
-    parser.add_argument('direction', default="vu", nargs=1, type=str, help="vu: v -> u, otherwise: u -> v")
+    parser.add_argument('direction', default="vu", nargs=1, type=str, help="vu: v -> u, uv: u -> v, hv: h -> v, vh: v -> h")
     args = parser.parse_args()
 
-    reverseDirection = args.direction[0] != "vu"
+    if args.direction[0] not in ["vu", "uv", "hv", "vh"]:
+        raise ValueError("No valid direction choosen! (Value is now: {0})".format(args.direction[0]))
+    else:
+        direction = args.direction[0]
+
     if args.mode[0] not in ["ESN", "NN", "RBF"]:
         raise ValueError("No valid predictionMode choosen! (Value is now: {0})".format(args.mode[0]))
     else:
         predictionMode = args.mode[0]
 
-    print("Prediction via {0}: {1}".format(predictionMode, "u -> v" if reverseDirection else "v -> u"))
-parseArguments()
+    print("Prediction via {0}: {1}".format(predictionMode, direction))
+parse_arguments()
 
-def setupArrays():
+def setup_arrays():
     global shared_input_data_base, shared_output_data_base, shared_prediction_base
     global shared_input_data, shared_output_data, shared_prediction
 
@@ -74,9 +81,9 @@ def setupArrays():
     shared_prediction = np.ctypeslib.as_array(shared_prediction_base.get_obj())
     shared_prediction = shared_prediction.reshape(-1, N, N)
     ###print("setting up finished")
-setupArrays()
+setup_arrays()
 
-def setupConstants():
+def setup_constants():
     global k, ddim, sigma, sigma_skip, eff_sigma, patch_radius, n_units, regression_parameter
 
     print("Using parameters:")
@@ -107,34 +114,39 @@ def setupConstants():
 
     eff_sigma = int(np.ceil(sigma/sigma_skip))
     patch_radius = sigma//2
-setupConstants()
+setup_constants()
 
 def generate_data(N, trans, sample_rate, Ngrid):
     data = None
-    if (os.path.exists("../cache/raw/{0}_{1}.uv.dat.npy".format(N, Ngrid)) == False):
-        ###print("generating data...")
-        data = generate_uv_data(N, 50000, 5, Ngrid=Ngrid)
-        np.save("../cache/raw/{0}_{1}.uv.dat.npy".format(N, Ngrid), data)
-        ###print("generating finished")
-    else:
-        ###print("loading data...")
-        data = np.load("../cache/raw/{0}_{1}.uv.dat.npy".format(N, Ngrid))
-        ###print("loading finished")
 
-        #at the moment we are doing a v -> u cross prediction.
-        if (reverseDirection):
-            #switch the entries for the u -> v prediction
-            tmp = data[0].copy()
-            data[0] = data[1].copy()
-            data[1] = tmp.copy()
+    if (direction in ["uv", "vu"]):
+        if (os.path.exists("../../cache/barkley/raw/{0}_{1}.uv.dat.npy".format(N, Ngrid)) == False):
+            data = bh.generate_uv_data(N, 50000, 5, Ngrid=Ngrid)
+            np.save("../../cache/barkley/raw/{0}_{1}.uv.dat.npy".format(N, Ngrid), data)
+        else:
+            data = np.load("../../cache/barkley/raw/{0}_{1}.uv.dat.npy".format(N, Ngrid))
+    else:
+        if (os.path.exists("../../cache/mitchell/raw/{0}_{1}.vh.dat.npy".format(N, Ngrid)) == False):
+            data = mh.generate_vh_data(N, 20000, 50, Ngrid=Ngrid)
+            np.save("../../cache/mitchell/raw/{0}_{1}.vh.dat.npy".format(N, Ngrid), data)
+        else:
+            data = np.load("../../cache/mitchell/raw/{0}_{1}.vh.dat.npy".format(N, Ngrid))
+
+    #at the moment we are doing a u -> v / v -> h cross prediction.
+    if (direction in ["vu", "hv"]):
+        #switch the entries for the v -> u / h -> v prediction
+        tmp = data[0].copy()
+        data[0] = data[1].copy()
+        data[1] = tmp.copy()
 
     return data
 
-def preparePredicter(y, x):
+def prepare_predicter(y, x):
     if (predictionMode == "ESN"):
         if (y < patch_radius or y >= N-patch_radius or x < patch_radius or x >= N-patch_radius):
             #frame
-            predicter = ESN(n_input = 1, n_output = 1, n_reservoir = n_units,
+            min_border_distance = np.min([y, x, N-1-y, N-1-x])
+            predicter = ESN(n_input = int((2*min_border_distance+1)**2), n_output = 1, n_reservoir = n_units,
                     weight_generation = "advanced", leak_rate = 0.70, spectral_radius = 0.8,
                     random_seed=42, noise_level=0.0001, sparseness=.1, regression_parameters=[regression_parameter], solver = "lsqr")
         else:
@@ -155,7 +167,7 @@ def preparePredicter(y, x):
 def get_prediction(data):
     y, x = data
 
-    predicter = preparePredicter(y, x)
+    predicter = prepare_predicter(y, x)
     pred = None
     if (y < patch_radius or y >= N-patch_radius or x < patch_radius or x >= N-patch_radius):
         #frame
@@ -165,7 +177,7 @@ def get_prediction(data):
         pred = fit_predict_inner_pixel(y, x, predicter)
     get_prediction.q.put((y, x, pred))
 
-def prepareFitData(y, x, pr, skip, def_param=(shared_input_data, shared_output_data)):
+def prepare_fit_data(y, x, pr, skip, def_param=(shared_input_data, shared_output_data)):
     if (predictionMode in ["NN", "RBF"]):
         delayed_patched_input_data = create_2d_delay_coordinates(shared_input_data[:, y-pr:y+pr+1, x-pr:x+pr+1][:, ::skip, ::skip], ddim, tau=119)
         delayed_patched_input_data = delayed_patched_input_data.reshape(ndata, -1)
@@ -190,24 +202,24 @@ def prepareFitData(y, x, pr, skip, def_param=(shared_input_data, shared_output_d
 
 def fit_predict_frame_pixel(y, x, predicter, def_param=(shared_input_data, shared_output_data)):
     min_border_distance = np.min([y, x, N-1-y, N-1-x])
-    training_data_in, test_data_in, training_data_out, test_data_out = prepareFitData(y, x, min_border_distance, 1)
+    training_data_in, test_data_in, training_data_out, test_data_out = prepare_fit_data(y, x, min_border_distance, 1)
 
-    predicter.fit(training_data_in, test_data_in)
-    pred = predicter.predict(training_data_out)
+    predicter.fit(training_data_in, training_data_out)
+    pred = predicter.predict(test_data_in)
     pred = pred.ravel()
 
     return pred
 
 def fit_predict_inner_pixel(y, x, predicter, def_param=(shared_input_data, shared_output_data)):
-    training_data_in, test_data_in, training_data_out, test_data_out = prepareFitData(y, x, patch_radius, sigma_skip)
+    training_data_in, test_data_in, training_data_out, test_data_out = prepare_fit_data(y, x, patch_radius, sigma_skip)
 
-    predicter.fit(training_data_in, test_data_in)
-    pred = predicter.predict(training_data_out)
+    predicter.fit(training_data_in, training_data_out)
+    pred = predicter.predict(test_data_in)
     pred = pred.ravel()
 
     return pred
 
-def processThreadResults(threadname, q, numberOfWorkers, numberOfResults, def_param=(shared_prediction, shared_output_data)):
+def process_thread_results(q, numberOfResults, def_param=(shared_prediction, shared_output_data)):
     global prediction
 
     bar = progressbar.ProgressBar(max_value=numberOfResults, redirect_stdout=True, poll_interval=0.0001)
@@ -236,12 +248,10 @@ def mainFunction():
         print("Please adjust the trainig and testing phase length!")
         exit()
 
-    delayed_patched_input_data = None
-    u_data = None
     ###print("generating data...")
-    u_data_t, v_data_t = generate_data(ndata, 20000, 50, Ngrid=N)
-    shared_input_data[:] = v_data_t[:]
-    shared_output_data[:] = u_data_t[:]
+    input_data_t, output_data_t = generate_data(ndata, 20000, 50, Ngrid=N)
+    shared_input_data[:] = input_data_t[:]
+    shared_output_data[:] = output_data_t[:]
     ###print("generation finished")
 
     queue = Queue() # use manager.queue() ?
@@ -255,7 +265,7 @@ def mainFunction():
                 jobs.append((y, x))
 
     ###print("fitting...")
-    processProcessResultsThread = Process(target=processThreadResults, args=("processProcessResultsThread", queue, 16, len(jobs)))
+    processProcessResultsThread = Process(target=process_thread_results, args=(queue, len(jobs)))
     processProcessResultsThread.start()
     results = pool.map(get_prediction, jobs)
     pool.close()
@@ -264,8 +274,8 @@ def mainFunction():
 
     ###print("finished fitting")
 
-    prediction[prediction < 0.0] = 0.0
-    prediction[prediction > 1.0] = 1.0
+    shared_prediction[shared_prediction < 0.0] = 0.0
+    shared_prediction[shared_prediction > 1.0] = 1.0
 
     diff = (shared_output_data[trainLength:]-shared_prediction)
     mse = np.mean((diff)**2)
