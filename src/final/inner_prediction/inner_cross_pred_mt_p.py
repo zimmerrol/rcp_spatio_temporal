@@ -88,30 +88,36 @@ def setup_constants():
         innerSize = [3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7][id-1]
         borderSize = [1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3][id-1]
 
-        print("\t ndata \t = {0} \n\t sigma \t = {1}\n\t sigma_skip \t = {2}\n\t n_units \t = {3}\n\t regular. \t = {4}".format(ndata, sigma, sigma_skip, n_units, regression_parameter))
+        print("\t ndata \t = {0} \n\t sigma \t = {1}\n\t sigma_skip \t = {2}\n\t n_units \t = {3}\n\t regular. \t = {4}".format(ndata, innerSize, borderSize, n_units, regression_parameter))
     elif (predictionMode == "NN"):
         ddim = [3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5,  3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5,  3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5,  3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5][id-1]
         k = [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,  3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,  5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5][id-1]
         innerSize = [3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7][id-1]
         borderSize = [1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3][id-1]
 
-        print("\t ndata \t = {0} \n\t sigma \t = {1}\n\t sigma_skip \t = {2}\n\t ddim \t = {3}\n\t k \t = {4}".format(ndata, sigma, sigma_skip, ddim, k))
+        print("\t ndata \t = {0} \n\t innerSize \t = {1}\n\t borderSize \t = {2}\n\t ddim \t = {3}\n\t k \t = {4}".format(ndata, innerSize, borderSize, ddim, k))
     elif (predictionMode == "RBF"):
         ddim = [3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5,  3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5,  3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5,  3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5][id-1]
         k = [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,  3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,  5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5][id-1]
         innerSize = [3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7][id-1]
         borderSize = [1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3][id-1]
-        print("\t ndata \t = {0} \n\t sigma \t = {1}\n\t sigma_skip \t = {2}\n\t ddim \t = {3}\n\t k \t = {4}".format(ndata, sigma, sigma_skip, ddim, k))
+        print("\t ndata \t = {0} \n\t innerSize \t = {1}\n\t borderSize \t = {2}\n\t ddim \t = {3}\n\t k \t = {4}".format(ndata, innerSize, borderSize, ddim, k))
 
     else:
         raise ValueError("No valid predictionMode choosen! (Value is now: {0})".format(predictionMode))
+
+    halfInnerSize = int(np.floor(innerSize / 2))
+    borderSize = 1
+    center = N//2
+    rightBorderAdd = 1 if innerSize != 2*halfInnerSize else 0
+
 setup_constants()
 
 def setup_arrays():
     global shared_input_data_base, shared_data_base, prediction_base
     global shared_input_data, shared_data, prediction
 
-    if (mode in ["NN", "RBF"]):
+    if (predictionMode in ["NN", "RBF"]):
         shared_input_data_base = multiprocessing.Array(ctypes.c_double, ddim*ndata*2*borderSize*(innerSize+(innerSize+2*borderSize)))
         shared_input_data = np.ctypeslib.as_array(shared_input_data_base.get_obj())
         shared_input_data = shared_input_data.reshape(ndata, -1)
@@ -129,7 +135,7 @@ def setup_arrays():
     prediction = prediction.reshape(testLength, N, N)
 setup_arrays()
 
-def generate_data(N, trans, sample_rate, Ngrid):
+def generate_data(N, trans, sample_rate, Ngrid, def_param=(shared_input_data, shared_data)):
     data = None
 
     if (direction == "u"):
@@ -152,18 +158,18 @@ def generate_data(N, trans, sample_rate, Ngrid):
                                                 (center - (halfInnerSize), center + (halfInnerSize) + rightBorderAdd),
                                             )
     input_data = data[:, input_y, input_x].reshape(ndata, -1)
-    if (mode in ["NN", "RBF"]):
-        shared_input_data = create_1d_delay_coordinates(input_data, ddim=ddim, tau=tau[direction]).reshape((ndata, -1))
+    if (predictionMode in ["NN", "RBF"]):
+        shared_input_data[:] = create_1d_delay_coordinates(input_data, delay_dimension=ddim, tau=tau[direction]).reshape((ndata, -1))
     else:
         shared_input_data[:] = input_data[:]
 
     shared_data[:] = data[:]
-    prediction[:] = data[:]
+    prediction[:] = data[trainLength:trainLength+testLength]
     prediction[:, output_y, output_x] = 0.0
 
 def prepare_predicter(y, x):
     if (predictionMode == "ESN"):
-        predicter = ESN(n_input = innerSize*innerSize, n_output = 1, n_reservoir = n_units,
+        predicter = ESN(n_input = shared_input_data.shape[1], n_output = 1, n_reservoir = n_units,
                     weight_generation = "advanced", leak_rate = 0.20, spectral_radius = 0.1,
                     random_seed=42, noise_level=0.0001, sparseness=.1, regression_parameters=[regression_parameter], solver = "lsqr")
     elif (predictionMode == "NN"):
@@ -175,11 +181,11 @@ def prepare_predicter(y, x):
 
     return predicter
 
-def fit_predict_pixel(y, x, predicter):
+def fit_predict_pixel(y, x, predicter, def_param=(shared_input_data, shared_data)):
     training_data_in = shared_input_data[:trainLength]
     test_data_in = shared_input_data[trainLength:trainLength+testLength]
-    training_data_out = shared_data[:trainLength, y, x]
-    test_data_out = shared_data[trainLength:trainLength+testLength, y, x]
+    training_data_out = shared_data[:trainLength, y, x].reshape(-1, 1)
+    test_data_out = shared_data[trainLength:trainLength+testLength, y, x].reshape(-1, 1)
 
     predicter.fit(training_data_in, training_data_out)
     pred = predicter.predict(test_data_in)
@@ -235,8 +241,7 @@ def mainFunction():
                                         )
     jobs = []
     for i in range(len(output_y)):
-        for x in range(N):
-            jobs.append((input_y, input_x, output_y[i], output_x[i]))
+        jobs.append((input_y, input_x, output_y[i], output_x[i]))
 
     print("fitting...")
     processProcessResultsThread = Process(target=process_thread_results, args=(queue, len(jobs)) )
@@ -252,9 +257,8 @@ def mainFunction():
     prediction[prediction > 1.0] = 1.0
 
     diff = (shared_data[trainLength:]-prediction)
-    mse = np.mean((diff)**2)
+    mse = np.mean((diff[:, output_y, output_x])**2)
     print("test error: {0}".format(mse))
-    print("inner test error: {0}".format(np.mean((diff[:, patch_radius:N-patch_radius, patch_radius:N-patch_radius])**2)))
 
     show_results([("Orig", shared_data[trainLength:]), ("Pred", prediction), ("Diff", diff)])
 
