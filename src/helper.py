@@ -2,6 +2,24 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
+def create_2d_delay_coordinates(data, delay_dimension, tau):
+    result = np.repeat(data[:, :, :, np.newaxis], repeats=delay_dimension, axis=3)
+
+    for n in range(1, delay_dimension):
+        result[:, :, :, n] = np.roll(result[:, :, :, n], n*tau, axis=0)
+    result[0:delay_dimension-1,:,:] = 0
+
+    return result
+
+def create_0d_delay_coordinates(data, delay_dimension, tau):
+    result = np.repeat(data[:, np.newaxis], repeats=delay_dimension, axis=1)
+
+    for n in range(1, delay_dimension):
+        result[:, n] = np.roll(result[:, n], n*tau, axis=0)
+    result[0:delay_dimension-1,:] = 0
+
+    return result
+
 def create_patch_indices(outer_range_x, outer_range_y, inner_range_x, inner_range_y):
     outer_ind_x = np.tile(range(outer_range_x[0], outer_range_x[1]), outer_range_y[1]-outer_range_y[0])
     outer_ind_y = np.repeat(range(outer_range_y[0], outer_range_y[1]), outer_range_x[1]-outer_range_x[0])
@@ -38,7 +56,7 @@ def show_results(packedData, forced_clim=None):
         for i in range(len(data)):
             if (type(data[i][1]) is not np.ndarray):
                     raise ValueError("Item for key '{0}' is not of the type numpy.ndarray".format(data[i][0]))
-        
+
         shape = data[0][1].shape
 
     i = 0

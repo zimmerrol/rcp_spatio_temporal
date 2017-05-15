@@ -31,17 +31,16 @@ testLength = 2000
 trainLength = ndata - testLength
 
 def setupArrays():
-    #TODO: Correct the array dimensions!
     global shared_input_data_base, shared_output_data_base, prediction_base
     global shared_input_data, shared_output_data, prediction
 
-    shared_input_data_base = multiprocessing.Array(ctypes.c_double, 2*trainLength*N*N)
+    shared_input_data_base = multiprocessing.Array(ctypes.c_double, ndata*N*N)
     shared_input_data = np.ctypeslib.as_array(shared_input_data_base.get_obj())
-    shared_input_data = shared_input_data.reshape(2, trainLength, N, N)
+    shared_input_data = shared_input_data.reshape(ndata, N, N)
 
-    shared_output_data_base = multiprocessing.Array(ctypes.c_double, 2*testLength*N*N)
+    shared_output_data_base = multiprocessing.Array(ctypes.c_double, ndata*N*N)
     shared_output_data = np.ctypeslib.as_array(shared_output_data_base.get_obj())
-    shared_output_data = shared_output_data.reshape(2, testLength, N, N)
+    shared_output_data = shared_output_data.reshape(ndata, N, N)
 
     prediction_base = multiprocessing.Array(ctypes.c_double, testLength*N*N)
     prediction = np.ctypeslib.as_array(prediction_base.get_obj())
@@ -122,17 +121,31 @@ def preparePredicter(y, x):
 
     return predicter
 
-def prepareFitData(y, x, pr, def_param=(shared_input_data, shared_output_data)):
-    training_data_in = shared_input_data[:trainLength][:, y - pr:y + pr+1, x - pr:x + pr+1][:, ::sigma_skip, ::sigma_skip].reshape(-1, eff_sigma*eff_sigma)
-    test_data_in = shared_input_data[trainLength:][:, y - pr:y + pr+1, x - pr:x + pr+1][:, ::sigma_skip, ::sigma_skip].reshape(-1, eff_sigma*eff_sigma)
+def prepareFitData(y, x, pr, skip, def_param=(shared_input_data, shared_output_data)):
+    if (predictionMode in ["NN", "RBF"]):
+        delayed_patched_input_data = create_2d_delay_coordinates(shared_input_data[:, y-pr:y+pr+1, x-pr:x+pr+1][:, ::skip, ::skip], ddim, tau=119)
+        delayed_patched_input_data = delayed_patched_input_data.reshape(ndata, -1)
 
-    training_data_out = shared_output_data[:trainLength][:, y, x].reshape(-1, 1)
-    test_data_out = shared_output_data[trainLength:][:, y, x].reshape(-1, 1)
+        delayed_patched_input_data_train = delayed_patched_input_data[:trainLength]
+        delayed_patched_input_data_test = delayed_patched_input_data[trainLength:trainLength+testLength]
+
+        training_data_in = delayed_patched_input_data_train.reshape(trainLength, -1)
+        test_data_in = delayed_patched_input_data_test.reshape(testLength, -1)
+
+        training_data_out = shared_output_data[:trainLength, y, x].reshape(-1,1)
+        test_data_out = shared_output_data[trainLength:trainLength+testLength, y, x].reshape(-1,1)
+
+    else:
+        training_data_in = shared_input_data[:trainLength][:, y - pr:y + pr+1, x - pr:x + pr+1][:, ::skip, ::skip].reshape(trainLength, -1)
+        test_data_in = shared_input_data[trainLength:trainLength+testLength][:, y - pr:y + pr+1, x - pr:x + pr+1][:, ::skip, ::skip].reshape(testLength, -1)
+
+        training_data_out = shared_output_data[:trainLength][:, y, x].reshape(-1, 1)
+        test_data_out = shared_output_data[trainLength:trainLength+testLength][:, y, x].reshape(-1, 1)
 
     return training_data_in, test_data_in, training_data_out, test_data_out
 
 def fit_predict_pixel(y, x, running_index, predicter):
-    training_data_in, test_data_in, training_data_out, test_data_out = prepareFitData(y, x, patch_radius)
+    training_data_in, test_data_in, training_data_out, test_data_out = prepareFitData(y, x, patch_radius, sigma_skip)
 
     predicter.fit(training_data_in, training_data_out)
     pred = predicter.predict(test_data_in)
@@ -142,7 +155,7 @@ def fit_predict_pixel(y, x, running_index, predicter):
 
 def fit_predict_frame_pixel(y, x, running_index, predicter):
     min_border_distance = np.min([y, x, N-1-y, N-1-x])
-    training_data_in, test_data_in, training_data_out, test_data_out = prepareFitData(y, x, min_border_distance)
+    training_data_in, test_data_in, training_data_out, test_data_out = prepareFitData(y, x, min_border_distance, 1)
 
     predicter.fit(training_data_in, training_data_out)
     pred = predicter.predict(test_data_in)
@@ -209,7 +222,7 @@ def mainFunction():
     print("blurring...")
 
     for t in range(ndata):
-        shared_input_data[t, :, :] = gaussian_filter(shared_input_data[t], sigma=9.0)
+        shared_input_data[t, :, :] = gaussian_filter(shared_output_data[t], sigma=9.0)
 
     show_results([("Blurred", shared_input_data[:trainLength]), ("Orig", shared_output_data[:trainLength])])
 

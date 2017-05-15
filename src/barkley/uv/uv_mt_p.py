@@ -58,17 +58,17 @@ def parseArguments():
 parseArguments()
 
 def setupArrays():
-    global shared_v_data_base, shared_u_data_base, shared_prediction_base
-    global shared_v_data, shared_u_data, shared_prediction
+    global shared_input_data_base, shared_output_data_base, shared_prediction_base
+    global shared_input_data, shared_output_data, shared_prediction
 
     ###print("setting up arrays...")
-    shared_v_data_base = multiprocessing.Array(ctypes.c_double, ndata*N*N)
-    shared_v_data = np.ctypeslib.as_array(shared_v_data_base.get_obj())
-    shared_v_data = shared_v_data.reshape(-1, N, N)
+    shared_input_data_base = multiprocessing.Array(ctypes.c_double, ndata*N*N)
+    shared_input_data = np.ctypeslib.as_array(shared_input_data_base.get_obj())
+    shared_input_data = shared_input_data.reshape(-1, N, N)
 
-    shared_u_data_base = multiprocessing.Array(ctypes.c_double, ndata*N*N)
-    shared_u_data = np.ctypeslib.as_array(shared_u_data_base.get_obj())
-    shared_u_data = shared_u_data.reshape(-1, N, N)
+    shared_output_data_base = multiprocessing.Array(ctypes.c_double, ndata*N*N)
+    shared_output_data = np.ctypeslib.as_array(shared_output_data_base.get_obj())
+    shared_output_data = shared_output_data.reshape(-1, N, N)
 
     shared_prediction_base = multiprocessing.Array(ctypes.c_double, testLength*N*N)
     shared_prediction = np.ctypeslib.as_array(shared_prediction_base.get_obj())
@@ -108,24 +108,6 @@ def setupConstants():
     eff_sigma = int(np.ceil(sigma/sigma_skip))
     patch_radius = sigma//2
 setupConstants()
-
-def create_2d_delay_coordinates(data, delay_dimension, tau):
-    result = np.repeat(data[:, :, :, np.newaxis], repeats=delay_dimension, axis=3)
-
-    for n in range(1, delay_dimension):
-        result[:, :, :, n] = np.roll(result[:, :, :, n], n*tau, axis=0)
-    result[0:delay_dimension-1,:,:] = 0
-
-    return result
-
-def create_0d_delay_coordinates(data, delay_dimension, tau):
-    result = np.repeat(data[:, np.newaxis], repeats=delay_dimension, axis=1)
-
-    for n in range(1, delay_dimension):
-        result[:, n] = np.roll(result[:, n], n*tau, axis=0)
-    result[0:delay_dimension-1,:] = 0
-
-    return result
 
 def generate_data(N, trans, sample_rate, Ngrid):
     data = None
@@ -177,76 +159,55 @@ def get_prediction(data):
     pred = None
     if (y < patch_radius or y >= N-patch_radius or x < patch_radius or x >= N-patch_radius):
         #frame
-        pred = predict_frame_pixel(data, predicter)
+        pred = fit_predict_frame_pixel(y, x, predicter)
     else:
         #inner
-        pred = predict_inner_pixel(data, predicter)
+        pred = fit_predict_inner_pixel(y, x, predicter)
     get_prediction.q.put((y, x, pred))
 
-def predict_frame_pixel(data, predicter, def_param=(shared_v_data, shared_u_data)):
-    y, x = data
-
+def prepareFitData(y, x, pr, skip, def_param=(shared_input_data, shared_output_data)):
     if (predictionMode in ["NN", "RBF"]):
-        delayed_v_data = create_0d_delay_coordinates(shared_v_data[:, y, x], ddim, tau=32)
+        delayed_patched_input_data = create_2d_delay_coordinates(shared_input_data[:, y-pr:y+pr+1, x-pr:x+pr+1][:, ::skip, ::skip], ddim, tau=119)
+        delayed_patched_input_data = delayed_patched_input_data.reshape(ndata, -1)
 
-        delayed_patched_v_data_train = delayed_v_data[:trainLength]
-        u_data_train = shared_u_data[:trainLength, y, x]
+        delayed_patched_input_data_train = delayed_patched_input_data[:trainLength]
+        delayed_patched_input_data_test = delayed_patched_input_data[trainLength:trainLength+testLength]
 
-        delayed_patched_v_data_test = delayed_v_data[trainLength:trainLength+testLength]
-        u_data_test = shared_u_data[trainLength:trainLength+testLength, y, x]
+        training_data_in = delayed_patched_input_data_train.reshape(trainLength, -1)
+        test_data_in = delayed_patched_input_data_test.reshape(testLength, -1)
 
-        flat_v_data_train = delayed_patched_v_data_train.reshape(-1, ddim)
-        flat_u_data_train = u_data_train.reshape(-1,1)
+        training_data_out = shared_output_data[:trainLength, y, x].reshape(-1,1)
+        test_data_out = shared_output_data[trainLength:trainLength+testLength, y, x].reshape(-1,1)
 
-        flat_v_data_test = delayed_patched_v_data_test.reshape(-1, ddim)
-        flat_u_data_test = u_data_test.reshape(-1,1)
     else:
-        flat_v_data_train = shared_v_data[:trainLength, y, x].reshape(-1, 1*1)
-        flat_u_data_train = shared_u_data[:trainLength, y, x].reshape(-1, 1*1)
+        training_data_in = shared_input_data[:trainLength][:, y - pr:y + pr+1, x - pr:x + pr+1][:, ::skip, ::skip].reshape(trainLength, -1)
+        test_data_in = shared_input_data[trainLength:trainLength+testLength][:, y - pr:y + pr+1, x - pr:x + pr+1][:, ::skip, ::skip].reshape(testLength, -1)
 
-        flat_v_data_test = shared_v_data[trainLength:, y, x].reshape(-1, 1*1)
-        flat_u_data_test = shared_u_data[trainLength:, y, x].reshape(-1, 1*1)
+        training_data_out = shared_output_data[:trainLength][:, y, x].reshape(-1, 1)
+        test_data_out = shared_output_data[trainLength:trainLength+testLength][:, y, x].reshape(-1, 1)
 
-    predicter.fit(flat_v_data_train, flat_u_data_train)
-    pred = predicter.predict(flat_v_data_test)
+    return training_data_in, test_data_in, training_data_out, test_data_out
+
+def fit_predict_frame_pixel(y, x, predicter, def_param=(shared_input_data, shared_output_data)):
+    min_border_distance = np.min([y, x, N-1-y, N-1-x])
+    training_data_in, test_data_in, training_data_out, test_data_out = prepareFitData(y, x, min_border_distance, 1)
+
+    predicter.fit(training_data_in, test_data_in)
+    pred = predicter.predict(training_data_out)
     pred = pred.ravel()
 
     return pred
 
-def predict_inner_pixel(data, predicter, def_param=(shared_v_data, shared_u_data)):
-    y, x = data
+def fit_predict_inner_pixel(y, x, predicter, def_param=(shared_input_data, shared_output_data)):
+    training_data_in, test_data_in, training_data_out, test_data_out = prepareFitData(y, x, patch_radius, sigma_skip)
 
-    if (predictionMode in ["NN", "RBF"]):
-        delayed_v_data = create_2d_delay_coordinates(shared_v_data[:, y-patch_radius:y+patch_radius+1, x-patch_radius:x+patch_radius+1][:, ::sigma_skip, ::sigma_skip], ddim, tau=119)
-        delayed_patched_v_data = np.empty((ndata, 1, 1, ddim*eff_sigma*eff_sigma))
-        delayed_patched_v_data[:, 0, 0] = delayed_v_data.reshape(-1, ddim*eff_sigma*eff_sigma)
-
-        delayed_patched_v_data_train = delayed_patched_v_data[:trainLength, 0, 0]
-        u_data_train = shared_u_data[:trainLength, y, x]
-
-        delayed_patched_v_data_test = delayed_patched_v_data[trainLength:trainLength+testLength, 0, 0]
-        u_data_test = shared_u_data[trainLength:trainLength+testLength, y, x]
-
-        flat_v_data_train = delayed_patched_v_data_train.reshape(-1, delayed_patched_v_data.shape[3])
-        flat_u_data_train = u_data_train.reshape(-1,1)
-
-        flat_v_data_test = delayed_patched_v_data_test.reshape(-1, delayed_patched_v_data.shape[3])
-        flat_u_data_test = u_data_test.reshape(-1,1)
-
-    else:
-        flat_v_data_train = shared_v_data[:trainLength, y - patch_radius:y + patch_radius+1, x - patch_radius:x + patch_radius+1][:, ::sigma_skip, ::sigma_skip].reshape(-1, eff_sigma*eff_sigma)
-        flat_u_data_train = shared_u_data[:trainLength, y, x].reshape(-1, 1)
-
-        flat_v_data_test = shared_v_data[trainLength:, y - patch_radius:y + patch_radius+1, x - patch_radius:x + patch_radius+1][:, ::sigma_skip, ::sigma_skip].reshape(-1, eff_sigma*eff_sigma)
-        flat_u_data_test = shared_u_data[trainLength:, y, x].reshape(-1, 1)
-
-    predicter.fit(flat_v_data_train, flat_u_data_train)
-    pred = predicter.predict(flat_v_data_test)
+    predicter.fit(training_data_in, test_data_in)
+    pred = predicter.predict(training_data_out)
     pred = pred.ravel()
 
     return pred
 
-def processThreadResults(threadname, q, numberOfWorkers, numberOfResults, def_param=(shared_prediction, shared_u_data)):
+def processThreadResults(threadname, q, numberOfWorkers, numberOfResults, def_param=(shared_prediction, shared_output_data)):
     global prediction
 
     bar = progressbar.ProgressBar(max_value=numberOfResults, redirect_stdout=True, poll_interval=0.0001)
@@ -275,12 +236,12 @@ def mainFunction():
         print("Please adjust the trainig and testing phase length!")
         exit()
 
-    delayed_patched_v_data = None
+    delayed_patched_input_data = None
     u_data = None
     ###print("generating data...")
     u_data_t, v_data_t = generate_data(ndata, 20000, 50, Ngrid=N)
-    shared_v_data[:] = v_data_t[:]
-    shared_u_data[:] = u_data_t[:]
+    shared_input_data[:] = v_data_t[:]
+    shared_output_data[:] = u_data_t[:]
     ###print("generation finished")
 
     queue = Queue() # use manager.queue() ?
@@ -306,12 +267,12 @@ def mainFunction():
     prediction[prediction < 0.0] = 0.0
     prediction[prediction > 1.0] = 1.0
 
-    diff = (shared_u_data[trainLength:]-shared_prediction)
+    diff = (shared_output_data[trainLength:]-shared_prediction)
     mse = np.mean((diff)**2)
     print("test error: {0}".format(mse))
     print("inner test error: {0}".format(np.mean((diff[:, patch_radius:N-patch_radius, patch_radius:N-patch_radius])**2)))
 
-    viewData = [("Orig", shared_u_data[trainLength:]), ("Pred", shared_prediction), ("Source", shared_v_data[trainLength:]), ("Diff", diff)]
+    viewData = [("Orig", shared_output_data[trainLength:]), ("Pred", shared_prediction), ("Source", shared_input_data[trainLength:]), ("Diff", diff)]
     directionName = "utov" if reverseDirection else "vtou"
     if (predictionMode in ["NN", "RBF"]):
         f = open("../cache/viewdata/{0}/{1}_viewdata_{2}_{3}_{4}_{5}_{6}.dat".format(directionName, predictionMode.lower(), ndata, sigma, sigma_skip, ddim, k), "wb")
