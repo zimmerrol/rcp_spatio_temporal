@@ -4,6 +4,8 @@ parentdir = os.path.dirname(currentdir)
 grandparentdir = os.path.dirname(parentdir)
 sys.path.insert(0, parentdir)
 sys.path.insert(0, grandparentdir)
+sys.path.insert(0, os.path.join(grandparentdir, "barkley"))
+sys.path.insert(0, os.path.join(grandparentdir, "mitchell"))
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -22,7 +24,7 @@ import ctypes
 from multiprocessing import process
 
 from helper import *
-import barkley_helper import as bh
+import barkley_helper as bh
 import mitchell_helper as mh
 import argparse
 
@@ -49,7 +51,7 @@ def setup_arrays():
 setup_arrays()
 
 def parse_arguments():
-    global id, predictionMode, reverseDirection
+    global id, predictionMode, direction
 
     id = int(os.getenv("SGE_TASK_ID", 0))
 
@@ -103,6 +105,30 @@ def setup_constants():
     eff_sigma = int(np.ceil(sigma/sigma_skip))
     patch_radius = sigma//2
 setup_constants()
+
+def generate_data(N, trans, sample_rate, Ngrid):
+    data = None
+
+    if (direction == "u"):
+        if (os.path.exists("../../cache/barkley/raw/{0}_{1}.dat.npy".format(N, Ngrid)) == False):
+            data = bh.generate_data(N, 50000, 5, Ngrid=Ngrid)
+            np.save("../../cache/barkley/raw/{0}_{1}.dat.npy".format(N, Ngrid), data)
+        else:
+            data = np.load("../../cache/barkley/raw/{0}_{1}.dat.npy".format(N, Ngrid))
+    else:
+        if (os.path.exists("../../cache/mitchell/raw/{0}_{1}.dat.npy".format(N, Ngrid)) == False):
+            data = mh.generate_data(N, 20000, 50, Ngrid=Ngrid)
+            np.save("../../cache/mitchell/raw/{0}_{1}.dat.npy".format(N, Ngrid), data)
+        else:
+            data = np.load("../../cache/mitchell/raw/{0}_{1}.dat.npy".format(N, Ngrid))
+
+    shared_input_data[:] = data[:]
+
+    print("blurring...")
+    for t in range(ndata):
+        shared_input_data[t, :, :] = gaussian_filter(shared_output_data[t], sigma=9.0)
+    show_results([("Blurred", shared_input_data[:trainLength]), ("Orig", shared_output_data[:trainLength])])
+    print("blurring finished")
 
 def prepare_predicter(y, x):
     if (predictionMode == "ESN"):
@@ -212,29 +238,7 @@ def process_thread_results(q, numberOfResults):
 def mainFunction():
     global shared_training_data, shared_test_data
 
-    if (direction == "u"):
-        if (os.path.exists("../../cache/barkley/raw/{0}_{1}.dat.npy".format(N, Ngrid)) == False):
-            data = bh.generate_data(N, 20000, 5, Ngrid=Ngrid)
-            np.save("../../cache/barkley/raw/{0}_{1}.dat.npy".format(N, Ngrid), data)
-        else:
-            data = np.load("../../cache/barkley/raw/{0}_{1}.dat.npy".format(N, Ngrid))
-    else:
-        if (os.path.exists("../../cache/mitchell/raw/{0}_{1}.dat.npy".format(N, Ngrid)) == False):
-            data = mh.generate_data(N, 20000, 50, Ngrid=Ngrid)
-            np.save("../../cache/mitchell/raw/{0}_{1}.dat.npy".format(N, Ngrid), data)
-        else:
-            data = np.load("../../cache/mitchell/raw/{0}_{1}.dat.npy".format(N, Ngrid))
-
-    shared_output_data[:, :, :] = data[:]
-
-    print("blurring...")
-
-    for t in range(ndata):
-        shared_input_data[t, :, :] = gaussian_filter(shared_output_data[t], sigma=9.0)
-
-    show_results([("Blurred", shared_input_data[:trainLength]), ("Orig", shared_output_data[:trainLength])])
-
-    print("blurring finished")
+    generate_data(ndata, 20000, 50, Ngrid=N)
 
     queue = Queue() # use manager.queue() ?
     print("preparing threads...")

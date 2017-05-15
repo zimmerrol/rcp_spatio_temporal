@@ -23,7 +23,7 @@ import ctypes
 from multiprocessing import process
 
 from helper import *
-import barkley_helper import as bh
+import barkley_helper as bh
 import mitchell_helper as mh
 import argparse
 
@@ -42,7 +42,7 @@ trainLength = 28000
 testLength = 2000
 
 def parse_arguments():
-    global id, predictionMode, reverseDirection
+    global id, predictionMode, direction
 
     id = int(os.getenv("SGE_TASK_ID", 0))
 
@@ -139,7 +139,8 @@ def generate_data(N, trans, sample_rate, Ngrid):
         data[0] = data[1].copy()
         data[1] = tmp.copy()
 
-    return data
+    shared_input_data[:] = data[0]
+    shared_output_data[:] = data[1]
 
 def prepare_predicter(y, x):
     if (predictionMode == "ESN"):
@@ -249,9 +250,7 @@ def mainFunction():
         exit()
 
     ###print("generating data...")
-    input_data_t, output_data_t = generate_data(ndata, 20000, 50, Ngrid=N)
-    shared_input_data[:] = input_data_t[:]
-    shared_output_data[:] = output_data_t[:]
+    generate_data(ndata, 20000, 50, Ngrid=N)
     ###print("generation finished")
 
     queue = Queue() # use manager.queue() ?
