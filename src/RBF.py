@@ -1,9 +1,9 @@
 import numpy as np
 
 class RBF(object):
-    def __init__(self, sigma=5.0, basisQuota = 0.05):
+    def __init__(self, sigma=5.0, basisPoints):
         self._sigma = sigma
-        self._basisQuota = basisQuota
+        self._basisPoints = basisPoints
 
     def rbf(xi, yi, sigmam):
         return np.exp(-np.sum((xi-yi)**2)/(2*sigmam**2))
@@ -18,7 +18,7 @@ class RBF(object):
         n = len(x)
 
         #m is the numberOfSamplingPoints
-        m = int(self._basisQuota*len(x))
+        m = self._basisPoints
 
         #according to http://stackoverflow.com/questions/9873626/choose-m-evenly-spaced-elements-from-a-sequence-of-length-n
         createEqualSpacedIndices = lambda m, n: [i*n//m + n//(2*m) for i in range(m)]

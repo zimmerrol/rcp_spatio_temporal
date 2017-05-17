@@ -16,7 +16,7 @@ export PYTHONUNBUFFERED=1
 #$ -j yes
 
 # Standard name of the job (if none is given on the command line):
-#$ -N cross_pred_nn_vh
+#$ -N cross_pred_rbf_placements_vh
 
 # Path for the output files
 #$ -o /home/roland/q-out/
@@ -32,4 +32,4 @@ export PYTHONUNBUFFERED=1
 
 #$ -q mvapich2-grannus04.q
 
-python uv_mt_p.py NN vh
+python cross_prediction_mt_p.py RBF vh
