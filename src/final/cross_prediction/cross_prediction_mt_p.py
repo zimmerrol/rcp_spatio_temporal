@@ -86,7 +86,7 @@ setup_arrays()
 
 def setup_constants():
     global k, ddim, sigma, sigma_skip, eff_sigma, patch_radius, n_units, regression_parameter
-    global trainLength, basisQuota
+    global trainLength, basisPoints
 
     print("Using parameters:")
 
@@ -116,7 +116,7 @@ def setup_constants():
     elif (predictionMode == "RBF"):
         trainLength = 28000
 
-        basisQuota = 0.05
+        basisPoints = 400
 
 
         ddim = [3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5,  3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5,  3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5,  3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5][id-1]
@@ -131,7 +131,7 @@ def setup_constants():
         ddim = 5
         k = 2
 
-        basisQuota = [0.01,0.02,0.03,0.04,0.05,0.06,0.07,0.08,0.09,0.10,0.11,0.12,0.13,0.14,0.15][id-1]
+        basisPoints = [50, 100, 150, 200, 250, 300, 350, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200][id-1]
         """
     else:
         raise ValueError("No valid predictionMode choosen! (Value is now: {0})".format(predictionMode))
@@ -183,7 +183,7 @@ def prepare_predicter(y, x):
     elif (predictionMode == "NN"):
         predicter = NN(k=k)
     elif (predictionMode == "RBF"):
-        predicter = RBF(sigma=5.0, basisQuota=basisQuota)
+        predicter = RBF(sigma=5.0, basisPoints=basisPoints)
     else:
         raise ValueError("No valid predictionMode choosen! (Value is now: {0})".format(predictionMode))
 
