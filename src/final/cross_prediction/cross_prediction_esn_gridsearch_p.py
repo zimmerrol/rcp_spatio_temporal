@@ -80,13 +80,13 @@ def generate_data(N, trans, sample_rate, Ngrid):
 def mainFunction():
     global output_weights, frame_output_weights, last_states
 
-    data = generate_data(ndata, 20000, 50, Ngrid=N))
+    data = generate_data(ndata, 20000, 50, Ngrid=N)
 
     training_data = data[:, :trainLength]
     test_data = data[:,trainLength:trainLength+testLength]
 
 
-    (sigma, sigma_skip) = [(3, 1), (5, 1), (5, 2), (7, 1), (7, 2), (7, 3)][id-1]
+    sigma, sigma_skip = [(3, 1), (5, 1), (5, 2), (7, 1), (7, 2), (7, 3)][id-1]
     patch_radius = sigma//2
     input_size = [9, 25, 9, 49, 16, 9][id-1]
 
