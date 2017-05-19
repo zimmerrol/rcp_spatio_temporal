@@ -49,11 +49,11 @@ def parse_arguments():
     else:
         direction = args.direction[0]
 
-    print("Prediction via: {1}".format(direction))
+    print("Prediction via: {0}".format(direction))
 parse_arguments()
 
-def mainFunction():
-    global output_weights, frame_output_weights, last_states
+def generate_data(N, trans, sample_rate, Ngrid):
+    data = None
 
     if (direction in ["uv", "vu"]):
         if (os.path.exists("../../cache/barkley/raw/{0}_{1}.uv.dat.npy".format(N, Ngrid)) == False):
@@ -74,6 +74,13 @@ def mainFunction():
         tmp = data[0].copy()
         data[0] = data[1].copy()
         data[1] = tmp.copy()
+
+    return data
+
+def mainFunction():
+    global output_weights, frame_output_weights, last_states
+
+    data = generate_data(ndata, 20000, 50, Ngrid=N))
 
     training_data = data[:, :trainLength]
     test_data = data[:,trainLength:trainLength+testLength]
