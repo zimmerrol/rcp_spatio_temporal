@@ -87,11 +87,12 @@ setup_arrays()
 def setup_constants():
     global k, ddim, sigma, sigma_skip, eff_sigma, patch_radius
     global trainLength, basisPoints, width, predictionMode
-    global n_units, spectral_radius, regression_parameter, leaking_rate, noise_level
+    global n_units, spectral_radius, regression_parameter, leaking_rate, noise_level, random_seed
 
     print("Using parameters:")
 
     if (predictionMode == "ESN"):
+        random_seed = {"vh": [40, 41, 40, 39, 39, 40], "hv": [42, 39, 41, 40, 40, 39] ,"uv": [40, 41, 40, 40, 40, 42], "vu": [40, 40, 40, 41, 40, 40]}[direction][id-1]
         n_units = {"vh": [50, 50, 50, 400, 200, 50], "hv": [400, 400, 400, 200, 200, 50] ,"uv": [400, 400, 400, 400, 400, 400], "vu": [400, 400, 400, 400, 400, 400]}[direction][id-1]
         spectral_radius = {"vh": [1.5, 1.5, 1.5, 3.0, 3.0, 3.0], "hv": [0.95, 1.1, 0.1, 1.1, 1.1, 0.95] ,"uv": [1.1, 0.8, 1.1, 1.5, 1.1, 0.5], "vu": [0.95, 3.0, 0.5, 3.0, 3.0, 0.1]}[direction][id-1]
         regression_parameter = {"vh": [5e-02, 5e-03, 5e-04, 5e-02, 5e-02, 5e-02], "hv": [5e-06, 5e-03, 5e-04, 5e-03, 5e-02, 5e-02], "uv": [5e-06, 5e-06, 5e-06, 5e-06, 5e-06, 5e-06], "vu": [5e-06, 5e-06, 5e-06, 5e-06, 5e-06, 5e-06]}[direction][id-1]
@@ -192,13 +193,13 @@ def prepare_predicter(y, x):
             #frame
             min_border_distance = np.min([y, x, N-1-y, N-1-x])
             predicter = ESN(n_input = int((2*min_border_distance+1)**2), n_output = 1, n_reservoir = n_units,
-                    weight_generation = "advanced", leak_rate = 0.70, spectral_radius = 0.8,
-                    random_seed=42, noise_level=0.0001, sparseness=.1, regression_parameters=[regression_parameter], solver = "lsqr")
+                    weight_generation = "advanced", leak_rate = leaking_rate, spectral_radius = spectral_radius,
+                    random_seed=random_seed, noise_level=noise_level, sparseness=sparseness, regression_parameters=[regression_parameter], solver = "lsqr")
         else:
             #inner
             predicter = ESN(n_input = eff_sigma*eff_sigma, n_output = 1, n_reservoir = n_units,
-                        weight_generation = "advanced", leak_rate = 0.70, spectral_radius = 0.8,
-                        random_seed=42, noise_level=0.0001, sparseness=.1, regression_parameters=[regression_parameter], solver = "lsqr")
+                        weight_generation = "advanced", leak_rate = leaking_rate, spectral_radius = spectral_radius,
+                        random_seed=random_seed, noise_level=noise_level, sparseness=sparseness, regression_parameters=[regression_parameter], solver = "lsqr")
 
     elif (predictionMode == "NN"):
         predicter = NN(k=k)

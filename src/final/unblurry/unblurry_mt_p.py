@@ -28,28 +28,13 @@ import barkley_helper as bh
 import mitchell_helper as mh
 import argparse
 
+process.current_process()._config['tempdir'] =  '/dev/shm/' #'/data.bmp/roland/temp/'
+
 tau = {"u" : 32, "v" : 119}
 N = 150
-ndata = 10000
+ndata = 30000
 testLength = 2000
-trainLength = ndata - testLength
-
-def setup_arrays():
-    global shared_input_data_base, shared_output_data_base, prediction_base
-    global shared_input_data, shared_output_data, prediction
-
-    shared_input_data_base = multiprocessing.Array(ctypes.c_double, ndata*N*N)
-    shared_input_data = np.ctypeslib.as_array(shared_input_data_base.get_obj())
-    shared_input_data = shared_input_data.reshape(ndata, N, N)
-
-    shared_output_data_base = multiprocessing.Array(ctypes.c_double, ndata*N*N)
-    shared_output_data = np.ctypeslib.as_array(shared_output_data_base.get_obj())
-    shared_output_data = shared_output_data.reshape(ndata, N, N)
-
-    prediction_base = multiprocessing.Array(ctypes.c_double, testLength*N*N)
-    prediction = np.ctypeslib.as_array(prediction_base.get_obj())
-    prediction = prediction.reshape(testLength, N, N)
-setup_arrays()
+trainLength = 15000
 
 def parse_arguments():
     global id, predictionMode, direction
@@ -74,31 +59,56 @@ def parse_arguments():
     print("Prediction via {0}".format(predictionMode))
 parse_arguments()
 
+def setup_arrays():
+    global shared_input_data_base, shared_output_data_base, shared_prediction_base
+    global shared_input_data, shared_output_data, shared_prediction
+
+    shared_input_data_base = multiprocessing.Array(ctypes.c_double, ndata*N*N)
+    shared_input_data = np.ctypeslib.as_array(shared_input_data_base.get_obj())
+    shared_input_data = shared_input_data.reshape(ndata, N, N)
+
+    shared_output_data_base = multiprocessing.Array(ctypes.c_double, ndata*N*N)
+    shared_output_data = np.ctypeslib.as_array(shared_output_data_base.get_obj())
+    shared_output_data = shared_output_data.reshape(ndata, N, N)
+
+    shared_prediction_base = multiprocessing.Array(ctypes.c_double, testLength*N*N)
+    shared_prediction = np.ctypeslib.as_array(shared_prediction_base.get_obj())
+    shared_prediction = shared_prediction.reshape(testLength, N, N)
+setup_arrays()
+
 def setup_constants():
-    global k, ddim, sigma, sigma_skip, eff_sigma, patch_radius, n_units, regression_parameter
+    global k, ddim, sigma, sigma_skip, eff_sigma, patch_radius
+    global trainLength, basisPoints, width, predictionMode
+    global n_units, spectral_radius, regression_parameter, leaking_rate, noise_level, random_seed
 
     print("Using parameters:")
 
     if (predictionMode == "ESN"):
-        n_units = [50,50,50,50,50,50,200,200,200,200,200,200,400,400,400,400,400,400,  50,50,50,50,50,50,200,200,200,200,200,200,400,400,400,400,400,400,  50,50,50,50,50,50,200,200,200,200,200,200,400,400,400,400,400,400,  50,50,50,50,50,50,200,200,200,200,200,200,400,400,400,400,400,400][id-1]
-        regression_parameter = [5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,  5e-3,5e-3,5e-3,5e-3,5e-3,5e-3,5e-3,5e-3,5e-3,5e-3,5e-3,5e-3,5e-3,5e-3,5e-3,5e-3,5e-3,5e-3,  5e-4,5e-4,5e-4,5e-4,5e-4,5e-4,5e-4,5e-4,5e-4,5e-4,5e-4,5e-4,5e-4,5e-4,5e-4,5e-4,5e-4,5e-4,  5e-5,5e-5,5e-5,5e-5,5e-5,5e-5,5e-5,5e-5,5e-5,5e-5,5e-5,5e-5,5e-5,5e-5,5e-5,5e-5,5e-5,5e-5][id-1]
-        sigma = [3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7][id-1]
-        sigma_skip = [1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3][id-1]
+        random_seed = {"v": [41,41,39,40,42,39], "u": [39,40,41,42,41,42]}[direction][id-1]
+        n_units = {"v": [50,200,50,50,50,50], "u": [200,400,50,50,50,50]}[direction][id-1]
+        spectral_radius = {"v": [0.1,0.1,3.0,0.1,0.5,3.0], "u": [1.1,0.95,0.95,1.5,1.5,0.95]}[direction][id-1]
+        regression_parameter = {"v": [5e-06, 5e-03, 5e-06, 5e-06, 5e-03, 5e-06], "u": [5e-06, 5e-06, 5e-06, 5e-06, 5e-04, 5e-04]}[direction][id-1]
+        leaking_rate = {"v": [0.05,0.05,0.05,0.05,0.05,0.05], "u": [0.2,0.2,0.05,0.2,0.05,0.05]}[direction][id-1]
+        noise_level = {"v": [1e-5,1e-4,1e-5,1e-5,1e-4,1e-4], "u": [1e-5,1e-4,1e-5,1e-5,1e4-,1e-4]}
+        sigma = [3, 5, 5, 7, 7, 7][id-1]
+        sigma_skip = [1, 1, 2, 1, 2, 3][id-1]
 
-        print("\t ndata \t = {0} \n\t sigma \t = {1}\n\t sigma_skip \t = {2}\n\t n_units \t = {3}\n\t regular. \t = {4}".format(ndata, sigma, sigma_skip, n_units, regression_parameter))
+        print("\t trainLength \t = {0} \n\t sigma \t = {1}\n\t sigma_skip \t = {2}\n\t n_units \t = {3}\n\t regular. \t = {4}".format(trainLength, sigma, sigma_skip, n_units, regression_parameter))
     elif (predictionMode == "NN"):
         ddim = [3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5,  3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5,  3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5,  3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5][id-1]
         k = [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,  3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,  5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5][id-1]
         sigma = [3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7][id-1]
         sigma_skip = [1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3][id-1]
 
-        print("\t ndata \t = {0} \n\t sigma \t = {1}\n\t sigma_skip \t = {2}\n\t ddim \t = {3}\n\t k \t = {4}".format(ndata, sigma, sigma_skip, ddim, k))
+        print("\t trainLength \t = {0} \n\t sigma \t = {1}\n\t sigma_skip \t = {2}\n\t ddim \t = {3}\n\t k \t = {4}".format(trainLength, sigma, sigma_skip, ddim, k))
     elif (predictionMode == "RBF"):
+        basisPoints = 100
+
         ddim = [3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5,  3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5,  3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5,  3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5,  3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5,  3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5][id-1]
         width = [.5,.5,.5,.5,.5,.5,.5,.5,.5,.5,.5,.5,.5,.5,.5,.5,.5,.5,  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,  3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,  5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,  7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,   9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9][id-1]
         sigma = [3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7][id-1]
         sigma_skip = [1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3][id-1]
-        print("\t ndata \t = {0} \n\t sigma \t = {1}\n\t sigma_skip \t = {2}\n\t ddim \t = {3}\n\t width \t = {4}".format(ndata, sigma, sigma_skip, ddim, width))
+        print("\t trainLength \t = {0} \n\t sigma \t = {1}\n\t sigma_skip \t = {2}\n\t ddim \t = {3}\n\t width \t = {4}".format(trainLength, sigma, sigma_skip, ddim, width))
 
     else:
         raise ValueError("No valid predictionMode choosen! (Value is now: {0})".format(predictionMode))
@@ -111,25 +121,25 @@ def generate_data(N, trans, sample_rate, Ngrid):
     data = None
 
     if (direction == "u"):
-        if (os.path.exists("../../cache/barkley/raw/{0}_{1}.dat.npy".format(N, Ngrid)) == False):
-            data = bh.generate_data(N, 20000, 5, Ngrid=Ngrid)
-            np.save("../../cache/barkley/raw/{0}_{1}.dat.npy".format(N, Ngrid), data)
+        if (os.path.exists("../../cache/barkley/raw/{0}_{1}.uv.dat.npy".format(N, Ngrid)) == False):
+            data = bh.generate_uv_data(N, 50000, 5, Ngrid=Ngrid)
+            np.save("../../cache/barkley/raw/{0}_{1}.uv.dat.npy".format(N, Ngrid), data)
         else:
-            data = np.load("../../cache/barkley/raw/{0}_{1}.dat.npy".format(N, Ngrid))
+            data = np.load("../../cache/barkley/raw/{0}_{1}.uv.dat.npy".format(N, Ngrid))
     else:
-        if (os.path.exists("../../cache/mitchell/raw/{0}_{1}.dat.npy".format(N, Ngrid)) == False):
-            data = mh.generate_data(N, 20000, 50, Ngrid=Ngrid)
-            np.save("../../cache/mitchell/raw/{0}_{1}.dat.npy".format(N, Ngrid), data)
+        if (os.path.exists("../../cache/mitchell/raw/{0}_{1}.vh.dat.npy".format(N, Ngrid)) == False):
+            data = mh.generate_vh_data(N, 20000, 50, Ngrid=Ngrid)
+            np.save("../../cache/mitchell/raw/{0}_{1}.vh.dat.npy".format(N, Ngrid), data)
         else:
-            data = np.load("../../cache/mitchell/raw/{0}_{1}.dat.npy".format(N, Ngrid))
+            data = np.load("../../cache/mitchell/raw/{0}_{1}.vh.dat.npy".format(N, Ngrid))
 
-    shared_input_data[:] = data[:]
+    shared_output_data[:] = data[0, :]
 
-    print("blurring...")
+    #print("blurring...")
     for t in range(ndata):
-        shared_output_data[t, :, :] = gaussian_filter(shared_output_data[t], sigma=9.0)
-    show_results([("Blurred", shared_input_data[:trainLength]), ("Orig", shared_output_data[:trainLength])])
-    print("blurring finished")
+        shared_input_data[t, :, :] = gaussian_filter(shared_output_data[t], sigma=9.0)
+    #show_results([("Blurred", shared_input_data[:trainLength]), ("Orig", shared_output_data[:trainLength])])
+    #print("blurring finished")
 
 def prepare_predicter(y, x):
     if (predictionMode == "ESN"):
@@ -138,22 +148,35 @@ def prepare_predicter(y, x):
             min_border_distance = np.min([y, x, N-1-y, N-1-x])
 
             predicter = ESN(n_input = int((2*min_border_distance+1)**2), n_output = 1, n_reservoir = n_units,
-                    weight_generation = "advanced", leak_rate = 0.70, spectral_radius = 0.8,
-                    random_seed=42, noise_level=0.0001, sparseness=.1, regression_parameters=[regression_parameter], solver = "lsqr")
+                    weight_generation = "advanced", leak_rate = leaking_rate, spectral_radius = spectral_radius,
+                    random_seed=random_seed, noise_level=noise_level, sparseness=sparseness, regression_parameters=[regression_parameter], solver = "lsqr")
         else:
             #inner
             predicter = ESN(n_input = eff_sigma*eff_sigma, n_output = 1, n_reservoir = n_units,
-                        weight_generation = "advanced", leak_rate = 0.70, spectral_radius = 0.8,
-                        random_seed=42, noise_level=0.0001, sparseness=.1, regression_parameters=[regression_parameter], solver = "lsqr")
+                        weight_generation = "advanced", leak_rate = leaking_rate, spectral_radius = spectral_radius,
+                        random_seed=random_seed, noise_level=noise_level, sparseness=sparseness, regression_parameters=[regression_parameter], solver = "lsqr")
 
     elif (predictionMode == "NN"):
         predicter = NN(k=k)
     elif (predictionMode == "RBF"):
-        predicter = RBF(sigma=5.0, basisQuota=0.05)
+        predicter = RBF(sigma=width, basisPoints=basisPoints)
     else:
         raise ValueError("No valid predictionMode choosen! (Value is now: {0})".format(predictionMode))
 
     return predicter
+
+def get_prediction(data):
+    y, x = data
+
+    predicter = prepare_predicter(y, x)
+    pred = None
+    if (y < patch_radius or y >= N-patch_radius or x < patch_radius or x >= N-patch_radius):
+        #frame
+        pred = fit_predict_frame_pixel(y, x, predicter)
+    else:
+        #inner
+        pred = fit_predict_inner_pixel(y, x, predicter)
+    get_prediction.q.put((y, x, pred))
 
 def prepare_fit_data(y, x, pr, skip, def_param=(shared_input_data, shared_output_data)):
     if (predictionMode in ["NN", "RBF"]):
@@ -178,16 +201,7 @@ def prepare_fit_data(y, x, pr, skip, def_param=(shared_input_data, shared_output
 
     return training_data_in, test_data_in, training_data_out, test_data_out
 
-def fit_predict_pixel(y, x, running_index, predicter):
-    training_data_in, test_data_in, training_data_out, test_data_out = prepare_fit_data(y, x, patch_radius, sigma_skip)
-
-    predicter.fit(training_data_in, training_data_out)
-    pred = predicter.predict(test_data_in)
-    pred = pred.ravel()
-
-    return pred
-
-def fit_predict_frame_pixel(y, x, running_index, predicter):
+def fit_predict_frame_pixel(y, x, predicter, def_param=(shared_input_data, shared_output_data)):
     min_border_distance = np.min([y, x, N-1-y, N-1-x])
     training_data_in, test_data_in, training_data_out, test_data_out = prepare_fit_data(y, x, min_border_distance, 1)
 
@@ -197,25 +211,16 @@ def fit_predict_frame_pixel(y, x, running_index, predicter):
 
     return pred
 
-def get_prediction_init(q):
-    get_prediction.q = q
+def fit_predict_inner_pixel(y, x, predicter, def_param=(shared_input_data, shared_output_data)):
+    training_data_in, test_data_in, training_data_out, test_data_out = prepare_fit_data(y, x, patch_radius, sigma_skip)
 
-def get_prediction(data):
-    y, x, running_index = data
+    predicter.fit(training_data_in, training_data_out)
+    pred = predicter.predict(test_data_in)
+    pred = pred.ravel()
 
-    predicter = prepare_predicter(y, x)
-    pred = None
-    if (y >= patch_radius and y < N-patch_radius and x >= patch_radius and x < N-patch_radius):
-        #inner point
-        pred = fit_predict_pixel(y, x, running_index, predicter)
+    return pred
 
-    else:
-        #frame
-        pred = fit_predict_frame_pixel(y, x, running_index, predicter)
-
-    get_prediction.q.put((y, x, pred))
-
-def process_thread_results(q, numberOfResults):
+def process_thread_results(q, numberOfResults, def_param=(shared_prediction, shared_output_data)):
     global prediction
 
     bar = progressbar.ProgressBar(max_value=numberOfResults, redirect_stdout=True, poll_interval=0.0001)
@@ -232,9 +237,12 @@ def process_thread_results(q, numberOfResults):
         finishedResults += 1
         ind_y, ind_x, data = newData
 
-        prediction[:, ind_y, ind_x] = data
+        shared_prediction[:, ind_y, ind_x] = data
 
         bar.update(finishedResults)
+
+def get_prediction_init(q):
+    get_prediction.q = q
 
 def mainFunction():
     global shared_training_data, shared_test_data
@@ -242,18 +250,17 @@ def mainFunction():
     generate_data(ndata, 20000, 50, Ngrid=N)
 
     queue = Queue() # use manager.queue() ?
-    print("preparing threads...")
+    ###print("preparing threads...")
     pool = Pool(processes=16, initializer=get_prediction_init, initargs=[queue,])
 
     modifyDataProcessList = []
     jobs = []
-    index = 0
 
     for y in range(N):
         for x in range(N):
-            jobs.append((y, x, index))
+            jobs.append((y, x))
 
-    print("fitting...")
+    ###print("fitting...")
     processProcessResultsThread = Process(target=process_thread_results, args=(queue, len(jobs)) )
     processProcessResultsThread.start()
     results = pool.map(get_prediction, jobs)
@@ -261,20 +268,20 @@ def mainFunction():
 
     processProcessResultsThread.join()
 
-    print("finished fitting")
+    ###print("finished fitting")
 
-    prediction[prediction < 0.0] = 0.0
-    prediction[prediction > 1.0] = 1.0
+    shared_prediction[shared_prediction < 0.0] = 0.0
+    shared_prediction[shared_prediction > 1.0] = 1.0
 
-    diff = (shared_output_data[trainLength:]-prediction)
+    diff = (shared_output_data[trainLength:trainLength+testLength]-shared_prediction)
     mse = np.mean((diff)**2)
     print("test error: {0}".format(mse))
     print("inner test error: {0}".format(np.mean((diff[:, patch_radius:N-patch_radius, patch_radius:N-patch_radius])**2)))
 
-    viewData = [("Source", shared_input_data[trainLength:]), ("Orig", shared_output_data[trainLength:]), ("Pred", prediction), ("Diff", diff)]
+    viewData = [("Source", shared_input_data[trainLength:trainLength+testLength]), ("Orig", shared_output_data[trainLength:trainLength+testLength]), ("Pred", shared_prediction), ("Diff", diff)]
     #show_results(viewData)
 
-    model = "barkley" if direction in ["uv", "vu"] else "mitchell"
+    model = "barkley" if direction == "u" else "mitchell"
 
     if (predictionMode == "NN"):
         f = open("../../cache/{0}/viewdata/unblur_{1}/{2}_viewdata_{3}_{4}_{5}_{6}_{7}.dat".format(model, direction, predictionMode.lower(), trainLength, sigma, sigma_skip, ddim, k), "wb")
@@ -286,6 +293,7 @@ def mainFunction():
     f.close()
 
     print("done")
+
 
 if __name__== '__main__':
     mainFunction()
