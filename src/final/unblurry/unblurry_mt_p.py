@@ -90,7 +90,7 @@ def setup_constants():
         spectral_radius = {"v": [0.1,0.1,3.0,0.1,0.5,3.0], "u": [1.1,0.95,0.95,1.5,1.5,0.95]}[direction][id-1]
         regression_parameter = {"v": [5e-06, 5e-03, 5e-06, 5e-06, 5e-03, 5e-06], "u": [5e-06, 5e-06, 5e-06, 5e-06, 5e-04, 5e-04]}[direction][id-1]
         leaking_rate = {"v": [0.05,0.05,0.05,0.05,0.05,0.05], "u": [0.2,0.2,0.05,0.2,0.05,0.05]}[direction][id-1]
-        noise_level = {"v": [1e-5,1e-4,1e-5,1e-5,1e-4,1e-4], "u": [1e-5,1e-4,1e-5,1e-5,1e-4,1e-4]}
+        noise_level = {"v": [1e-5,1e-4,1e-5,1e-5,1e-4,1e-4], "u": [1e-5,1e-4,1e-5,1e-5,1e-4,1e-4]}[direction][id-1]
         sigma = [3, 5, 5, 7, 7, 7][id-1]
         sigma_skip = [1, 1, 2, 1, 2, 3][id-1]
 
