@@ -87,11 +87,12 @@ setup_arrays()
 def setup_constants():
     global k, ddim, sigma, sigma_skip, eff_sigma, patch_radius
     global trainLength, basisPoints, width, predictionMode
-    global n_units, spectral_radius, regression_parameter, leaking_rate, noise_level, random_seed
+    global n_units, spectral_radius, regression_parameter, leaking_rate, noise_level, random_seed, sparseness
 
     print("Using parameters:")
 
     if (predictionMode == "ESN"):
+        sparseness = {"vh": [.1,.1,.1,.1,.1,.1], "hv": [.1,.1,.1,.2,.2,.2] ,"uv": [.2,.2,.1,.1,.1,.2], "vu": [.1,.2,.1,.1,.1,.1,]}[direction][id-1]
         random_seed = {"vh": [40, 41, 40, 39, 39, 40], "hv": [42, 39, 41, 40, 40, 39] ,"uv": [40, 41, 40, 40, 40, 42], "vu": [40, 40, 40, 41, 40, 40]}[direction][id-1]
         n_units = {"vh": [50, 50, 50, 400, 200, 50], "hv": [400, 400, 400, 200, 200, 50] ,"uv": [400, 400, 400, 400, 400, 400], "vu": [400, 400, 400, 400, 400, 400]}[direction][id-1]
         spectral_radius = {"vh": [1.5, 1.5, 1.5, 3.0, 3.0, 3.0], "hv": [0.95, 1.1, 0.1, 1.1, 1.1, 0.95] ,"uv": [1.1, 0.8, 1.1, 1.5, 1.1, 0.5], "vu": [0.95, 3.0, 0.5, 3.0, 3.0, 0.1]}[direction][id-1]

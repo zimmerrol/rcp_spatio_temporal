@@ -79,17 +79,18 @@ setup_arrays()
 def setup_constants():
     global k, ddim, sigma, sigma_skip, eff_sigma, patch_radius
     global trainLength, basisPoints, width, predictionMode
-    global n_units, spectral_radius, regression_parameter, leaking_rate, noise_level, random_seed
+    global n_units, spectral_radius, regression_parameter, leaking_rate, noise_level, random_seed, sparseness
 
     print("Using parameters:")
 
     if (predictionMode == "ESN"):
+        sparseness = {"v": [.2,.2,.2,.1,.1,.2], "u": [.1,.1,.1,.1,.1,.1]}[direction][id-1]
         random_seed = {"v": [41,41,39,40,42,39], "u": [39,40,41,42,41,42]}[direction][id-1]
         n_units = {"v": [50,200,50,50,50,50], "u": [200,400,50,50,50,50]}[direction][id-1]
         spectral_radius = {"v": [0.1,0.1,3.0,0.1,0.5,3.0], "u": [1.1,0.95,0.95,1.5,1.5,0.95]}[direction][id-1]
         regression_parameter = {"v": [5e-06, 5e-03, 5e-06, 5e-06, 5e-03, 5e-06], "u": [5e-06, 5e-06, 5e-06, 5e-06, 5e-04, 5e-04]}[direction][id-1]
         leaking_rate = {"v": [0.05,0.05,0.05,0.05,0.05,0.05], "u": [0.2,0.2,0.05,0.2,0.05,0.05]}[direction][id-1]
-        noise_level = {"v": [1e-5,1e-4,1e-5,1e-5,1e-4,1e-4], "u": [1e-5,1e-4,1e-5,1e-5,1e4-,1e-4]}
+        noise_level = {"v": [1e-5,1e-4,1e-5,1e-5,1e-4,1e-4], "u": [1e-5,1e-4,1e-5,1e-5,1e-4,1e-4]}
         sigma = [3, 5, 5, 7, 7, 7][id-1]
         sigma_skip = [1, 1, 2, 1, 2, 3][id-1]
 
