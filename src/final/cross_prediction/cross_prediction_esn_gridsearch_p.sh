@@ -19,7 +19,7 @@ export PYTHONUNBUFFERED=1
 #$ -N cross_prediction_esn_gridsearch_uv
 
 # Path for the output files
-#$ -o /home/roland/q-rcp_bachelor_thesis/
+#$ -o /home/roland/q-out_cross_esn_gs/
 
 # Limit memory usage
 #$ -hard -l h_vmem=62G
