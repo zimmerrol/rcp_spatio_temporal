@@ -39,7 +39,7 @@ process.current_process()._config['tempdir'] =  '/dev/shm/' #'/data.bmp/roland/t
 tau = {"uv" : 32, "vu" : 32,  "vh" : 119, "hv" : 119}
 N = 150
 ndata = 30000
-trainLength = 28000
+trainLength = 15000#28000
 testLength = 2000
 
 def parse_arguments():
@@ -57,7 +57,7 @@ def parse_arguments():
     else:
         direction = args.direction[0]
 
-    if args.mode[0] not in ["ESN", "NN", "RBF"]:
+    if args.mode[0] not in ["ESN", "NN", "NN2","RBF"]:
         raise ValueError("No valid predictionMode choosen! (Value is now: {0})".format(args.mode[0]))
     else:
         predictionMode = args.mode[0]
@@ -85,18 +85,22 @@ def setup_arrays():
 setup_arrays()
 
 def setup_constants():
-    global k, ddim, sigma, sigma_skip, eff_sigma, patch_radius, n_units, regression_parameter
-    global trainLength, basisPoints
+    global k, ddim, sigma, sigma_skip, eff_sigma, patch_radius
+    global trainLength, basisPoints, width, predictionMode
+    global n_units, spectral_radius, regression_parameter, leaking_rate, noise_level
 
     print("Using parameters:")
 
     if (predictionMode == "ESN"):
-        n_units = [50,50,50,50,50,50,200,200,200,200,200,200,400,400,400,400,400,400,  50,50,50,50,50,50,200,200,200,200,200,200,400,400,400,400,400,400,  50,50,50,50,50,50,200,200,200,200,200,200,400,400,400,400,400,400,  50,50,50,50,50,50,200,200,200,200,200,200,400,400,400,400,400,400][id-1]
-        regression_parameter = [5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,  5e-3,5e-3,5e-3,5e-3,5e-3,5e-3,5e-3,5e-3,5e-3,5e-3,5e-3,5e-3,5e-3,5e-3,5e-3,5e-3,5e-3,5e-3,  5e-4,5e-4,5e-4,5e-4,5e-4,5e-4,5e-4,5e-4,5e-4,5e-4,5e-4,5e-4,5e-4,5e-4,5e-4,5e-4,5e-4,5e-4,  5e-5,5e-5,5e-5,5e-5,5e-5,5e-5,5e-5,5e-5,5e-5,5e-5,5e-5,5e-5,5e-5,5e-5,5e-5,5e-5,5e-5,5e-5][id-1]
-        sigma = [3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7][id-1]
-        sigma_skip = [1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3][id-1]
+        n_units = {"vh": [50, 50, 50, 400, 200, 50], "hv": [400, 400, 400, 200, 200, 50] ,"uv": [400, 400, 400, 400, 400, 400], "vu": [400, 400, 400, 400, 400, 400]}[direction][id-1]
+        spectral_radius = {"vh": [1.5, 1.5, 1.5, 3.0, 3.0, 3.0], "hv": [0.95, 1.1, 0.1, 1.1, 1.1, 0.95] ,"uv": [1.1, 0.8, 1.1, 1.5, 1.1, 0.5], "vu": [0.95, 3.0, 0.5, 3.0, 3.0, 0.1]}[direction][id-1]
+        regression_parameter = {"vh": [5e-02, 5e-03, 5e-04, 5e-02, 5e-02, 5e-02], "hv": [5e-06, 5e-03, 5e-04, 5e-03, 5e-02, 5e-02], "uv": [5e-06, 5e-06, 5e-06, 5e-06, 5e-06, 5e-06], "vu": [5e-06, 5e-06, 5e-06, 5e-06, 5e-06, 5e-06]}[direction][id-1]
+        leaking_rate = {"vh": [0.05,0.05,0.05,0.05,0.05,0.05], "hv": [0.5, 0.9, 0.95, 0.5, 0.9, 0.05], "uv": [0.9, 0.2, 0.2, 0.2, 0.2, 0.2], "vu": [0.05, 0.05, 0.05, 0.05, 0.5, 0.05]}[direction][id-1]
+        noise_level = {"vh": [1e-4,1e-4,1e-5,1e-4,1e-5,1e-5], "hv": [1e-4,1e-4,1e-4,1e-5,1e-5,1e-5], "uv": [1e-5,1e-4,1e-5,1e-5,1e-4,1e-4] , "vu": [1e-4,1e-4,1e-5,1e-4,1e-4,1e-5]}
+        sigma = [3, 5, 5, 7, 7, 7][id-1]
+        sigma_skip = [1, 1, 2, 1, 2, 3][id-1]
 
-        print("\t ndata \t = {0} \n\t sigma \t = {1}\n\t sigma_skip \t = {2}\n\t n_units \t = {3}\n\t regular. \t = {4}".format(ndata, sigma, sigma_skip, n_units, regression_parameter))
+        print("\t trainLength \t = {0} \n\t sigma \t = {1}\n\t sigma_skip \t = {2}\n\t n_units \t = {3}\n\t regular. \t = {4}".format(trainLength, sigma, sigma_skip, n_units, regression_parameter))
     elif (predictionMode == "NN"):
 
         ddim = [3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5,  3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5,  3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5,  3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5][id-1]
@@ -112,27 +116,43 @@ def setup_constants():
         trainLength = 1000*np.arange(2,29)[id-1]
         """
 
-        print("\t ndata \t = {0} \n\t sigma \t = {1}\n\t sigma_skip \t = {2}\n\t ddim \t = {3}\n\t k \t = {4}".format(ndata, sigma, sigma_skip, ddim, k))
-    elif (predictionMode == "RBF"):
-        trainLength = 28000
-
-        basisPoints = 400
-
-
-        ddim = [3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5,  3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5,  3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5,  3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5][id-1]
-        k = [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,  3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,  5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5][id-1]
-        sigma = [3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7][id-1]
-        sigma_skip = [1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3][id-1]
         print("\t trainLength \t = {0} \n\t sigma \t = {1}\n\t sigma_skip \t = {2}\n\t ddim \t = {3}\n\t k \t = {4}".format(trainLength, sigma, sigma_skip, ddim, k))
-        """
+    elif (predictionMode == "NN2"):
+        predictionMode = "NN"
 
+        sigma = 3
+        sigma_skip = 1
+        ddim = 3
+        k = 5
+
+        trainLength = 1000*np.arange(2,29)[id-1]
+
+        print("\t trainLength \t = {0} \n\t sigma \t = {1}\n\t sigma_skip \t = {2}\n\t ddim \t = {3}\n\t k \t = {4}".format(trainLength, sigma, sigma_skip, ddim, k))
+    elif (predictionMode == "RBF"):
+        basisPoints = 100#400
+
+
+        ddim = [3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5,  3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5,  3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5,  3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5,  3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5,  3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5][id-1]
+
+        width = [.5,.5,.5,.5,.5,.5,.5,.5,.5,.5,.5,.5,.5,.5,.5,.5,.5,.5,  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,  3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,  5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,  7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,   9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9][id-1]
+        sigma = [3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7][id-1]
+        sigma_skip = [1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3][id-1]
+
+        print("\t trainLength \t = {0} \n\t sigma \t = {1}\n\t sigma_skip \t = {2}\n\t ddim \t = {3}\n\t width \t = {4}\n\t basisPoints = {5}".format(trainLength, sigma, sigma_skip, ddim, width, basisPoints))
+
+
+
+        """
         sigma = 7
         sigma_skip = 1
         ddim = 5
         k = 2
+        width = 5.0
 
-        basisPoints = [50, 100, 150, 200, 250, 300, 350, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200][id-1]
+        basisPoints = [5,10,15,20,25,30,35,40,45][id-1] #[50, 100, 150, 200, 250, 300, 350, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200][id-1]
+        print("\t trainLength \t = {0} \n\t sigma \t = {1}\n\t sigma_skip \t = {2}\n\t ddim \t = {3}\n\t width \t = {4}\n\t basisPoints = {5}".format(trainLength, sigma, sigma_skip, ddim, width, basisPoints))
         """
+
     else:
         raise ValueError("No valid predictionMode choosen! (Value is now: {0})".format(predictionMode))
 
@@ -183,7 +203,7 @@ def prepare_predicter(y, x):
     elif (predictionMode == "NN"):
         predicter = NN(k=k)
     elif (predictionMode == "RBF"):
-        predicter = RBF(sigma=5.0, basisPoints=basisPoints)
+        predicter = RBF(sigma=width, basisPoints=basisPoints)
     else:
         raise ValueError("No valid predictionMode choosen! (Value is now: {0})".format(predictionMode))
 
@@ -307,10 +327,14 @@ def mainFunction():
 
     viewData = [("Orig", shared_output_data[trainLength:]), ("Pred", shared_prediction), ("Source", shared_input_data[trainLength:]), ("Diff", diff)]
 
-    if (predictionMode in ["NN", "RBF"]):
-        f = open("../cache/viewdata/{0}/{1}_viewdata_{2}_{3}_{4}_{5}_{6}.dat".format(direction, predictionMode.lower(), ndata, sigma, sigma_skip, ddim, k), "wb")
+    model = "barkley" if direction in ["uv", "vu"] else "mitchell"
+
+    if (predictionMode == "NN"):
+        f = open("../../cache/{0}/viewdata/{1}/{2}_viewdata_{3}_{4}_{5}_{6}_{7}.dat".format(model, direction, predictionMode.lower(), trainLength, sigma, sigma_skip, ddim, k), "wb")
+    elif (predictionMode == "RBF"):
+        f = open("../../cache/{0}/viewdata/{1}/{2}_viewdata_{3}_{4}_{5}_{6}_{7}_{8}.dat".format(model, direction, predictionMode.lower(), trainLength, sigma, sigma_skip, ddim, width, basisPoints), "wb")
     else:
-        f = open("../cache/viewdata/{0}/{1}_viewdata_{2}_{3}_{4}_{5}_{6}.dat".format(direction, predictionMode.lower(), ndata, sigma, sigma_skip, regression_parameter, n_units), "wb")
+        f = open("../../cache/{0}/viewdata/{1}/{2}_viewdata_{3}_{4}_{5}_{6}_{7}.dat".format(model, direction, predictionMode.lower(), trainLength, sigma, sigma_skip, regression_parameter, n_units), "wb")
     pickle.dump(viewData, f)
     f.close()
 
