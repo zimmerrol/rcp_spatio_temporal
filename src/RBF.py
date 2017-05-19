@@ -1,7 +1,7 @@
 import numpy as np
 
 class RBF(object):
-    def __init__(self, sigma=5.0, basisPoints):
+    def __init__(self, basisPoints, sigma=5.0):
         self._sigma = sigma
         self._basisPoints = basisPoints
 
@@ -25,6 +25,19 @@ class RBF(object):
 
 
         self._samplingPoints = x[createEqualSpacedIndices(m, len(x))]
+
+
+        self._samplingPoints = x[createEqualSpacedIndices(m, len(x))]
+
+        print(self._samplingPoints[i].shape)
+
+        distances = np.empty((len(self._samplingPoints)-1, len(self._samplingPoints)-1))
+        for i in range(len(self._samplingPoints)):
+            for j in range(i, len(self._samplingPoints)):
+                distances[i, j] = np.mean((self._samplingPoints[i]-self._samplingPoints[j])**2)
+                distances[j, i] = distances[i, j]
+
+
         self._sigmam = np.ones(m)*self._sigma
 
         #construct matrices
