@@ -49,7 +49,7 @@ def parse_arguments():
     else:
         direction = args.direction[0]
 
-    print("Prediction via {0}: {1}".format(predictionMode, direction))
+    print("Prediction via: {1}".format(direction))
 parse_arguments()
 
 def mainFunction():
