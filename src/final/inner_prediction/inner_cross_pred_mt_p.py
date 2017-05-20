@@ -90,10 +90,12 @@ def setup_constants():
 
         print("\t ndata \t = {0} \n\t sigma \t = {1}\n\t sigma_skip \t = {2}\n\t n_units \t = {3}\n\t regular. \t = {4}".format(ndata, innerSize, borderSize, n_units, regression_parameter))
     elif (predictionMode == "NN"):
-        ddim = [3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5,  3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5,  3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5,  3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5][id-1]
-        k = [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,  3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,  5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5][id-1]
-        innerSize = [3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7][id-1]
-        borderSize = [1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3][id-1]
+        ddim = [3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,  5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,][id-1]
+        k = [4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,  5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,  5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,  5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,][id-1]
+        innerSize = [4,4,4,  8,8,8,  16,16,16,  32,32,32,  64,64,64,  128,128,128,  146,146,146,  148,148][id-1]
+        borderSize = [1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,
+                      1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,
+                      1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,][id-1]
 
         print("\t ndata \t = {0} \n\t innerSize \t = {1}\n\t borderSize \t = {2}\n\t ddim \t = {3}\n\t k \t = {4}".format(ndata, innerSize, borderSize, ddim, k))
     elif (predictionMode == "RBF"):
@@ -110,7 +112,6 @@ def setup_constants():
     borderSize = 1
     center = N//2
     rightBorderAdd = 1 if innerSize != 2*halfInnerSize else 0
-
 setup_constants()
 
 def setup_arrays():
@@ -139,17 +140,19 @@ def generate_data(N, trans, sample_rate, Ngrid, def_param=(shared_input_data, sh
     data = None
 
     if (direction == "u"):
-        if (os.path.exists("../../cache/barkley/raw/{0}_{1}.dat.npy".format(N, Ngrid)) == False):
+        if (os.path.exists("../../cache/barkley/raw/{0}_{1}.uv.dat.npy".format(N, Ngrid)) == False):
             data = bh.generate_data(N, 20000, 5, Ngrid=Ngrid)
-            np.save("../../cache/barkley/raw/{0}_{1}.dat.npy".format(N, Ngrid), data)
+            np.save("../../cache/barkley/raw/{0}_{1}.uv.dat.npy".format(N, Ngrid), data)
         else:
-            data = np.load("../../cache/barkley/raw/{0}_{1}.dat.npy".format(N, Ngrid))
+            data = np.load("../../cache/barkley/raw/{0}_{1}.uv.dat.npy".format(N, Ngrid))
     else:
-        if (os.path.exists("../../cache/mitchell/raw/{0}_{1}.dat.npy".format(N, Ngrid)) == False):
+        if (os.path.exists("../../cache/mitchell/raw/{0}_{1}.vh.dat.npy".format(N, Ngrid)) == False):
             data = mh.generate_data(N, 20000, 50, Ngrid=Ngrid)
-            np.save("../../cache/mitchell/raw/{0}_{1}.dat.npy".format(N, Ngrid), data)
+            np.save("../../cache/mitchell/raw/{0}_{1}.vh.dat.npy".format(N, Ngrid), data)
         else:
-            data = np.load("../../cache/mitchell/raw/{0}_{1}.dat.npy".format(N, Ngrid))
+            data = np.load("../../cache/mitchell/raw/{0}_{1}.vh.dat.npy".format(N, Ngrid))
+
+    data = data[0,:]
 
     input_y, input_x, output_y, output_x = create_patch_indices(
                                                 (center - (halfInnerSize+borderSize), center + (halfInnerSize+borderSize) + rightBorderAdd),
@@ -197,7 +200,7 @@ def get_prediction_init(q):
     get_prediction.q = q
 
 def get_prediction(data):
-    input_y, input_x, y, x = data
+    y, x = data
 
     predicter = prepare_predicter(y, x)
     pred = fit_predict_pixel(y, x, predicter)
@@ -241,7 +244,7 @@ def mainFunction():
                                         )
     jobs = []
     for i in range(len(output_y)):
-        jobs.append((input_y, input_x, output_y[i], output_x[i]))
+        jobs.append((output_y[i], output_x[i]))
 
     print("fitting...")
     processProcessResultsThread = Process(target=process_thread_results, args=(queue, len(jobs)) )

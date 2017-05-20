@@ -16,20 +16,20 @@ export PYTHONUNBUFFERED=1
 #$ -j yes
 
 # Standard name of the job (if none is given on the command line):
-#$ -N uv_nn_utov
+#$ -N inner_cross_pred_nn_u
 
 # Path for the output files
-#$ -o /home/roland/q-out/
+#$ -o /home/roland/q-out_inner_cross/
 
 # Limit memory usage
 #$ -hard -l h_vmem=62G
 
 # array range
-#$ -t 1-72
+#$ -t 1-138
 
 # parallel
 #$ -pe mvapich2-grannus04 16
 
 #$ -q mvapich2-grannus04.q
 
-python inner_cross_pred_mt_p.py NN uv
+python inner_cross_pred_mt_p.py NN u
