@@ -143,6 +143,19 @@ def setup_constants():
         print("\t trainLength \t = {0} \n\t sigma \t = {1}\n\t sigma_skip \t = {2}\n\t ddim \t = {3}\n\t width \t = {4}\n\t basisPoints = {5}".format(trainLength, sigma, sigma_skip, ddim, width, basisPoints))
 
 
+    elif (predictionMode == "RBF2"):
+        predictionMode = "RBF"
+
+        sigma = 3
+        sigma_skip = 1
+        ddim = 3
+
+        width = np.repeat([.5, 1.0, 3.0, 5.0, 7.0, 9.0], 25)[id-1]
+        basisPoints = np.repeat([5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 100, 150, 200, 250, 300, 350, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200], 6)[id-1]
+
+        print("\t trainLength \t = {0} \n\t sigma \t = {1}\n\t sigma_skip \t = {2}\n\t ddim \t = {3}\n\t width \t = {4}\n\t basisPoints = {5}".format(trainLength, sigma, sigma_skip, ddim, width, basisPoints))
+
+
 
         """
         sigma = 7

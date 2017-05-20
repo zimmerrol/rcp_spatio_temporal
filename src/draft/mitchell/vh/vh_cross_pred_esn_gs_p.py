@@ -13,7 +13,7 @@ print("NHOSTS: %s, NSLOTS: %s" % (os.getenv("NHOSTS"), os.getenv("NSLOTS")))
 import sys
 print(sys.version)
 
-#id=1
+id=1
 
 # -*- coding: utf-8 -*-
 
@@ -23,8 +23,10 @@ import os,sys,inspect
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)
 grandparentdir = os.path.dirname(parentdir)
+grandgrandparentdir = os.path.dirname(grandparentdir)
 sys.path.insert(0, parentdir)
 sys.path.insert(0, grandparentdir)
+sys.path.insert(0, grandgrandparentdir)
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -40,6 +42,7 @@ import ctypes
 from GridSearchP import GridSearchP
 
 from helper import *
+from helper_mitchellschaeffer import *
 
 N = 150
 ndata = 10000
@@ -49,17 +52,18 @@ eff_sigma = int(np.ceil(sigma/sigma_skip))
 patch_radius = sigma // 2
 n_units = 450
 
+
 def mainFunction():
     global output_weights, frame_output_weights, last_states
 
-    if (os.path.exists("../cache/raw/{0}_{1}.vh.dat.npy".format(ndata, N)) == False):
+    if (os.path.exists("../../../cache/mitchell/raw/{0}_{1}.vh.dat.npy".format(ndata, N)) == False):
         print("generating data...")
         data = generate_vh_data(ndata, 20000, 50, Ngrid=N) #20000 was 50000 ndata
-        np.save("../cache/raw/{0}_{1}.vh.dat.npy".format(ndata, N), data)
+        np.save("../../../cache/mitchell/raw/{0}_{1}.vh.dat.npy".format(ndata, N), data)
         print("generating finished")
     else:
         print("loading data...")
-        data = np.load("../cache/raw/{0}_{1}.vh.dat.npy".format(ndata, N))
+        data = np.load("../../../cache/mitchell/raw/{0}_{1}.vh.dat.npy".format(ndata, N))
 
         """
         #switch the entries for the u->v prediction
