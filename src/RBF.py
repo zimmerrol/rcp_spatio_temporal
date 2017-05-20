@@ -29,6 +29,7 @@ class RBF(object):
 
         self._samplingPoints = x[createEqualSpacedIndices(m, len(x))]
 
+        """
         print(self._samplingPoints[i].shape)
 
         distances = np.empty((len(self._samplingPoints)-1, len(self._samplingPoints)-1))
@@ -36,7 +37,7 @@ class RBF(object):
             for j in range(i, len(self._samplingPoints)):
                 distances[i, j] = np.mean((self._samplingPoints[i]-self._samplingPoints[j])**2)
                 distances[j, i] = distances[i, j]
-
+        """
 
         self._sigmam = np.ones(m)*self._sigma
 
