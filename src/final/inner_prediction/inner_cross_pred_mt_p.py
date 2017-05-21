@@ -116,7 +116,7 @@ def setup_constants():
         borderSize = [1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,
                       1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,
                       1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,][id-1]
-    print("\t ndata \t = {0} \n\t innerSize \t = {1}\n\t borderSize \t = {2}\n\t ddim \t = {3}\n\t k \t = {4}".format(ndata, innerSize, borderSize, ddim, k))
+        print("\t ndata \t = {0} \n\t innerSize \t = {1}\n\t borderSize \t = {2}\n\t ddim \t = {3}\n\t k \t = {4}".format(ndata, innerSize, borderSize, ddim, k))
 
     else:
         raise ValueError("No valid predictionMode choosen! (Value is now: {0})".format(predictionMode))
@@ -276,7 +276,19 @@ def mainFunction():
     mse = np.mean((diff[:, output_y, output_x])**2)
     print("test error: {0}".format(mse))
 
-    show_results([("Orig", shared_data[trainLength:trainLength+testLength]), ("Pred", prediction), ("Diff", diff)])
+    model = "barkley" if direction == "u" else "mitchell"
+    viewData = [("Orig", shared_data[trainLength:trainLength+testLength]), ("Pred", prediction), ("Diff", diff)]
+
+    if (predictionMode == "NN"):
+        f = open("../../cache/{0}/viewdata/{1}/{2}_viewdata_{3}_{4}_{5}_{6}_{7}.dat".format(model, "inner_cross_pred", predictionMode.lower(), trainLength, innerSize, borderSize, ddim, k), "wb")
+    elif (predictionMode == "RBF"):
+        f = open("../../cache/{0}/viewdata/{1}/{2}_viewdata_{3}_{4}_{5}_{6}_{7}_{8}.dat".format(model, "inner_cross_pred", predictionMode.lower(), trainLength, innerSize, borderSize, ddim, width, basisPoints), "wb")
+    else:
+        f = open("../../cache/{0}/viewdata/{1}/{2}_viewdata_{3}_{4}_{5}_{6}_{7}.dat".format(model, "inner_cross_pred", predictionMode.lower(), trainLength, innerSize, borderSize, regression_parameter, n_units), "wb")
+    pickle.dump(viewData, f)
+    f.close()
+
+    #show_results(viewData)
 
 if __name__== '__main__':
     mainFunction()
