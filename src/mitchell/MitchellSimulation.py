@@ -35,6 +35,30 @@ class MitchellSimulation:
         self._h = np.repeat(tmp, np.ones(len(self._h), dtype=int)*n, axis=1)
         self._h = gaussian_filter(self._h, sigma=3)
 
+    def initialize_one_spiral(self):
+        self._v = np.zeros((self.Nx, self.Ny))
+        self._h = np.zeros((self.Nx, self.Ny))
+
+        #for one spiral
+        for i in range(self.Nx):
+            for j in range(self.Ny):
+                if (i >= self.Nx//2):
+                    self._v[i, j] = 1.0
+                if (j >= self.Ny//2):
+                    self._h[i, j] = 1.0/2.0
+
+    def initialize_two_spirals(self):
+        self._v = np.zeros((self.Nx, self.Ny))
+        self._h = np.zeros((self.Nx, self.Ny))
+
+        #for two spirals
+        for i in range(self.Nx):
+            for j in range(self.Ny):
+                if (i >= self.Nx//3 and i <= self.Nx//3*2):
+                    self._v[i, j] = 1.0
+                if (j >= self.Ny//2):
+                    self._h[i, j] = 1.0/2.0
+
     def _set_boundaries(self, oldFields):
         if (self._boundary_mode == "noflux"):
             for (field, oldField) in zip((self._v, self._h), oldFields):

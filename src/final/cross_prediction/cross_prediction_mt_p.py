@@ -57,7 +57,7 @@ def parse_arguments():
     else:
         direction = args.direction[0]
 
-    if args.mode[0] not in ["ESN", "NN", "NN2","RBF"]:
+    if args.mode[0] not in ["ESN", "NN", "NN2","RBF", "RBF2"]:
         raise ValueError("No valid predictionMode choosen! (Value is now: {0})".format(args.mode[0]))
     else:
         predictionMode = args.mode[0]
