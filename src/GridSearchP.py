@@ -17,7 +17,7 @@ class GridSearchP:
     def _get_score(data):
         params, fixed_params, trainingInput, trainingOutput, testingDataSequence, esnType = data
 
-        
+
         output_postprocessor = lambda x:x
 
         try:
@@ -34,11 +34,13 @@ class GridSearchP:
 
             test_mse = np.mean(test_mse)
         except:
-            print("Unexpected error:", sys.exc_info()[0])        
-        
+            print("Unexpected error:", sys.exc_info()[0])
+            import traceback
+            print(traceback.format_exc())
+
         dat = (test_mse, training_acc, params)
         GridSearchP._get_score.q.put(dat)
-        
+
         return dat
 
     def _get_score_init(q):
@@ -47,14 +49,14 @@ class GridSearchP:
     def processThreadResults(threadname, q, numberOfWorkers, numberOfResults, verbose):
         if (verbose == 0):
             return
-            
+
         if (verbose == 1):
             bar = progressbar.ProgressBar(max_value=numberOfResults, redirect_stdout=True)
             bar.update(0)
         finishedResults = 0
-        
+
         print_step = numberOfResults//200
-        
+
         print(print_step)
 
         while True:
@@ -70,7 +72,7 @@ class GridSearchP:
                 if (finishedResults % print_step == 0):
                     print("{0}/{1}".format(finishedResults, numberOfResults))
                     sys.stdout.flush()
-                        
+
         if (verbose == 1):
             bar.finish()
 
@@ -94,7 +96,7 @@ class GridSearchP:
         pool.close()
 
         processProcessResultsThread.join()
-        
+
         print(results)
 
         res = min(results, key=operator.itemgetter(0))
