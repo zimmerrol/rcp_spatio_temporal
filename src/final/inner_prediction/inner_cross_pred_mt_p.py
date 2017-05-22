@@ -1,3 +1,5 @@
+# This Python file uses the following encoding: utf-8
+
 import os,sys,inspect
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)
@@ -85,22 +87,23 @@ def setup_constants():
         innerSize = [3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7][id-1]
         borderSize = [1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3][id-1]
 
-        print("\t ndata \t = {0} \n\t sigma \t = {1}\n\t sigma_skip \t = {2}\n\t n_units \t = {3}\n\t regular. \t = {4}".format(ndata, innerSize, borderSize, n_units, regression_parameter))
+        print("\t trainLength \t = {0} \n\t sigma \t = {1}\n\t sigma_skip \t = {2}\n\t n_units \t = {3}\n\t regular. \t = {4}".format(trainLength, innerSize, borderSize, n_units, regression_parameter))
     elif (predictionMode == "NN"):
-        ddim = [3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,
-                4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
-                5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,][id-1]
-        k = [4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,  5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,
-             4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,  5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,
-             4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,  5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,][id-1]
-        innerSize = [4,4,4, 8,8,8, 16,16,16, 32,32,32, 64,64,64, 128,128,128, 146,146,146, 148,148,  4,4,4, 8,8,8, 16,16,16, 32,32,32, 64,64,64, 128,128,128, 146,146,146, 148,148,
-                     4,4,4, 8,8,8, 16,16,16, 32,32,32, 64,64,64, 128,128,128, 146,146,146, 148,148,  4,4,4, 8,8,8, 16,16,16, 32,32,32, 64,64,64, 128,128,128, 146,146,146, 148,148,
-                     4,4,4, 8,8,8, 16,16,16, 32,32,32, 64,64,64, 128,128,128, 146,146,146, 148,148,  4,4,4, 8,8,8, 16,16,16, 32,32,32, 64,64,64, 128,128,128, 146,146,146, 148,148,][id-1]
-        borderSize = [1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,
-                      1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,
-                      1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,][id-1]
+        #3*30 elements
+        ddim = [3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,
+                4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+                5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,][id-1]
+        k = [4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,  5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,
+             4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,  5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,
+             4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,  5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,][id-1]
+        innerSize = [4,4,4, 8,8,8, 16,16,16, 32,32,32, 64,64,64,  4,4,4, 8,8,8, 16,16,16, 32,32,32, 64,64,64,
+                     4,4,4, 8,8,8, 16,16,16, 32,32,32, 64,64,64,  4,4,4, 8,8,8, 16,16,16, 32,32,32, 64,64,64,
+                     4,4,4, 8,8,8, 16,16,16, 32,32,32, 64,64,64,  4,4,4, 8,8,8, 16,16,16, 32,32,32, 64,64,64,][id-1]
+        borderSize = [1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,
+                      1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,
+                      1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  ][id-1]
 
-        print("\t ndata \t = {0} \n\t innerSize \t = {1}\n\t borderSize \t = {2}\n\t ddim \t = {3}\n\t k \t = {4}".format(ndata, innerSize, borderSize, ddim, k))
+        print("\t trainLength \t = {0} \n\t innerSize \t = {1}\n\t borderSize \t = {2}\n\t ddim \t = {3}\n\t k \t = {4}".format(trainLength, innerSize, borderSize, ddim, k))
     elif (predictionMode == "RBF"):
         basisPoints = 100
 
@@ -116,7 +119,7 @@ def setup_constants():
         borderSize = [1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,
                       1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,
                       1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,][id-1]
-        print("\t ndata \t = {0} \n\t innerSize \t = {1}\n\t borderSize \t = {2}\n\t ddim \t = {3}\n\t k \t = {4}".format(ndata, innerSize, borderSize, ddim, k))
+        print("\t trainLength \t = {0} \n\t innerSize \t = {1}\n\t borderSize \t = {2}\n\t ddim \t = {3}\n\t k \t = {4}".format(trainLength, innerSize, borderSize, ddim, k))
 
     else:
         raise ValueError("No valid predictionMode choosen! (Value is now: {0})".format(predictionMode))
@@ -280,11 +283,11 @@ def mainFunction():
     viewData = [("Orig", shared_data[trainLength:trainLength+testLength]), ("Pred", prediction), ("Diff", diff)]
 
     if (predictionMode == "NN"):
-        f = open("../../cache/{0}/viewdata/{1}/{2}_viewdata_{3}_{4}_{5}_{6}_{7}.dat".format(model, "inner_cross_pred", predictionMode.lower(), trainLength, innerSize, borderSize, ddim, k), "wb")
+        f = open("../../cache/{0}/viewdata/inner_cross_pred/{1}/{2}_viewdata_{3}_{4}_{5}_{6}_{7}.dat".format(model, direction, predictionMode.lower(), trainLength, innerSize, borderSize, ddim, k), "wb")
     elif (predictionMode == "RBF"):
-        f = open("../../cache/{0}/viewdata/{1}/{2}_viewdata_{3}_{4}_{5}_{6}_{7}_{8}.dat".format(model, "inner_cross_pred", predictionMode.lower(), trainLength, innerSize, borderSize, ddim, width, basisPoints), "wb")
+        f = open("../../cache/{0}/viewdata/inner_cross_pred/{1}/{2}_viewdata_{3}_{4}_{5}_{6}_{7}_{8}.dat".format(model, direction, predictionMode.lower(), trainLength, innerSize, borderSize, ddim, width, basisPoints), "wb")
     else:
-        f = open("../../cache/{0}/viewdata/{1}/{2}_viewdata_{3}_{4}_{5}_{6}_{7}.dat".format(model, "inner_cross_pred", predictionMode.lower(), trainLength, innerSize, borderSize, regression_parameter, n_units), "wb")
+        f = open("../../cache/{0}/viewdata/inner_cross_pred/{1}/{2}_viewdata_{3}_{4}_{5}_{6}_{7}.dat".format(model, direction, predictionMode.lower(), trainLength, innerSize, borderSize, regression_parameter, n_units), "wb")
     pickle.dump(viewData, f)
     f.close()
 
