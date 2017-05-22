@@ -31,9 +31,9 @@ import argparse
 from GridSearchP import GridSearchP
 
 N = 150
-ndata = 10000
+ndata =30000
 testLength = 2000
-trainLength = 8000
+trainLength = 15000
 
 def parse_arguments():
     global id, predictionMode, direction
