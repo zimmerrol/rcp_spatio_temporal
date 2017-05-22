@@ -61,6 +61,7 @@ parse_arguments()
 def setup_constants():
     global k, ddim, sigma, sigma_skip, eff_sigma, patch_radius, n_units, regression_parameter
     global innerSize, halfInnerSize, borderSize, center, rightBorderAdd
+    global n_units, seed, regression_parameter, spectral_radius, leak_rate, sparseness, noise_level
 
     #there is a difference between odd and even numbers for the innerSize
     #odd size  => there is a center point and the left and the right area without this center are even spaced
@@ -82,10 +83,15 @@ def setup_constants():
     print("Using parameters:")
 
     if (predictionMode == "ESN"):
-        n_units = [50,50,50,50,50,50,200,200,200,200,200,200,400,400,400,400,400,400,  50,50,50,50,50,50,200,200,200,200,200,200,400,400,400,400,400,400,  50,50,50,50,50,50,200,200,200,200,200,200,400,400,400,400,400,400,  50,50,50,50,50,50,200,200,200,200,200,200,400,400,400,400,400,400][id-1]
-        regression_parameter = [5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,  5e-3,5e-3,5e-3,5e-3,5e-3,5e-3,5e-3,5e-3,5e-3,5e-3,5e-3,5e-3,5e-3,5e-3,5e-3,5e-3,5e-3,5e-3,  5e-4,5e-4,5e-4,5e-4,5e-4,5e-4,5e-4,5e-4,5e-4,5e-4,5e-4,5e-4,5e-4,5e-4,5e-4,5e-4,5e-4,5e-4,  5e-5,5e-5,5e-5,5e-5,5e-5,5e-5,5e-5,5e-5,5e-5,5e-5,5e-5,5e-5,5e-5,5e-5,5e-5,5e-5,5e-5,5e-5][id-1]
-        innerSize = [3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7][id-1]
-        borderSize = [1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3][id-1]
+        n_units = {"u": [400,400,50,50,50,200,400,400,50,50,50,200,400,400,50,50,50,200,50,50,50]}[direction][id-1]
+        seed = {"u": [40,39,42,41,41,39,40,39,42,41,41,39,40,39,42,41,41,39,40,40,42]}[direction][id-1]
+        regression_parameter = {"u": [5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-6]}[direction][id-1]
+        spectral_radius = {"u": [0.1,3,3,0.1,3,1.5,0.1,3,3,0.1,3,1.5,0.1,3,3,0.1,0.5,1.5,0.1,0.1,0.8]}[direction][id-1]
+        leak_rate = {"u": [.95,.9,.9,.05,.5,.95,.95,.9,.9,.05,.5,.95,.95,.9,.9,.05,.5,.95,.2,.2,.05]}[direction][id-1]
+        sparseness = {"u": 2,2,2,1,2,2,2,2,2,1,2,2,2,2,2,1,2,2,1,1,1}[direction][id-1]/10
+        noise_level = {"u": [1e-4,1e-5,1e-4,1e-5,1e-5,1e-5,1e-4,1e-5,1e-4,1e-5,1e-5,1e-5,1e-4,1e-5,1e-4,1e-5,1e-5,1e-5,1e-5,1e-5,1e-5,]}[direction][id-1]
+        innerSize = [4,8,16,32,64,128, 4,8,16,32,64,128, 4,8,16,32,64,128, 146,146,148][id-1]
+        borderSize = [1,1,1,1,1,1, 2,2,2,2,2,2, 3,3,3,3,3,3, 1,2,1][id-1]
 
         print("\t trainLength \t = {0} \n\t sigma \t = {1}\n\t sigma_skip \t = {2}\n\t n_units \t = {3}\n\t regular. \t = {4}".format(trainLength, innerSize, borderSize, n_units, regression_parameter))
     elif (predictionMode == "NN"):
@@ -189,8 +195,8 @@ def generate_data(N, trans, sample_rate, Ngrid, def_param=(shared_input_data, sh
 def prepare_predicter(y, x):
     if (predictionMode == "ESN"):
         predicter = ESN(n_input = shared_input_data.shape[1], n_output = 1, n_reservoir = n_units,
-                    weight_generation = "advanced", leak_rate = 0.20, spectral_radius = 0.1,
-                    random_seed=42, noise_level=0.0001, sparseness=.1, regression_parameters=[regression_parameter], solver = "lsqr")
+                    weight_generation = "advanced", leak_rate = leak_rate, spectral_radius = spectral_radius,
+                    random_seed=seed, noise_level=noise_level, sparseness=sparseness, regression_parameters=[regression_parameter], solver = "lsqr")
     elif (predictionMode == "NN"):
         predicter = NN(k=k)
     elif (predictionMode == "RBF"):

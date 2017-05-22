@@ -16,7 +16,7 @@ export PYTHONUNBUFFERED=1
 #$ -j yes
 
 # Standard name of the job (if none is given on the command line):
-#$ -N inner_cross_pred_nn_v
+#$ -N inner_cross_pred_esn_u
 
 # Path for the output files
 #$ -o /home/roland/q-out_inner_cross/
@@ -25,11 +25,11 @@ export PYTHONUNBUFFERED=1
 #$ -hard -l h_vmem=62G
 
 # array range
-#$ -t 1-138
+#$ -t 1-21
 
 # parallel
-#$ -pe mvapich2-grannus06 16
+#$ -pe mvapich2-grannus05 16
 
-#$ -q mvapich2-grannus06.q
+#$ -q mvapich2-grannus05.q
 
-python inner_cross_pred_mt_p.py NN v
+python inner_cross_pred_mt_p.py ESN u
