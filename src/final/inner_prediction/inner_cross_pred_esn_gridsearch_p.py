@@ -121,7 +121,7 @@ def mainFunction():
     sys.stdout.flush()
     results = gs.fit(inputData[:trainLength], outputData[:trainLength],
                 [(inputData[trainLength:trainLength+testLength], outputData[trainLength:trainLength+testLength])],
-                printfreq=100, verbose=2, n_jobs=1)
+                printfreq=100, verbose=2, n_jobs=16)
     print("results:\r\n")
     print(results)
     print("")
