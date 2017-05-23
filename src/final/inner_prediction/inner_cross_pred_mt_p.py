@@ -59,6 +59,7 @@ def parse_arguments():
 parse_arguments()
 
 def setup_constants():
+    global id
     global k, ddim, sigma, sigma_skip, eff_sigma, patch_radius, n_units, regression_parameter
     global innerSize, halfInnerSize, borderSize, center, rightBorderAdd
     global n_units, seed, regression_parameter, spectral_radius, leak_rate, sparseness, noise_level
@@ -112,12 +113,10 @@ def setup_constants():
         print("\t trainLength \t = {0} \n\t innerSize \t = {1}\n\t borderSize \t = {2}\n\t ddim \t = {3}\n\t k \t = {4}".format(trainLength, innerSize, borderSize, ddim, k))
     elif (predictionMode == "RBF"):
         basisPoints = 100
-        global id
 
-        superId = 0
-        while (id > 90):
-            superId += 1
-            id -= 90
+
+        superId = id // 90
+        id = id % 90
 
         ddim = [3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,
                 4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
