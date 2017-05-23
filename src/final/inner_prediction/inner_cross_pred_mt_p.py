@@ -112,6 +112,7 @@ def setup_constants():
         print("\t trainLength \t = {0} \n\t innerSize \t = {1}\n\t borderSize \t = {2}\n\t ddim \t = {3}\n\t k \t = {4}".format(trainLength, innerSize, borderSize, ddim, k))
     elif (predictionMode == "RBF"):
         basisPoints = 100
+        global id
 
         superId = 0
         while (id > 90):
