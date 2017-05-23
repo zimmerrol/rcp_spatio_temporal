@@ -114,9 +114,10 @@ def setup_constants():
     elif (predictionMode == "RBF"):
         basisPoints = 100
 
-
-        superId = id // 90
-        id = id % 90
+        superId = 0
+        while (id > 90):
+            id -= 90
+            superId += 1
 
         ddim = [3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,
                 4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
