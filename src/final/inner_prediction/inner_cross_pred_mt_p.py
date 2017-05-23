@@ -134,6 +134,30 @@ def setup_constants():
                       1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  ][id-1]
         print("\t trainLength \t = {0} \n\t innerSize \t = {1}\n\t borderSize \t = {2}\n\t ddim \t = {3}\n\t width \t = {4}".format(trainLength, innerSize, borderSize, ddim, width))
 
+    elif (predictionMode == "RBF2"):
+        basisPoints = 100
+
+        #id: 1-108
+
+        superId = 0
+        while (id > 36):
+            id -= 12
+            superId += 1
+
+        ddim = [3,3,3,3,3,3,3,3,3,3,3,3,
+                4,4,4,4,4,4,4,4,4,4,4,4,
+                5,5,5,5,5,5,5,5,5,5,5,5,][id-1]
+        width = [[0.5, 1.0], [3.0, 5.0], [7.0, 9.0]][superId][[0,0,0,0,0,0,  1,1,1,1,1,1,
+                 0,0,0,0,0,0,  1,1,1,1,1,1,
+                 0,0,0,0,0,0,  1,1,1,1,1,1,][id-1]]
+        innerSize = [128,128,128,  146,146, 148,  128,128,128,  146,146, 148,
+                     128,128,128,  146,146, 148,  128,128,128,  146,146, 148,
+                     128,128,128,  146,146, 148,  128,128,128,  146,146, 148,][id-1]
+        borderSize = [1,2,3,  1,2,  1,  1,2,3,  1,2,  1,
+                      1,2,3,  1,2,  1,  1,2,3,  1,2,  1,
+                      1,2,3,  1,2,  1,  1,2,3,  1,2,  1,][id-1]
+        print("\t trainLength \t = {0} \n\t innerSize \t = {1}\n\t borderSize \t = {2}\n\t ddim \t = {3}\n\t width \t = {4}".format(trainLength, innerSize, borderSize, ddim, width))
+
     else:
         raise ValueError("No valid predictionMode choosen! (Value is now: {0})".format(predictionMode))
 
