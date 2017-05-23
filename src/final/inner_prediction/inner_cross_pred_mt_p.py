@@ -50,7 +50,7 @@ def parse_arguments():
     else:
         direction = args.direction[0]
 
-    if args.mode[0] not in ["ESN", "NN", "RBF"]:
+    if args.mode[0] not in ["ESN", "NN", "RBF", "RBF2"]:
         raise ValueError("No valid predictionMode choosen! (Value is now: {0})".format(args.mode[0]))
     else:
         predictionMode = args.mode[0]
@@ -63,7 +63,7 @@ def setup_constants():
     global k, ddim, sigma, sigma_skip, eff_sigma, patch_radius, n_units, regression_parameter
     global innerSize, halfInnerSize, borderSize, center, rightBorderAdd
     global n_units, seed, regression_parameter, spectral_radius, leak_rate, sparseness, noise_level
-    global width, basisPoints
+    global width, basisPoints, predictionMode
 
     #there is a difference between odd and even numbers for the innerSize
     #odd size  => there is a center point and the left and the right area without this center are even spaced
@@ -136,6 +136,8 @@ def setup_constants():
 
     elif (predictionMode == "RBF2"):
         basisPoints = 100
+
+        predictionMode = "RBF"
 
         #id: 1-108
 
