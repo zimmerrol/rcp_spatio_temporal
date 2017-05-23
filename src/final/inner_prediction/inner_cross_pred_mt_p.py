@@ -206,7 +206,7 @@ def prepare_predicter(y, x):
     elif (predictionMode == "NN"):
         predicter = NN(k=k)
     elif (predictionMode == "RBF"):
-        predicter = RBF(sigma=5.0, basisQuota=0.05)
+        predicter = RBF(sigma=width, basisPoints=basisPoints)
     else:
         raise ValueError("No valid predictionMode choosen! (Value is now: {0})".format(predictionMode))
 
