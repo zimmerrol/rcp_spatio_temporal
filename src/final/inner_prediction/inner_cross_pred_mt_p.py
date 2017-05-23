@@ -63,6 +63,7 @@ def setup_constants():
     global k, ddim, sigma, sigma_skip, eff_sigma, patch_radius, n_units, regression_parameter
     global innerSize, halfInnerSize, borderSize, center, rightBorderAdd
     global n_units, seed, regression_parameter, spectral_radius, leak_rate, sparseness, noise_level
+    global width, basisPoints
 
     #there is a difference between odd and even numbers for the innerSize
     #odd size  => there is a center point and the left and the right area without this center are even spaced
