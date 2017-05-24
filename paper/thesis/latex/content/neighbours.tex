@@ -10,8 +10,23 @@ zugeordnet werden. Diese Definition erfüllt $\sum_i w_i = 1$ und ordnen zudem f
 F(\vec{x}) = \vec{y} = \sum^k_i \vec{y}_i \left( \sum_j \frac{||\vec{x}_i-\vec{x}||}{||\vec{x}_j-\vec{x}||} \right) ^{-1}.
 \end{align}
 
-Der Schlüssel in der Bewältigung einer solchen Aufgabe liegt hauptsächlich in der Art und Weise, wie die $k$ nächsten Nachbarn gesucht werden. Hierbei werden im Folgenden die beiden Algorithmen \textsc{k-d-tree} und \textsc{ball-tree} ebenso betrachtet wie ein naiver Ansatz. Bei diesem naiven Ansatz (\textit{brute force}) werden die nächsten Nachbarn aus dem unsortierten Trainingsdatensatz durch pures Ausprobieren aller Möglichen Punkte ermittelt.
+Der Schlüssel in der Bewältigung einer solchen Aufgabe liegt hauptsächlich in der Art und Weise, wie die $k$ nächsten Nachbarn gesucht werden. Hierbei wird im Folgenden der Algorithmus \textsc{k-d-tree} ebenso betrachtet wie ein naiver Ansatz. Bei diesem naiven Ansatz (\textit{brute force}) werden die nächsten Nachbarn aus dem unsortierten Trainingsdatensatz durch pures Ausprobieren aller möglichen Punkte ermittelt.
 
 \subsection{k-d-tree}
+Ein \textsc{k-d-tree} ist eine Spezialform eines Binärbaumes, und eine oftmals genutzte Methode um Suchvorgänge in Datenstrukturen durchzuführen. Das zugrundeliegende Prinzip eines solchen Baumen ist, dass wenn der Punkt $P_1$ weit entfernt von $P_2$ liegt, aber $P_3$ nahe an $P_2$ liegt, so folgt daraus, dass $P_1$ und $P_3$ weit voneinander entfernt liegen müssen. Durch eine solche Argumentation muss bei einem solchem Suchvorgang die Distanz zweier Punkte seltener berechnet werden, wodurch Rechenzeit eingespart werden kann.\\
+ 
+Der Suchvorgang besteht aus zwei Phasen. Zuerst wird die Aufbauphase des Baumes durchgeführt, bei der die Trainingsdaten einsortiert und damit ein Suchindex erzeugt wird. Anschließend folgt die Suchphase, bei der der zuvor erstellte Suchindex nach dem nächsten Nachbarn durchsucht wird.\\
 
-\subsection{ball-tree}
+In der Aufbauphase wird zuerst eine Dimensionen ausgewählt und der Median der Daten in dieser Dimension bestimmt. Anschließend werden die Datenpunkte anhand dieses Wertes in eine Menge unterteilt die nur größere oder nur kleinere Elemente bezogen auf jene Dimension beinhaltet. Die beiden Mengen bilden die ersten Äste des Baumes. Nun wird dieser Schritt rekursiv auf alle Äste angewendet, und die hierbei zum Vergleich genutzte Dimension iteriert \cite{de2000computational}. Dieses Verfahren wird so lange wiederholt, bis eine bestimmte maximale Anzahl $N_{max}$ an Knotenpunkten pro Ast erreicht wird. Ab dieser unteren Grenze wird das Erstellen des Binärbaumes beendet. Ab dieser Grenze benötigt der Zugriff auf die verschiedenen Elemente und das Aufteilen in neue Äste mehr Zeit, als das Berechnen der Abstände zwischen den verbleibenden $N_{max}$ Knoten und dem Suchpunkt. Eine beispielhafte Darstellung des Verfahrens ist in Abbildung \ref{fig:kdtree} zu finden.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width = 0.9 \textwidth]{figures/illustrations/kdtree.pdf}
+    \caption{Exemplarische Darstellung eines \textsc{k-d-trees} für $d=2$ Dimensionen. In der linkten Hälfte ist die graphische Interpretation der Aufteilung und in der rechten der Aufbau des entstehenden Baumes zu finden \cite{de2000computational}.}
+    \label{fig:kdtree}
+\end{figure}
+
+Die Suchphase wird nun wieder rekursiv durchgeführt. Hierbei werden wieder iterierend die verschiedenen Dimensionen verglichen, und sich somit immer weiter im Suchbaum nach unten ein Weg gebahnt \cite{de2000computational}. In der untersten Ebene, also wenn nur noch eine Suche zwischen maximal $N_{max}$ Elemente durchgeführt werden muss, wird nun die \textit{brute force}-Suche genutzt. In dieser Arbeit ist für alle Anwendungen diese Schwelle auf $N_{max} = 40$ gesetzt worden.\\
+
+Diese Methode zeichnet sich durch eine Laufzeit, welche sich wie $\mathcal{O}(\log(N))$ verhält, aus \cite{bentley1975multidimensional}. Dies ist geringer, als die Laufzeit eines naiven Suchvorgangs, welche sich wie $N$ verhält. Es hat sich allerdings gezeigt, dass wenn $d$ hinreichend groß ist, diese Vorteile geringer werden, und ab einer gewissen Dimensionalität die Suche langsamer als ein naiver Suchvorgang abläuft.\\
+
