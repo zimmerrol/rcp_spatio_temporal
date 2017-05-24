@@ -41,11 +41,11 @@ if (direction == "u"):
     else:
         data = np.load("../../cache/barkley/raw/{0}_{1}.uv.dat.npy".format(ndata, N))
 else:
-    if (os.path.exists("../../cache/mitchell/raw/{0}_{1}.dat.vh.npy".format(ndata, N)) == False):
+    if (os.path.exists("../../cache/mitchell/raw/{0}_{1}.vh.dat.npy".format(ndata, N)) == False):
         data = mh.generate_data(ndata, 20000, 50, Ngrid=N)
-        np.save("../../cache/mitchell/raw/{0}_{1}.dat.vh.npy".format(ndata, N), data)
+        np.save("../../cache/mitchell/raw/{0}_{1}.vh.dat.npy".format(ndata, N), data)
     else:
-        data = np.load("../../cache/mitchell/raw/{0}_{1}.dat.vh.npy".format(ndata, N))
+        data = np.load("../../cache/mitchell/raw/{0}_{1}.vh.dat.npy".format(ndata, N))
 
 data = data[0]
 
