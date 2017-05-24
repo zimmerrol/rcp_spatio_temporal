@@ -79,7 +79,7 @@ def default_errors(innerSize, borderSize, data):
     msemean = np.mean((test_data_out-mean)**2)
 
     #use the mean of the border values of the test data
-    meanborder = np.repeat(np.mean(train_data_out, axis=1), innerSize*innerSize).reshape((len(test_data_out), innerSize, innerSize))
+    meanborder = np.repeat(np.mean(test_data_in, axis=1), innerSize*innerSize).reshape((len(test_data_out), innerSize, innerSize))
     msemeanborder = np.mean((test_data_out-meanborder)**2)
 
     print("{0}\t{1}\t{2}\t{3}".format(innerSize, borderSize, msemean, msemeanborder))
