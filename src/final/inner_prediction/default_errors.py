@@ -47,7 +47,33 @@ else:
     else:
         data = np.load("../../cache/mitchell/raw/{0}_{1}.dat.vh.npy".format(ndata, N))
 
-def default_errors(innerSize, borderSize, train_data_in, train_data_out, test_data_in, test_data_out):
+def create_data(innerSize, borderSize, data):
+    halfInnerSize = int(np.floor(innerSize / 2))
+    borderSize = 1
+    center = N//2
+    rightBorderAdd = 1 if innerSize != 2*halfInnerSize else 0
+
+    input_y, input_x, output_y, output_x = create_patch_indices(
+                                                (center - (halfInnerSize+borderSize), center + (halfInnerSize+borderSize) + rightBorderAdd),
+                                                (center - (halfInnerSize+borderSize), center + (halfInnerSize+borderSize) + rightBorderAdd),
+                                                (center - (halfInnerSize), center + (halfInnerSize) + rightBorderAdd),
+                                                (center - (halfInnerSize), center + (halfInnerSize) + rightBorderAdd)
+                                            )
+
+    inputData = data[:, input_y, input_x]
+    outputData = data[:, output_y, output_x]
+
+    train_data_in = inputData[:trainLength]
+    test_data_in = inputData[trainLength:trainLength+testLength]
+
+    train_data_out = outputData[:trainLength]
+    test_data_out = outputData[trainLength:trainLength+testLength]
+
+    return train_data_in, train_data_out, test_data_in, test_data_out
+
+def default_errors(innerSize, borderSize, data):
+    train_data_in, train_data_out, test_data_in, test_data_out = create_data(innerSize, borderSize, data)
+
     #use the mean of the inner data of the train data
     mean = np.mean(train_data_out)
     msemean = np.mean((test_data_out-mean)**2)
@@ -65,4 +91,4 @@ settings = [(4,1), (8,1), (16,1), (32,1), (64,1), (128,1),
 
 print("inner size\t\tborder size\t\tmean train\t\tmean border")
 for innerSize, borderSize in settings:
-    default_errors(innerSize, borderSize, train_data_in, train_data_out, test_data_in, test_data_out)
+    default_errors(innerSize, borderSize, data)
