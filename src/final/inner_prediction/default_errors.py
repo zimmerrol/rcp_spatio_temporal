@@ -47,6 +47,8 @@ else:
     else:
         data = np.load("../../cache/mitchell/raw/{0}_{1}.dat.vh.npy".format(ndata, N))
 
+data = data[0]
+
 def create_data(innerSize, borderSize, data):
     halfInnerSize = int(np.floor(innerSize / 2))
     borderSize = 1
@@ -79,7 +81,7 @@ def default_errors(innerSize, borderSize, data):
     msemean = np.mean((test_data_out-mean)**2)
 
     #use the mean of the border values of the test data
-    meanborder = np.repeat(np.mean(test_data_in, axis=1), innerSize*innerSize).reshape((len(test_data_out), innerSize, innerSize))
+    meanborder = np.repeat(np.mean(test_data_in, axis=1), innerSize*innerSize).reshape((testLength, innerSize, innerSize))
     msemeanborder = np.mean((test_data_out-meanborder)**2)
 
     print("{0}\t{1}\t{2}\t{3}".format(innerSize, borderSize, msemean, msemeanborder))
