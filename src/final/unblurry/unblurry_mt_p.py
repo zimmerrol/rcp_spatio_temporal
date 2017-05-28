@@ -86,7 +86,7 @@ def setup_constants():
     if (predictionMode == "ESN"):
         sparseness = {"v": [.2,.2,.2,.1,.1,.2], "u": [.1,.1,.1,.1,.1,.1]}[direction][id-1]
         random_seed = {"v": [41,41,39,40,42,39], "u": [39,40,41,42,41,42]}[direction][id-1]
-        n_units = {"v": [50,200,50,50,50,50], "u": [200,400,400,50,50,50]}[direction][id-1]
+        n_units = {"v": [50,200,50,50,50,50], "u": [200,400,50,50,50,50]}[direction][id-1]
         spectral_radius = {"v": [0.1,0.1,3.0,0.1,0.5,3.0], "u": [1.1,0.95,0.95,1.5,1.5,0.95]}[direction][id-1]
         regression_parameter = {"v": [5e-06, 5e-03, 5e-06, 5e-06, 5e-03, 5e-06], "u": [5e-06, 5e-06, 5e-06, 5e-06, 5e-04, 5e-04]}[direction][id-1]
         leaking_rate = {"v": [0.05,0.05,0.05,0.05,0.05,0.05], "u": [0.2,0.2,0.05,0.2,0.05,0.05]}[direction][id-1]
