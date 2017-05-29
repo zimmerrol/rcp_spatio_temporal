@@ -94,9 +94,9 @@ def setup_constants():
     elif (predictionMode == "RBFP"):
         cpmtp.predictionMode = "RBF"
 
-        cpmtp.sigma = {"vh": 3, "hv": 5, "uv": 3}[direction]
-        cpmtp.sigma_skip = {"vh": 1, "hv": 2, "uv": 1}[direction]
-        cpmtp.ddim = {"vh": 3, "hv": 5, "uv": 3}[direction]
+        cpmtp.sigma = {"vh": 3, "hv": 5, "uv": 1, "vu": 5}[direction]
+        cpmtp.sigma_skip = {"vh": 1, "hv": 2, "uv": 1, "vu": 1}[direction]
+        cpmtp.ddim = {"vh": 3, "hv": 5, "uv": 3, "vu": 3}[direction]
 
         cpmtp.width = np.tile([.5, 1.0, 3.0, 5.0, 7.0, 9.0], 22)[id-1]
         cpmtp.basisPoints = np.repeat([5, 10, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 320, 340, 360, 380, 400], 6)[id-1]
