@@ -31,15 +31,15 @@ def setup_constants():
     print("Using parameters:")
 
     if (cpmtp.predictionMode == "ESN"):
-        cpmtp.sparseness = {"vh": [.1,.1,.1,.1,.1,.1], "hv": [.1,.1,.1,.2,.2,.2] ,"uv": [.2,.2,.1,.1,.1,.2], "vu": [.1,.2,.1,.1,.1,.1,]}[direction][id-1]
-        cpmtp.random_seed = {"vh": [40, 41, 40, 39, 39, 40], "hv": [42, 39, 41, 40, 40, 39] ,"uv": [40, 41, 40, 40, 40, 42], "vu": [40, 40, 40, 41, 40, 40]}[direction][id-1]
-        cpmtp.n_units = {"vh": [50, 50, 50, 400, 200, 50], "hv": [400, 400, 400, 200, 200, 50] ,"uv": [400, 400, 400, 400, 400, 400], "vu": [400, 400, 400, 400, 400, 400]}[direction][id-1]
-        cpmtp.spectral_radius = {"vh": [1.5, 1.5, 1.5, 3.0, 3.0, 3.0], "hv": [0.95, 1.1, 0.1, 1.1, 1.1, 0.95] ,"uv": [1.1, 0.8, 1.1, 1.5, 1.1, 0.5], "vu": [0.95, 3.0, 0.5, 3.0, 3.0, 0.1]}[direction][id-1]
-        cpmtp.regression_parameter = {"vh": [5e-02, 5e-03, 5e-04, 5e-02, 5e-02, 5e-02], "hv": [5e-06, 5e-03, 5e-04, 5e-03, 5e-02, 5e-02], "uv": [5e-06, 5e-06, 5e-06, 5e-06, 5e-06, 5e-06], "vu": [5e-06, 5e-06, 5e-06, 5e-06, 5e-06, 5e-06]}[direction][id-1]
-        cpmtp.leaking_rate = {"vh": [0.05,0.05,0.05,0.05,0.05,0.05], "hv": [0.5, 0.9, 0.95, 0.5, 0.9, 0.05], "uv": [0.9, 0.2, 0.2, 0.2, 0.2, 0.2], "vu": [0.05, 0.05, 0.05, 0.05, 0.5, 0.05]}[direction][id-1]
-        cpmtp.noise_level = {"vh": [1e-4,1e-4,1e-5,1e-4,1e-5,1e-5], "hv": [1e-4,1e-4,1e-4,1e-5,1e-5,1e-5], "uv": [1e-5,1e-4,1e-5,1e-5,1e-4,1e-4] , "vu": [1e-4,1e-4,1e-5,1e-4,1e-4,1e-5]}[direction][id-1]
-        cpmtp.sigma = [3, 5, 5, 7, 7, 7][id-1]
-        cpmtp.sigma_skip = [1, 1, 2, 1, 2, 3][id-1]
+        cpmtp.sparseness = {"vh": [.1,.1,.1,.1,.1,.1,.1], "hv": [.1, .1,.1,.1,.2,.2,.2] ,"uv": [.1,.2,.2,.1,.1,.1,.2], "vu": [.1,.1,.2,.1,.1,.1,.1,]}[direction][id-1]
+        cpmtp.random_seed = {"vh": [40,40, 41, 40, 39, 39, 40], "hv": [41, 42, 39, 41, 40, 40, 39] ,"uv": [42,40, 41, 40, 40, 40, 42], "vu": [40,40, 40, 40, 41, 40, 40]}[direction][id-1]
+        cpmtp.n_units = {"vh": [50,50, 50, 50, 400, 200, 50], "hv": [50, 400, 400, 400, 200, 200, 50] ,"uv": [50,400, 400, 400, 400, 400, 400], "vu": [400,400, 400, 400, 400, 400, 400]}[direction][id-1]
+        cpmtp.spectral_radius = {"vh": [3,1.5, 1.5, 1.5, 3.0, 3.0, 3.0], "hv": [1.1, 0.95, 1.1, 0.1, 1.1, 1.1, 0.95] ,"uv": [1.1,1.1, 0.8, 1.1, 1.5, 1.1, 0.5], "vu": [0.1,0.95, 3.0, 0.5, 3.0, 3.0, 0.1]}[direction][id-1]
+        cpmtp.regression_parameter = {"vh": [5e-2,5e-02, 5e-03, 5e-04, 5e-02, 5e-02, 5e-02], "hv": [5e-6, 5e-06, 5e-03, 5e-04, 5e-03, 5e-02, 5e-02], "uv": [5e-6,5e-06, 5e-06, 5e-06, 5e-06, 5e-06, 5e-06], "vu": [5e-6,5e-06, 5e-06, 5e-06, 5e-06, 5e-06, 5e-06]}[direction][id-1]
+        cpmtp.leaking_rate = {"vh": [0.05,0.05,0.05,0.05,0.05,0.05,0.05], "hv": [0.95, 0.5, 0.9, 0.95, 0.5, 0.9, 0.05], "uv": [0.95,0.9, 0.2, 0.2, 0.2, 0.2, 0.2], "vu": [0.05,0.05, 0.05, 0.05, 0.05, 0.5, 0.05]}[direction][id-1]
+        cpmtp.noise_level = {"vh": [1e-5,1e-4,1e-4,1e-5,1e-4,1e-5,1e-5], "hv": [1e-5,1e-4,1e-4,1e-4,1e-5,1e-5,1e-5], "uv": [1e-5,1e-5,1e-4,1e-5,1e-5,1e-4,1e-4] , "vu": [1e-5,1e-4,1e-4,1e-5,1e-4,1e-4,1e-5]}[direction][id-1]
+        cpmtp.sigma = [1, 3, 5, 5, 7, 7, 7][id-1]
+        cpmtp.sigma_skip = [1, 1, 1, 2, 1, 2, 3][id-1]
 
         print("\t trainLength \t = {0} \n\t sigma \t = {1}\n\t sigma_skip \t = {2}\n\t n_units \t = {3}\n\t regular. \t = {4}".format(cpmtp.trainLength, cpmtp.sigma, cpmtp.sigma_skip, cpmtp.n_units, cpmtp.regression_parameter))
     elif (cpmtp.predictionMode == "NN"):
