@@ -50,8 +50,16 @@ def setup_constants():
         cpmtp.sigma_skip = [1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3][id-1]
 
         print("\t trainLength \t = {0} \n\t sigma \t = {1}\n\t sigma_skip \t = {2}\n\t ddim \t = {3}\n\t k \t = {4}".format(cpmtp.trainLength, cpmtp.sigma, cpmtp.sigma_skip, cpmtp.ddim, cpmtp.k))
+    elif (cpmtp.predictionMode == "NN3"):
+        cpmtp.predictionMode = "NN"
+        cpmtp.ddim = [3,4,5,  3,4,5,  3,4,5,  3,4,5,][id-1]
+        cpmtp.k = [2,2,2,  3,3,3,  4,4,4,  5,5,5,][id-1]
+        cpmtp.sigma = [1,1,1, 1,1,1, 1,1,1, 1,1,1][id-1]
+        cpmtp.sigma_skip = [1,1,1, 1,1,1, 1,1,1, 1,1,1][id-1]
+
+        print("\t trainLength \t = {0} \n\t sigma \t = {1}\n\t sigma_skip \t = {2}\n\t ddim \t = {3}\n\t k \t = {4}".format(cpmtp.trainLength, cpmtp.sigma, cpmtp.sigma_skip, cpmtp.ddim, cpmtp.k))
     elif (cpmtp.predictionMode == "NN2"):
-        predictionMode = "NN"
+        cpmtp.predictionMode = "NN"
 
         cpmtp.sigma = 3
         cpmtp.sigma_skip = 1
