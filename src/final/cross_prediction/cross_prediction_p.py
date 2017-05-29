@@ -16,7 +16,7 @@ def parse_arguments():
     else:
         cpmtp.direction = args.direction[0]
 
-    if args.mode[0] not in ["ESN", "NN", "NN2","RBF", "RBF2"]:
+    if args.mode[0] not in ["ESN", "ESN2", "NN", "NN2", "NN3", "RBF", "RBF2", "RBF3"]:
         raise ValueError("No valid predictionMode choosen! (Value is now: {0})".format(args.mode[0]))
     else:
         cpmtp.predictionMode = args.mode[0]
