@@ -36,6 +36,8 @@ ndata = 30000
 testLength = 2000
 trainLength = 15000
 
+useInputScaling = False
+
 def parse_arguments():
     global id, predictionMode, direction
 
@@ -51,7 +53,7 @@ def parse_arguments():
     else:
         direction = args.direction[0]
 
-    if args.mode[0] not in ["ESN", "NN", "RBF"]:
+    if args.mode[0] not in ["ESN", "NN", "NN2", "RBF2", "RBF"]:
         raise ValueError("No valid predictionMode choosen! (Value is now: {0})".format(args.mode[0]))
     else:
         predictionMode = args.mode[0]
@@ -100,6 +102,14 @@ def setup_constants():
         k = [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,  3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,  5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5][id-1]
         sigma = [3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7][id-1]
         sigma_skip = [1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3][id-1]
+
+        print("\t trainLength \t = {0} \n\t sigma \t = {1}\n\t sigma_skip \t = {2}\n\t ddim \t = {3}\n\t k \t = {4}".format(trainLength, sigma, sigma_skip, ddim, k))
+    elif (predictionMode == "NN2"):
+        predictionMode = "NN"
+        ddim = [3,4,5,  3,4,5,  3,4,5,  3,4,5,][id-1]
+        k = [2,2,2,  3,3,3,  4,4,4,  5,5,5,][id-1]
+        sigma = [1,1,1, 1,1,1, 1,1,1, 1,1,1][id-1]
+        sigma_skip = [1,1,1, 1,1,1, 1,1,1, 1,1,1][id-1]
 
         print("\t trainLength \t = {0} \n\t sigma \t = {1}\n\t sigma_skip \t = {2}\n\t ddim \t = {3}\n\t k \t = {4}".format(trainLength, sigma, sigma_skip, ddim, k))
     elif (predictionMode == "RBF"):
@@ -151,8 +161,10 @@ def prepare_predicter(y, x, training_data_in, training_data_out):
             #inner
             input_dimension = eff_sigma*eff_sigma
 
-        #approximate the input scaling using the MI
-        input_scaling = calculate_esn_mi_input_scaling(training_data_in, training_data_out[:,0])
+        input_scaling = None
+        if (useInputScaling):
+            #approximate the input scaling using the MI
+            input_scaling = calculate_esn_mi_input_scaling(training_data_in, training_data_out[:,0])
 
         predicter = ESN(n_input = input_dimension, n_output = 1, n_reservoir = n_units,
                 weight_generation = "advanced", leak_rate = leaking_rate, spectral_radius = spectral_radius,
