@@ -125,10 +125,10 @@ def get_prediction(data):
     pred = None
     if (y < patch_radius or y >= N-patch_radius or x < patch_radius or x >= N-patch_radius):
         #frame
-        pred = fit_predict_frame_pixel(y, x, predicter)
+        pred = fit_predict_frame_pixel(y, x)
     else:
         #inner
-        pred = fit_predict_inner_pixel(y, x, predicter)
+        pred = fit_predict_inner_pixel(y, x)
     get_prediction.q.put((y, x, pred))
 
 def prepare_fit_data(y, x, pr, skip, def_param=(shared_input_data, shared_output_data)):
