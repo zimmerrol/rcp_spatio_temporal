@@ -152,7 +152,7 @@ def prepare_predicter(y, x, training_data_in, training_data_out):
             input_dimension = eff_sigma*eff_sigma
 
         #approximate the input scaling using the MI
-        input_scaling = calculate_esn_mi_input_scaling(training_data_in, training_data_out)
+        input_scaling = calculate_esn_mi_input_scaling(training_data_in, training_data_out[:,0])
 
         predicter = ESN(n_input = input_dimension, n_output = 1, n_reservoir = n_units,
                 weight_generation = "advanced", leak_rate = leaking_rate, spectral_radius = spectral_radius,
