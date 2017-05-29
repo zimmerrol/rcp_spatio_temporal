@@ -25,7 +25,6 @@ from multiprocessing import process
 from helper import *
 import barkley_helper as bh
 import mitchell_helper as mh
-import argparse
 
 
 #get V animation data -> [N, 150, 150]
@@ -34,36 +33,17 @@ import argparse
 #create d*sigma*sigma-k tree from this data
 #search nearest neighbours (1 or 2) and predict new U value
 
-process.current_process()._config['tempdir'] =  '/dev/shm/' #'/data.bmp/roland/temp/'
+#set the temporary buffer for the multiprocessing module manually to the shm
+#to solve "no enough space"-problems
+process.current_process()._config['tempdir'] =  '/dev/shm/'
 
 tau = {"uv" : 32, "vu" : 32,  "vh" : 119, "hv" : 119}
 N = 150
 ndata = 30000
-trainLength = 15000#28000
+trainLength = 15000
 testLength = 2000
 
-def parse_arguments():
-    global id, predictionMode, direction
-
-    id = int(os.getenv("SGE_TASK_ID", 0))
-
-    parser = argparse.ArgumentParser(description='')
-    parser.add_argument('mode', nargs=1, type=str, help="Can be: NN, RBF, ESN")
-    parser.add_argument('direction', default="vu", nargs=1, type=str, help="vu: v -> u, uv: u -> v, hv: h -> v, vh: v -> h")
-    args = parser.parse_args()
-
-    if args.direction[0] not in ["vu", "uv", "hv", "vh"]:
-        raise ValueError("No valid direction choosen! (Value is now: {0})".format(args.direction[0]))
-    else:
-        direction = args.direction[0]
-
-    if args.mode[0] not in ["ESN", "NN", "NN2","RBF", "RBF2"]:
-        raise ValueError("No valid predictionMode choosen! (Value is now: {0})".format(args.mode[0]))
-    else:
-        predictionMode = args.mode[0]
-
-    print("Prediction via {0}: {1}".format(predictionMode, direction))
-parse_arguments()
+useInputScaling = False
 
 def setup_arrays():
     global shared_input_data_base, shared_output_data_base, shared_prediction_base
@@ -84,98 +64,7 @@ def setup_arrays():
     ###print("setting up finished")
 setup_arrays()
 
-def setup_constants():
-    global k, ddim, sigma, sigma_skip, eff_sigma, patch_radius
-    global trainLength, basisPoints, width, predictionMode
-    global n_units, spectral_radius, regression_parameter, leaking_rate, noise_level, random_seed, sparseness
-
-    print("Using parameters:")
-
-    if (predictionMode == "ESN"):
-        sparseness = {"vh": [.1,.1,.1,.1,.1,.1], "hv": [.1,.1,.1,.2,.2,.2] ,"uv": [.2,.2,.1,.1,.1,.2], "vu": [.1,.2,.1,.1,.1,.1,]}[direction][id-1]
-        random_seed = {"vh": [40, 41, 40, 39, 39, 40], "hv": [42, 39, 41, 40, 40, 39] ,"uv": [40, 41, 40, 40, 40, 42], "vu": [40, 40, 40, 41, 40, 40]}[direction][id-1]
-        n_units = {"vh": [50, 50, 50, 400, 200, 50], "hv": [400, 400, 400, 200, 200, 50] ,"uv": [400, 400, 400, 400, 400, 400], "vu": [400, 400, 400, 400, 400, 400]}[direction][id-1]
-        spectral_radius = {"vh": [1.5, 1.5, 1.5, 3.0, 3.0, 3.0], "hv": [0.95, 1.1, 0.1, 1.1, 1.1, 0.95] ,"uv": [1.1, 0.8, 1.1, 1.5, 1.1, 0.5], "vu": [0.95, 3.0, 0.5, 3.0, 3.0, 0.1]}[direction][id-1]
-        regression_parameter = {"vh": [5e-02, 5e-03, 5e-04, 5e-02, 5e-02, 5e-02], "hv": [5e-06, 5e-03, 5e-04, 5e-03, 5e-02, 5e-02], "uv": [5e-06, 5e-06, 5e-06, 5e-06, 5e-06, 5e-06], "vu": [5e-06, 5e-06, 5e-06, 5e-06, 5e-06, 5e-06]}[direction][id-1]
-        leaking_rate = {"vh": [0.05,0.05,0.05,0.05,0.05,0.05], "hv": [0.5, 0.9, 0.95, 0.5, 0.9, 0.05], "uv": [0.9, 0.2, 0.2, 0.2, 0.2, 0.2], "vu": [0.05, 0.05, 0.05, 0.05, 0.5, 0.05]}[direction][id-1]
-        noise_level = {"vh": [1e-4,1e-4,1e-5,1e-4,1e-5,1e-5], "hv": [1e-4,1e-4,1e-4,1e-5,1e-5,1e-5], "uv": [1e-5,1e-4,1e-5,1e-5,1e-4,1e-4] , "vu": [1e-4,1e-4,1e-5,1e-4,1e-4,1e-5]}[direction][id-1]
-        sigma = [3, 5, 5, 7, 7, 7][id-1]
-        sigma_skip = [1, 1, 2, 1, 2, 3][id-1]
-
-        print("\t trainLength \t = {0} \n\t sigma \t = {1}\n\t sigma_skip \t = {2}\n\t n_units \t = {3}\n\t regular. \t = {4}".format(trainLength, sigma, sigma_skip, n_units, regression_parameter))
-    elif (predictionMode == "NN"):
-
-        ddim = [3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5,  3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5,  3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5,  3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5][id-1]
-        k = [2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,  3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,  4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,  5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5][id-1]
-        sigma = [3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7][id-1]
-        sigma_skip = [1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3][id-1]
-        """
-        sigma = 7
-        sigma_skip = 1
-        ddim = 3
-        k = 5
-
-        trainLength = 1000*np.arange(2,29)[id-1]
-        """
-
-        print("\t trainLength \t = {0} \n\t sigma \t = {1}\n\t sigma_skip \t = {2}\n\t ddim \t = {3}\n\t k \t = {4}".format(trainLength, sigma, sigma_skip, ddim, k))
-    elif (predictionMode == "NN2"):
-        predictionMode = "NN"
-
-        sigma = 3
-        sigma_skip = 1
-        ddim = 3
-        k = 5
-
-        trainLength = 1000*np.arange(2,29)[id-1]
-
-        print("\t trainLength \t = {0} \n\t sigma \t = {1}\n\t sigma_skip \t = {2}\n\t ddim \t = {3}\n\t k \t = {4}".format(trainLength, sigma, sigma_skip, ddim, k))
-    elif (predictionMode == "RBF"):
-        basisPoints = 100#400
-
-
-        ddim = [3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5,  3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5,  3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5,  3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5,  3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5,  3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5][id-1]
-
-        width = [.5,.5,.5,.5,.5,.5,.5,.5,.5,.5,.5,.5,.5,.5,.5,.5,.5,.5,  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,  3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,  5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,  7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,   9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9][id-1]
-        sigma = [3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7][id-1]
-        sigma_skip = [1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3][id-1]
-
-        print("\t trainLength \t = {0} \n\t sigma \t = {1}\n\t sigma_skip \t = {2}\n\t ddim \t = {3}\n\t width \t = {4}\n\t basisPoints = {5}".format(trainLength, sigma, sigma_skip, ddim, width, basisPoints))
-
-
-    elif (predictionMode == "RBF2"):
-        predictionMode = "RBF"
-
-        sigma = {"vh": 3, "hv": 5, "uv": 3}[direction]
-        sigma_skip = {"vh": 1, "hv": 2, "uv": 1}[direction]
-        ddim = {"vh": 3, "hv": 5, "uv": 3}[direction]
-
-        width = np.tile([.5, 1.0, 3.0, 5.0, 7.0, 9.0], 22)[id-1]
-        basisPoints = np.repeat([5, 10, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 320, 340, 360, 380, 400], 6)[id-1]
-
-        print("\t trainLength \t = {0} \n\t sigma \t = {1}\n\t sigma_skip \t = {2}\n\t ddim \t = {3}\n\t width \t = {4}\n\t basisPoints = {5}".format(trainLength, sigma, sigma_skip, ddim, width, basisPoints))
-
-
-
-        """
-        sigma = 7
-        sigma_skip = 1
-        ddim = 5
-        k = 2
-        width = 5.0
-
-        basisPoints = [5,10,15,20,25,30,35,40,45][id-1] #[50, 100, 150, 200, 250, 300, 350, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200][id-1]
-        print("\t trainLength \t = {0} \n\t sigma \t = {1}\n\t sigma_skip \t = {2}\n\t ddim \t = {3}\n\t width \t = {4}\n\t basisPoints = {5}".format(trainLength, sigma, sigma_skip, ddim, width, basisPoints))
-        """
-
-    else:
-        raise ValueError("No valid predictionMode choosen! (Value is now: {0})".format(predictionMode))
-
-    eff_sigma = int(np.ceil(sigma/sigma_skip))
-    patch_radius = sigma//2
-setup_constants()
-
-def generate_data(N, trans, sample_rate, Ngrid):
+def generate_data(N, Ngrid):
     data = None
 
     if (direction in ["uv", "vu"]):
@@ -201,19 +90,25 @@ def generate_data(N, trans, sample_rate, Ngrid):
     shared_input_data[:] = data[0]
     shared_output_data[:] = data[1]
 
-def prepare_predicter(y, x):
+def prepare_predicter(y, x, training_data_in, training_data_out):
     if (predictionMode == "ESN"):
         if (y < patch_radius or y >= N-patch_radius or x < patch_radius or x >= N-patch_radius):
             #frame
             min_border_distance = np.min([y, x, N-1-y, N-1-x])
-            predicter = ESN(n_input = int((2*min_border_distance+1)**2), n_output = 1, n_reservoir = n_units,
-                    weight_generation = "advanced", leak_rate = leaking_rate, spectral_radius = spectral_radius,
-                    random_seed=random_seed, noise_level=noise_level, sparseness=sparseness, regression_parameters=[regression_parameter], solver = "lsqr")
+            input_dimension = int((2*min_border_distance+1)**2)
         else:
             #inner
-            predicter = ESN(n_input = eff_sigma*eff_sigma, n_output = 1, n_reservoir = n_units,
-                        weight_generation = "advanced", leak_rate = leaking_rate, spectral_radius = spectral_radius,
-                        random_seed=random_seed, noise_level=noise_level, sparseness=sparseness, regression_parameters=[regression_parameter], solver = "lsqr")
+            input_dimension = eff_sigma*eff_sigma
+
+        input_scaling = None
+        if (useInputScaling):
+            #approximate the input scaling using the MI
+            input_scaling = calculate_esn_mi_input_scaling(training_data_in, training_data_out[:,0])
+
+        predicter = ESN(n_input = input_dimension, n_output = 1, n_reservoir = n_units,
+                    weight_generation = "advanced", leak_rate = leaking_rate, spectral_radius = spectral_radius,
+                    random_seed=random_seed, noise_level=noise_level, sparseness=sparseness, , input_scaling = input_scaling,
+                    regression_parameters=[regression_parameter], solver = "lsqr")
 
     elif (predictionMode == "NN"):
         predicter = NN(k=k)
@@ -227,7 +122,6 @@ def prepare_predicter(y, x):
 def get_prediction(data):
     y, x = data
 
-    predicter = prepare_predicter(y, x)
     pred = None
     if (y < patch_radius or y >= N-patch_radius or x < patch_radius or x >= N-patch_radius):
         #frame
@@ -260,19 +154,21 @@ def prepare_fit_data(y, x, pr, skip, def_param=(shared_input_data, shared_output
 
     return training_data_in, test_data_in, training_data_out, test_data_out
 
-def fit_predict_frame_pixel(y, x, predicter, def_param=(shared_input_data, shared_output_data)):
+def fit_predict_frame_pixel(y, x, def_param=(shared_input_data, shared_output_data)):
     min_border_distance = np.min([y, x, N-1-y, N-1-x])
     training_data_in, test_data_in, training_data_out, test_data_out = prepare_fit_data(y, x, min_border_distance, 1)
 
+    predicter = prepare_predicter(y, x, training_data_in, training_data_out)
     predicter.fit(training_data_in, training_data_out)
     pred = predicter.predict(test_data_in)
     pred = pred.ravel()
 
     return pred
 
-def fit_predict_inner_pixel(y, x, predicter, def_param=(shared_input_data, shared_output_data)):
+def fit_predict_inner_pixel(y, x, def_param=(shared_input_data, shared_output_data)):
     training_data_in, test_data_in, training_data_out, test_data_out = prepare_fit_data(y, x, patch_radius, sigma_skip)
 
+    predicter = prepare_predicter(y, x, training_data_in, training_data_out)
     predicter.fit(training_data_in, training_data_out)
     pred = predicter.predict(test_data_in)
     pred = pred.ravel()
@@ -304,16 +200,14 @@ def get_prediction_init(q):
     get_prediction.q = q
 
 def mainFunction():
-    if (trainLength +testLength > ndata):
+    if (trainLength + testLength > ndata):
         print("Please adjust the trainig and testing phase length!")
         exit()
 
-    ###print("generating data...")
-    generate_data(ndata, 20000, 50, Ngrid=N)
-    ###print("generation finished")
+    generate_data(ndata, Ngrid=N)
 
     queue = Queue() # use manager.queue() ?
-    ###print("preparing threads...")
+
     pool = Pool(processes=16, initializer=get_prediction_init, initargs=[queue,])
 
     modifyDataProcessList = []
@@ -322,15 +216,12 @@ def mainFunction():
         for x in range(N):
                 jobs.append((y, x))
 
-    ###print("fitting...")
     processProcessResultsThread = Process(target=process_thread_results, args=(queue, len(jobs)))
     processProcessResultsThread.start()
     results = pool.map(get_prediction, jobs)
     pool.close()
 
     processProcessResultsThread.join()
-
-    ###print("finished fitting")
 
     shared_prediction[shared_prediction < 0.0] = 0.0
     shared_prediction[shared_prediction > 1.0] = 1.0
