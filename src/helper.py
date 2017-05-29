@@ -25,7 +25,7 @@ def calculate_mutualinformation(x, y, bins):
 
 def calculate_esn_mi_input_scaling(input_data, output_data):
     if (len(input_data) is not len(output_data)):
-        raise ValueError("input_data and output_data do not have the same length!")
+        raise ValueError("input_data and output_data do not have the same length -  {0} vs. {1}".format(input_data.shape, output_data.shape))
 
     #Scott's rule to calculate nbins
     std_output = np.std(output_data)
