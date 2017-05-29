@@ -91,7 +91,7 @@ def setup_constants():
         print("\t trainLength \t = {0} \n\t sigma \t = {1}\n\t sigma_skip \t = {2}\n\t ddim \t = {3}\n\t width \t = {4}\n\t basisPoints = {5}".format(cpmtp.trainLength, cpmtp.sigma, cpmtp.sigma_skip, cpmtp.ddim, cpmtp.width, cpmtp.basisPoints))
 
 
-    elif (predictionMode == "RBFP"):
+    elif (cpmtp.predictionMode == "RBFP"):
         cpmtp.predictionMode = "RBF"
 
         cpmtp.sigma = {"vh": 3, "hv": 5, "uv": 1, "vu": 5}[direction]
