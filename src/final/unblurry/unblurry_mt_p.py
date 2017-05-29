@@ -156,7 +156,7 @@ def prepare_predicter(y, x, training_data_in, training_data_out):
 
         predicter = ESN(n_input = input_dimension, n_output = 1, n_reservoir = n_units,
                 weight_generation = "advanced", leak_rate = leaking_rate, spectral_radius = spectral_radius,
-                random_seed=random_seed, noise_level=noise_level, sparseness=sparseness, input_scaling = input_scaling
+                random_seed=random_seed, noise_level=noise_level, sparseness=sparseness, input_scaling = input_scaling,
                 regression_parameters=[regression_parameter], solver = "lsqr")
 
     elif (predictionMode == "NN"):
