@@ -35,6 +35,8 @@ ndata = 30000
 testLength = 2000
 trainLength = 15000
 
+useInputScaling = False
+
 def parse_arguments():
     global id, predictionMode, direction
 
@@ -83,9 +85,9 @@ def mainFunction():
     test_data = data[:,trainLength:trainLength+testLength]
 
 
-    sigma, sigma_skip = [(3, 1), (5, 1), (5, 2), (7, 1), (7, 2), (7, 3)][id-1]
+    sigma, sigma_skip = [(1,1), (3, 1), (5, 1), (5, 2), (7, 1), (7, 2), (7, 3)][id-1]
     patch_radius = sigma//2
-    input_size = [9, 25, 9, 49, 16, 9][id-1]
+    input_size = [1, 9, 25, 9, 49, 16, 9][id-1]
 
     """
     #approximate the input scaling using the MI for a small square
@@ -105,10 +107,13 @@ def mainFunction():
     average_mi = average_mi / (10*10)
     """
 
-    input_scaling = calculate_esn_mi_input_scaling(
-                            training_data[1, :, N//2-patch_radius:N//2+patch_radius+1, N//2-patch_radius:N//2+patch_radius+1][:, ::sigma_skip, ::sigma_skip].reshape((trainLength, -1)),
-                            training_data[0, :, N//2, N//2]
-                            )
+    input_scaling = None
+    if (useInputScaling):
+        #approximate the input scaling using the MI
+        input_scaling = calculate_esn_mi_input_scaling(
+                                training_data[1, :, N//2-patch_radius:N//2+patch_radius+1, N//2-patch_radius:N//2+patch_radius+1][:, ::sigma_skip, ::sigma_skip].reshape((trainLength, -1)),
+                                training_data[0, :, N//2, N//2]
+                                )
 
     param_grid = {"n_reservoir": [50, 200, 400], "spectral_radius": [0.1, 0.5, 0.8, 0.95, 1.0, 1.1, 1.5, 3.0], "leak_rate": [.05, .2, .5 , .7, .9, .95],
                 "random_seed": [42,41,40,39],  "sparseness": [.1, .2], "noise_level": [0.0001, 0.00001], "regression_parameters": [[5e-2],[5e-3],[5e-4],[5e-5],[5e-6]]}
