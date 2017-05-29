@@ -121,6 +121,16 @@ def setup_constants():
         sigma_skip = [1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3][id-1]
         print("\t trainLength \t = {0} \n\t sigma \t = {1}\n\t sigma_skip \t = {2}\n\t ddim \t = {3}\n\t width \t = {4}".format(trainLength, sigma, sigma_skip, ddim, width))
 
+    elif (predictionMode == "RBF2"):
+        predictionMode = "RBF"
+        basisPoints = 100
+
+        ddim = [3,4,5,  3,4,5,  3,4,5,  3,4,5,  3,4,5,  3,4,5,][id-1]
+        width = [.5,.5,.5,  1,1,1,  3,3,3,  5,5,5,  7,7,7,   9,9,9,][id-1]
+        sigma = [1,1,1, 1,1,1, 1,1,1, 1,1,1, 1,1,1, 1,1,1,][id-1]
+        sigma_skip = [1,1,1, 1,1,1, 1,1,1, 1,1,1, 1,1,1, 1,1,1,][id-1]
+        print("\t trainLength \t = {0} \n\t sigma \t = {1}\n\t sigma_skip \t = {2}\n\t ddim \t = {3}\n\t width \t = {4}".format(trainLength, sigma, sigma_skip, ddim, width))
+
     else:
         raise ValueError("No valid predictionMode choosen! (Value is now: {0})".format(predictionMode))
 
