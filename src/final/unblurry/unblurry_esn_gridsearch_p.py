@@ -87,9 +87,32 @@ def mainFunction():
     patch_radius = sigma//2
     input_size = [9, 25, 9, 49, 16, 9][id-1]
 
+    """
+    #approximate the input scaling using the MI for a small square
+    average_mi = np.zeros(int(np.ceil(sigma/patch_radius)**2))
+    mi = np.zeros_like(average_mi)
+    for y in range(N//2-5, N//2+5):
+        for x in range(N//2-5, N//2+5):
+            #Scott's rule
+            std_output = np.std(training_data[0, :, y, x])
+            nbins = int(np.ceil(2.0/(3.5*std_output/np.power(trainLength, 1.0/3.0))))
+
+            patch_data = training_data[1, :, N//2-patch_radius:N//2+patch_radius+1, N//2-patch_radius:N//2+patch_radius+1][:, ::sigma_skip, ::sigma_skip].reshape((trainLength, -1))
+            for i in range(len(mi)):
+                 mi[i] = calculate_mutualinformation(patch_data[:, i], training_data[0, :, y, x], nbins)
+            mi = mi / np.max(mi)
+            average_mi += mi
+    average_mi = average_mi / (10*10)
+    """
+
+    input_scaling = calculate_esn_mi_input_scaling(
+                            training_data[1, :, N//2-patch_radius:N//2+patch_radius+1, N//2-patch_radius:N//2+patch_radius+1][:, ::sigma_skip, ::sigma_skip].reshape((trainLength, -1)),
+                            training_data[0, :, N//2, N//2]
+                            )
+
     param_grid = {"n_reservoir": [50, 200, 400], "spectral_radius": [0.1, 0.5, 0.8, 0.95, 1.0, 1.1, 1.5, 3.0], "leak_rate": [.05, .2, .5 , .7, .9, .95],
                 "random_seed": [42,41,40,39],  "sparseness": [.1, .2], "noise_level": [0.0001, 0.00001], "regression_parameters": [[5e-2],[5e-3],[5e-4],[5e-5],[5e-6]]}
-    fixed_params = {"n_output": 1, "n_input": input_size, "solver": "lsqr", "weight_generation": "advanced"}
+    fixed_params = {"n_output": 1, "n_input": input_size, "solver": "lsqr", "weight_generation": "advanced", "input_scaling" : input_scaling}
 
     gs = GridSearchP(param_grid, fixed_params, esnType=ESN)
 
