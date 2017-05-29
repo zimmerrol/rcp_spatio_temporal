@@ -118,12 +118,12 @@ def setup_constants():
     patch_radius = sigma//2
 setup_constants()
 
-def generate_data(N, trans, sample_rate, Ngrid):
+def generate_data(N, Ngrid):
     data = None
 
     if (direction == "u"):
         if (os.path.exists("../../cache/barkley/raw/{0}_{1}.uv.dat.npy".format(N, Ngrid)) == False):
-            data = bh.generate_uv_data(N, 50000, 5, Ngrid=Ngrid)
+            data = bh.generate_uv_data(N, 20000, 5, Ngrid=Ngrid)
             np.save("../../cache/barkley/raw/{0}_{1}.uv.dat.npy".format(N, Ngrid), data)
         else:
             data = np.load("../../cache/barkley/raw/{0}_{1}.uv.dat.npy".format(N, Ngrid))
@@ -136,26 +136,28 @@ def generate_data(N, trans, sample_rate, Ngrid):
 
     shared_output_data[:] = data[0, :]
 
-    #print("blurring...")
+    #blur the data
     for t in range(ndata):
         shared_input_data[t, :, :] = gaussian_filter(shared_output_data[t], sigma=9.0)
-    #show_results([("Blurred", shared_input_data[:trainLength]), ("Orig", shared_output_data[:trainLength])])
-    #print("blurring finished")
 
-def prepare_predicter(y, x):
+def prepare_predicter(y, x, training_data_in, training_data_out):
     if (predictionMode == "ESN"):
+
         if (y < patch_radius or y >= N-patch_radius or x < patch_radius or x >= N-patch_radius):
             #frame
             min_border_distance = np.min([y, x, N-1-y, N-1-x])
-
-            predicter = ESN(n_input = int((2*min_border_distance+1)**2), n_output = 1, n_reservoir = n_units,
-                    weight_generation = "advanced", leak_rate = leaking_rate, spectral_radius = spectral_radius,
-                    random_seed=random_seed, noise_level=noise_level, sparseness=sparseness, regression_parameters=[regression_parameter], solver = "lsqr")
+            input_dimension = int((2*min_border_distance+1)**2)
         else:
             #inner
-            predicter = ESN(n_input = eff_sigma*eff_sigma, n_output = 1, n_reservoir = n_units,
-                        weight_generation = "advanced", leak_rate = leaking_rate, spectral_radius = spectral_radius,
-                        random_seed=random_seed, noise_level=noise_level, sparseness=sparseness, regression_parameters=[regression_parameter], solver = "lsqr")
+            input_dimension = eff_sigma*eff_sigma
+
+        #approximate the input scaling using the MI
+        input_scaling = calculate_esn_mi_input_scaling(training_data_in, training_data_out)
+
+        predicter = ESN(n_input = input_dimension, n_output = 1, n_reservoir = n_units,
+                weight_generation = "advanced", leak_rate = leaking_rate, spectral_radius = spectral_radius,
+                random_seed=random_seed, noise_level=noise_level, sparseness=sparseness, input_scaling = input_scaling
+                regression_parameters=[regression_parameter], solver = "lsqr")
 
     elif (predictionMode == "NN"):
         predicter = NN(k=k)
@@ -169,14 +171,13 @@ def prepare_predicter(y, x):
 def get_prediction(data):
     y, x = data
 
-    predicter = prepare_predicter(y, x)
     pred = None
     if (y < patch_radius or y >= N-patch_radius or x < patch_radius or x >= N-patch_radius):
         #frame
-        pred = fit_predict_frame_pixel(y, x, predicter)
+        pred = fit_predict_frame_pixel(y, x)
     else:
         #inner
-        pred = fit_predict_inner_pixel(y, x, predicter)
+        pred = fit_predict_inner_pixel(y, x)
     get_prediction.q.put((y, x, pred))
 
 def prepare_fit_data(y, x, pr, skip, def_param=(shared_input_data, shared_output_data)):
@@ -202,19 +203,21 @@ def prepare_fit_data(y, x, pr, skip, def_param=(shared_input_data, shared_output
 
     return training_data_in, test_data_in, training_data_out, test_data_out
 
-def fit_predict_frame_pixel(y, x, predicter, def_param=(shared_input_data, shared_output_data)):
+def fit_predict_frame_pixel(y, x, def_param=(shared_input_data, shared_output_data)):
     min_border_distance = np.min([y, x, N-1-y, N-1-x])
     training_data_in, test_data_in, training_data_out, test_data_out = prepare_fit_data(y, x, min_border_distance, 1)
 
+    predicter = prepare_predicter(y, x, training_data_in, training_data_out)
     predicter.fit(training_data_in, training_data_out)
     pred = predicter.predict(test_data_in)
     pred = pred.ravel()
 
     return pred
 
-def fit_predict_inner_pixel(y, x, predicter, def_param=(shared_input_data, shared_output_data)):
+def fit_predict_inner_pixel(y, x, def_param=(shared_input_data, shared_output_data)):
     training_data_in, test_data_in, training_data_out, test_data_out = prepare_fit_data(y, x, patch_radius, sigma_skip)
 
+    predicter = prepare_predicter(y, x, training_data_in, training_data_out)
     predicter.fit(training_data_in, training_data_out)
     pred = predicter.predict(test_data_in)
     pred = pred.ravel()
@@ -248,7 +251,7 @@ def get_prediction_init(q):
 def mainFunction():
     global shared_training_data, shared_test_data
 
-    generate_data(ndata, 20000, 50, Ngrid=N)
+    generate_data(ndata, Ngrid=N)
 
     queue = Queue() # use manager.queue() ?
     ###print("preparing threads...")
