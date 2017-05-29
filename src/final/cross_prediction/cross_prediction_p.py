@@ -16,7 +16,7 @@ def parse_arguments():
     else:
         cpmtp.direction = args.direction[0]
 
-    if args.mode[0] not in ["ESN", "ESN2", "NN", "NN2", "NN3", "RBF", "RBF2", "RBF3"]:
+    if args.mode[0] not in ["ESN", "ESN2", "NN", "NNT", "NN3", "RBF", "RBFP", "RBF3"]:
         raise ValueError("No valid predictionMode choosen! (Value is now: {0})".format(args.mode[0]))
     else:
         cpmtp.predictionMode = args.mode[0]
@@ -58,7 +58,7 @@ def setup_constants():
         cpmtp.sigma_skip = [1,1,1, 1,1,1, 1,1,1, 1,1,1][id-1]
 
         print("\t trainLength \t = {0} \n\t sigma \t = {1}\n\t sigma_skip \t = {2}\n\t ddim \t = {3}\n\t k \t = {4}".format(cpmtp.trainLength, cpmtp.sigma, cpmtp.sigma_skip, cpmtp.ddim, cpmtp.k))
-    elif (cpmtp.predictionMode == "NN2"):
+    elif (cpmtp.predictionMode == "NNT"):
         cpmtp.predictionMode = "NN"
 
         cpmtp.sigma = 3
@@ -70,19 +70,28 @@ def setup_constants():
 
         print("\t trainLength \t = {0} \n\t sigma \t = {1}\n\t sigma_skip \t = {2}\n\t ddim \t = {3}\n\t k \t = {4}".format(cpmtp.trainLength, cpmtp.sigma, cpmtp.sigma_skip, cpmtp.ddim, cpmtp.k))
     elif (cpmtp.predictionMode == "RBF"):
-        cpmtp.basisPoints = 100#400
-
+        cpmtp.basisPoints = 100
 
         cpmtp.ddim = [3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5,  3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5,  3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5,  3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5,  3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5,  3,3,3,3,3,3,4,4,4,4,4,4,5,5,5,5,5,5][id-1]
-
         cpmtp.width = [.5,.5,.5,.5,.5,.5,.5,.5,.5,.5,.5,.5,.5,.5,.5,.5,.5,.5,  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,  3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,  5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,  7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,   9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9][id-1]
         cpmtp.sigma = [3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7,  3,5,7,5,7,7,3,5,7,5,7,7,3,5,7,5,7,7][id-1]
         cpmtp.sigma_skip = [1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3,  1,1,1,2,2,3,1,1,1,2,2,3,1,1,1,2,2,3][id-1]
 
         print("\t trainLength \t = {0} \n\t sigma \t = {1}\n\t sigma_skip \t = {2}\n\t ddim \t = {3}\n\t width \t = {4}\n\t basisPoints = {5}".format(cpmtp.trainLength, cpmtp.sigma, cpmtp.sigma_skip, cpmtp.ddim, cpmtp.width, cpmtp.basisPoints))
 
+    elif (cpmtp.predictionMode == "RBF3"):
+        cpmtp.predictionMode = "RBF"
+        cpmtp.basisPoints = 100
 
-    elif (predictionMode == "RBF2"):
+        cpmtp.ddim = [3,4,5,  3,4,5,  3,4,5,  3,4,5,  3,4,5,  3,4,5,][id-1]
+        cpmtp.width = [.5,.5,.5,  1,1,1,  3,3,3,  5,5,5,  7,7,7,   9,9,9,][id-1]
+        cpmtp.sigma = [1,1,1, 1,1,1, 1,1,1, 1,1,1, 1,1,1, 1,1,1,][id-1]
+        cpmtp.sigma_skip = [1,1,1, 1,1,1, 1,1,1, 1,1,1, 1,1,1, 1,1,1,][id-1]
+
+        print("\t trainLength \t = {0} \n\t sigma \t = {1}\n\t sigma_skip \t = {2}\n\t ddim \t = {3}\n\t width \t = {4}\n\t basisPoints = {5}".format(cpmtp.trainLength, cpmtp.sigma, cpmtp.sigma_skip, cpmtp.ddim, cpmtp.width, cpmtp.basisPoints))
+
+
+    elif (predictionMode == "RBFP"):
         cpmtp.predictionMode = "RBF"
 
         cpmtp.sigma = {"vh": 3, "hv": 5, "uv": 3}[direction]
