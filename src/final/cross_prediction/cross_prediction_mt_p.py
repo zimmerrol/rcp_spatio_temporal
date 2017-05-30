@@ -173,7 +173,7 @@ def fit_predict_inner_pixel(y, x, def_param=(shared_input_data, shared_output_da
     try:
         predicter.fit(training_data_in, training_data_out)
     except LinAlgError as err:
-        print("(y,x) = ({0},{1}) raised a SVD error")
+        print("(y,x) = ({0},{1}) raised a SVD error".format(y, x))
         raise err
     pred = predicter.predict(test_data_in)
     pred = pred.ravel()
