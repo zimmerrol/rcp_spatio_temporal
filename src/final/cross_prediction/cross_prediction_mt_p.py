@@ -165,11 +165,16 @@ def fit_predict_frame_pixel(y, x, def_param=(shared_input_data, shared_output_da
 
     return pred
 
+from numpy.linalg.linalg import LinAlgError
 def fit_predict_inner_pixel(y, x, def_param=(shared_input_data, shared_output_data)):
     training_data_in, test_data_in, training_data_out, test_data_out = prepare_fit_data(y, x, patch_radius, sigma_skip)
 
     predicter = prepare_predicter(y, x, training_data_in, training_data_out)
-    predicter.fit(training_data_in, training_data_out)
+    try:
+        predicter.fit(training_data_in, training_data_out)
+    except LinAlgError as err:
+        print("(y,x) = ({0},{1}) raised a SVD error")
+        raise err
     pred = predicter.predict(test_data_in)
     pred = pred.ravel()
 

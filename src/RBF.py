@@ -54,10 +54,17 @@ class RBF(object):
           A[i] = RBF.rbf_vec(x[i], self._samplingPoints, self._sigmam)
 
         #calculate the resulting weights L
-        APINV = np.linalg.pinv(A)
-        L = np.dot(APINV, y) #F
+        from numpy.linalg.linalg import LinAlgError
+        try:
+            APINV = np.linalg.pinv(A)
+            L = np.dot(APINV, y) #F
 
-        self._Lt = L.T
+            self._Lt = L.T
+        except LinAlgError as err:
+            print("SVD did NOT converge")
+            print("#of NaNs: " + str(np.count_nonzero(np.isnan(A))))
+            print("#of Infs: " + str(np.count_nonzero(np.isinf(A))))
+            raise err
 
     def predict(self, x):
         prediction = np.zeros((len(x), self._nprime))
