@@ -22,4 +22,8 @@ else:
 
 print("Showing results from '{0}'".format(args.file[0]))
 
+if (type(viewData) is dictionary):
+	diff = viewData["diff"]
+	print("MSE: {0}".format(np.mean(diff**2)))
+
 show_results(viewData, forced_clim=clim)
