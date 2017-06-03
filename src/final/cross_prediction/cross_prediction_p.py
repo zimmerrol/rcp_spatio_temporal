@@ -55,7 +55,7 @@ def setup_constants():
 
         cpmtp.sigma = {"vh":7, "uv": 1}[cpmtp.direction]
         cpmtp.sigma_skip = {"vh":1, "uv": 1}[cpmtp.direction]
-        cpmtp.ddim = {"vh":3, "uv": 2}[cpmtp.direction]
+        cpmtp.ddim = {"vh":3, "uv": 3}[cpmtp.direction]
         cpmtp.k = {"vh":5, "uv": 5}[cpmtp.direction]
 
         cpmtp.trainLength = 1000*np.arange(2,29)[id-1]
