@@ -1,1 +1,210 @@
 \section{Kreuz-Prädiktion}
+Momentan ist es durch invitro Experimente bereits möglich die Ausbreitung der elektrischen Erregung auf der Oberfläche des Herzmuskels experimentell aufzuzeichnen. Nun stellt sich die Frage, ob anhand beispielsweise der Messung der Membramspannung weitere Variablen des Systems wie die Kalium-Konzentration oder ähnliches ermittelt werden kann. Diese Fragestellung wird in der ersten Aufgabe betrachtet. Es wird die Vorhersage von der Spannungsvariable auf die zweite Variable des jeweiligen Modells sowohl für das \textit{Barkley}- als auch für das \textit{Mitchell-Schaeffer}-Modell durchgeführt. Dabei wird zuerst die Nächste Nachbar Methode, anschließend die radialen Basisfunktionen und schlussendlich die \textit{ESN}s verwendet. Es werden sowohl die einzelnen Ergebnisse präsentiert als auch ein abschließender Vergleich durchgeführt.
+ 
+\subsection{Nächste Nachbar Vorhersage}
+Die Ergebnisse für die optimalen Hyperparameter sind in Tabelle \ref{tab:exp_cross_nn_results} zu finden. Dabei sind sowohl die verwendeten Parameter als auch die erzielten Fehler MSE und NRMSE aufgelistet.
+\begin{table}[h]
+	\centering
+
+	\begin{tabular}{|c|c|c|}
+		\multicolumn{1}{c|}{} & Barkley & Mitchell-Schaeffer \\ 
+		\hline \hline 
+		\rule[-1ex]{0pt}{2.5ex} $\sigma$ & $1$ & $7$ \\ 
+		\hline 
+		\rule[-1ex]{0pt}{2.5ex} $\Delta \sigma$ & $1$ & $1$ \\ 
+		\hline 
+		\rule[-1ex]{0pt}{2.5ex} $\delta$ & $3$ & $3$ \\ 
+		\hline 
+		\rule[-1ex]{0pt}{2.5ex} k & $5$ & $5$ \\ 
+		\hline 
+		\rule[-1ex]{0pt}{2.5ex} Laufzeit [s] & $40$ & $5252$ \\ 
+		\hline 
+		\rule[-1ex]{0pt}{2.5ex} \textbf{MSE} & \textbf{0.00105} & \textbf{0.01353} \\ 
+		\hline 
+		\rule[-1ex]{0pt}{2.5ex} \textbf{NRMSE} & \textbf{0.1367} & \textbf{0.7438} \\ 
+		\hline 
+	\end{tabular} 
+
+	\caption{Gefundene Hyperparameter der nächsten Nachbar Vorhersage für das \textit{Mitchell-Schaeffer}- und das \textit{Barkley}-Modell, welche zu den geringsten Fehlern führen.}
+\label{tab:exp_cross_nn_results}
+\end{table} 
+
+Dabei ist die stark unterschiedliche Laufzeit der beiden Vorhersagen auffällig. Dies lässt sich allerdings durch die verschiedenen Dimensionalitäten der Quellvariable erklären: Während beim \textit{Barkley}-Modell lediglich ein $3$-dimensionaler Vektor für die Vorhersage die besten Ergebnisse erzielt konnte beim \textit{Mitchell-Schaeffer}-Modell durch die Verwendung eines $147$-dimensionalen Quellvektors die besten Ergebnisse erzielt werden. Da, wie in Abschnitt \ref{sc:theory_nn} erwähnt, die benötigte Zeit für eine Vorhersage sehr stark mit der Dimension zunimmt, lässt sich somit der Anstieg von $40$ auf $5252$ Sekunden erklären.
+
+Da eine Nächsten Nachbar Vorhersage nur anhand der in der Trainingsphase gesehenen Datenpunkte eine Vorhersage erstellt, ist anzunehmen, dass die Qualität dieser sehr stark von der Länge der Trainingsphase abhängt. Um dies zu untersuchen ist für die zuvor ermittelten Hyperparameter eine Vorhersage für verschiedene Trainingslängen $N_{Training}$ durchgeführt und die dabei auftretenden MSEs und die benötigte Laufzeit gemessen worden. Hierbei können zwei Effekte beobachtet werden. Bei der Betrachtung der grafischen Darstellung der benötigten Laufzeit in Abbildung \ref{fig:exp_cross_nn_trainlength_time} ist zu erkennen, dass ein linearer Zusammenhang zwischen der $N_{Training}$ und Laufzeit existiert. Der erzielte Fehler verhält sich dagegen anders und sinkt asymptotisch gegen eine untere Schranke ab nach Abbildung \ref{fig:exp_cross_nn_trainlength_mse}. Anzumerken ist, dass die Sättigung des Fehlers im \textit{Barkley}-Modell schon ab etwa $N_{Training}=15000$ eintritt, doch beim \textit{Mitchell-Schaeffer}-Modell erst deutlich später. Dies ist ein Hinweis darauf, dass die Dynamiken im letzteren chaotischer und unregelmäßiger als bei ersten ablaufen. Zusammenfassend lässt sich somit die Wahl der Trainingslänge von $N_{Training} = 15000$ für alle Szenarien und alle drei Methoden damit begründen, dass man für die Nächste Nachbar Vorhersage, welche am empfindlichsten auf diese Länge reagiert, eine akzeptablen Kompromiss zwischen der Rechenzeit und der Genauigkeit erhält.
+
+\begin{figure}[h]
+	\centering
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[height=2.2in]{figures/results/cross_prediction/nn_trainlength_uv_time.pdf}
+		\setcapmargin[1cm]{1cm}
+		\caption{Abhängigkeit für das \\ \textit{Barkey}-Model.}
+		\label{fig:exp_cross_nn_trainlength_time_uv}
+	\end{subfigure}%
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[height=2.2in]{figures/results/cross_prediction/nn_trainlength_vh_time.pdf}
+		\setcapmargin[1cm]{1cm}
+		\caption{Abhängigkeit für das \\ \textit{Mitchell-Schaeffer}-Model.}
+		\label{fig:exp_cross_nn_trainlength_time_vh}
+	\end{subfigure}
+	\caption{Darstellung der Abhängigkeit des benötigten Laufzeit von der verwendeten Anzahl an Trainingsdaten $N_{Training}$ für das \textit{Barkley}-Modell (links) und für das \textit{Mitchell-Schaeffer}-Modell (rechts) bei der Verwendung einer nächsten Nachbar Vorhersage.}
+	\label{fig:exp_cross_nn_trainlength_time}
+\end{figure}
+
+\begin{figure}[h]
+	\centering
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[height=2.2in]{figures/results/cross_prediction/nn_trainlength_uv_mse.pdf}
+		\setcapmargin[1cm]{1cm}
+		\caption{Abhängigkeit für das \\ \textit{Barkey}-Model.}
+		\label{fig:exp_cross_nn_trainlength_mse_uv}
+	\end{subfigure}%
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[height=2.2in]{figures/results/cross_prediction/nn_trainlength_vh_mse.pdf}
+		\setcapmargin[1cm]{1cm}
+		\caption{Abhängigkeit für das \\ \textit{Mitchell-Schaeffer}-Model.}
+		\label{fig:exp_cross_nn_trainlength_mse_vh}
+	\end{subfigure}
+	\caption{Darstellung der Abhängigkeit des MSE von der verwendeten Anzahl an Trainingsdaten $N_{Training}$ für das \textit{Barkley}-Modell (links) und für das \textit{Mitchell-Schaeffer}-Modell (rechts) bei der Verwendung einer nächsten Nachbar Vorhersage.}
+	\label{fig:exp_cross_nn_trainlength_mse}
+\end{figure}
+
+\FloatBarrier
+\subsection{Radiale Basisfunktionen}
+Bei der Verwendung radialer Basisfunktionen stellt zudem die Breite $\sigma_{RBF}$ der Gaußfunktionen als auch die Anzahl der Basisfunktionen $l$ einen wichtigen Parameter dar. Im Rahmen dieser Arbeit ist die Anzahl der Basisfunktionen auf $l=100$ festgelegt worden - diese Wahl wird im Folgenden weiter motiviert werden. Um die anderen Parameter zu finden, sind $\sigma$, $\Delta \sigma$ wie oben beschrieben, $\delta \in [3,4,5]$ und $\sigma_{RBF} \in [0.5, 1.0, 3.0, 5.0, 7.0, 9.0]$ variiert worden. In Tabelle \ref{tab:exp_cross_rbf_results} sind die dadurch gefundenen optimalen Parameter, die damit erreichten Fehler und die benötigte Laufzeit erneut für beide Modelle aufgelistet. Hierbei ist zu bemerken, dass die optimalen Werte für $\sigma$, $\Delta \sigma$ und $\delta$ mit denen für die NN-Vorhersage übereinstimmen. 
+
+\begin{table}[h]
+	\centering
+
+	\begin{tabular}{|c|c|c|}
+		\multicolumn{1}{c|}{} & Barkley & Mitchell-Schaeffer \\ 
+		\hline \hline 
+		\rule[-1ex]{0pt}{2.5ex} $\sigma$ & $1$ & $7$ \\ 
+		\hline 
+		\rule[-1ex]{0pt}{2.5ex} $\Delta \sigma$ & $1$ & $1$ \\ 
+		\hline 
+		\rule[-1ex]{0pt}{2.5ex} $\delta$ & $3$ & $3$ \\ 
+		\hline 
+		\rule[-1ex]{0pt}{2.5ex} $\sigma_{RBF}$ & $0.5$ & $5$ \\ 
+		\hline 
+		\rule[-1ex]{0pt}{2.5ex} Laufzeit [s] & $1430$ & $1434$ \\ 
+		\hline 
+		\rule[-1ex]{0pt}{2.5ex} \textbf{MSE} & \textbf{0.00064} & \textbf{0.00890} \\ 
+		\hline 
+		\rule[-1ex]{0pt}{2.5ex} \textbf{NRMSE} & \textbf{0.1069} & \textbf{0.2679} \\ 
+		\hline 
+	\end{tabular} 
+	\caption{Gefundene Hyperparameter der radialen Basisfunktionen für das \textit{Mitchell-Schaeffer}- und das \textit{Barkley}-Modell, welche zu den geringsten Fehlern führen.}
+	\label{tab:exp_cross_rbf_results}
+\end{table} 
+
+Analog zu der Untersuchung des Einflusses der Trainingslänge $N_{Training}$ bietet es sich für die radialen Basisfunktionen an, den Einfluss der Anzahl der verwendeten Basisfunktionen $l$ auf die Genauigkeit und die benötigte Laufzeit zu untersuchen. Dabei werden jeweils wieder die besten zuvor ermittelten Hyperparameter verwendet. Hierfür sind die gemessenen Laufzeiten gegen die Anzahl der Basisfunktionen in Abbildung \ref{fig:exp_cross_rbf_placements_time} aufgetragen worden. Es ist erneut anzunehmen, dass ein linearer Zusammenhang zwischen den beiden Größen existiert.
+
+\begin{figure}[h]
+	\centering
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[height=2.2in]{figures/results/cross_prediction/rbf_placements_uv_time.pdf}
+		\setcapmargin[1cm]{1cm}
+		\caption{Abhängigkeit für das \\ \textit{Barkey}-Model.}
+		\label{fig:exp_cross_rbf_placements_time_uv}
+	\end{subfigure}%
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[height=2.2in]{figures/results/cross_prediction/rbf_placements_vh_time.pdf}
+		\setcapmargin[1cm]{1cm}
+		\caption{Abhängigkeit für das \\ \textit{Mitchell-Schaeffer}-Model.}
+		\label{fig:exp_cross_rbf_placements_time_vh}
+	\end{subfigure}
+	\caption{Darstellung der Abhängigkeit des benötigten Laufzeit der Basisfunktionen $l$ für das \textit{Barkley}-Modell (links) und für das \textit{Mitchell-Schaeffer}-Modell (rechts) bei der Verwendung radialer Basisfunktionen.}
+	\label{fig:exp_cross_rbf_placements_time}
+\end{figure}
+
+Der Zusammenhang zwischen dem MSE und der Anzahl der Basisfunktionen ist in Abbildung \ref{fig:exp_cross_rbf_placements_mse} zusehen. Zum einen kann ein ein asymptotischer Anteil erkannt werden, sodass der Fehler erst einmal für mehr Basisfunktionen abnimmt. Allerdings lässt Abbildung \ref{fig:exp_cross_rbf_placements_mse_uv} erahnen, dass es hierbei einen optimalen Wert gibt, ab dem der Fehler wieder ansteigt. Dies kann durch eine schlechtere Generalisierung der Dynamik und ein zu starkes Anpassen und die Trainingsphase (auch bekannt als \textit{Overfitting}) erklärt werden. Zusammenfassend zeigt sich, dass die Wahl von $100$ Basisfunktionen eine akzeptable Abschätzung ist, sodass der Fehler möglichst gering ist und die Laufzeit auch gering gehalten wird. Diese Annahme wird im Folgenden ohne weitere qualitative Untersuchungen auf die anderen beiden Probleme übertragen, um den benötigten Rechenaufwand für die Parametersuche in einem angebrachten Rahmen zu halten.  
+
+\begin{figure}[h]
+	\centering
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[height=2.2in]{figures/results/cross_prediction/rbf_placements_uv_mse.pdf}
+		\setcapmargin[1cm]{1cm}
+		\caption{Abhängigkeit für das \\ \textit{Barkey}-Model.}
+		\label{fig:exp_cross_rbf_placements_mse_uv}
+	\end{subfigure}%
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[height=2.2in]{figures/results/cross_prediction/rbf_placements_vh_mse.pdf}
+		\setcapmargin[1cm]{1cm}
+  		\caption{Abhängigkeit für das \\ \textit{Mitchell-Schaeffer}-Model.}
+  		\label{fig:exp_cross_rbf_placements_mse_vh}
+	\end{subfigure}
+	\caption{Darstellung der Abhängigkeit des MSE von der verwendeten Anzahl der Basisfunktionen $l$ für das \textit{Barkley}-Modell (links) und für das \textit{Mitchell-Schaeffer}-Modell (rechts) bei der Verwendung radialer Basisfunktionen.}
+	\label{fig:exp_cross_rbf_placements_mse}
+\end{figure}
+
+\FloatBarrier
+\subsection{Echo State Network}
+Abschließend ist dieses Problem nun mit den \textit{ESN}s gelöst worden. Dazu wurden die Hyperparameter nach Abschnitt \ref{sec:exp_general_esn} gesucht worden. Die gefundenen Parameter und die damit erreichten Ergebnisse sind in Tabelle \ref{tab:exp_cross_esn_results} aufgelistet. Es ist auffällig, dass die optimalen Werte für $\sigma$ und $\Delta \sigma$ hier von denen der NN- und der RBF-Vorhersage abweichen.
+\begin{table}[h]
+	\centering
+	\captionsetup{width=0.9\linewidth}
+	\begin{tabular}{|c|c|c|}
+		\multicolumn{1}{c|}{} &  Barkley & Mitchell-Schaeffer \\ 
+		\hline \hline 
+		\rule[-1ex]{0pt}{2.5ex} $\sigma$ & $5$ & $3$ \\ 
+		\hline 
+		\rule[-1ex]{0pt}{2.5ex} $\Delta \sigma$ & $2$ & $1$ \\ 
+		\hline 
+		\rule[-1ex]{0pt}{3.5ex} $N$ & $400$ & $400$ \\ 
+		\hline 
+		\rule[-1ex]{0pt}{3.5ex} $\rho(|\mathbf{W}|)$ & $1.10$ & $1.50$\\ 
+		\hline 
+		\rule[-1ex]{0pt}{3.5ex} $\alpha$ & $0.20$ & $0.05$ \\ 
+		\hline 
+		\rule[-1ex]{0pt}{3.5ex} $\epsilon$ & $0.1$ & $0.1$ \\ 
+		\hline 
+		\rule[-1ex]{0pt}{3.5ex} $\nu_{max}$ & $\num{1e-5}$ & $\num{1e-4}$\\ 
+		\hline 
+		\rule[-1ex]{0pt}{3.5ex} $\lambda$ & $\num{5e-6}$ & $\num{5e-4}$\\ 
+		\hline 
+		\rule[-1ex]{0pt}{2.5ex} Laufzeit [s] & $3604$ & $3823$ \\ 
+		\hline 
+		\rule[-1ex]{0pt}{2.5ex} \textbf{MSE} & \textbf{0.00001} & \textbf{0.00175} \\ 
+		\hline
+		\rule[-1ex]{0pt}{2.5ex} \textbf{NRMSE} & \textbf{0.0462} & \textbf{0.0718} \\ 
+		\hline 
+	\end{tabular} 
+	\caption{Gefundene Hyperparameter des \textsc{ESN} für das \textit{Mitchell-Schaeffer}- und das \textit{Barkley}-Modell, welche zu den geringsten Fehlern führen.}
+	\label{tab:exp_cross_esn_results}
+\end{table}
+
+\FloatBarrier
+\subsection{Vergleich}
+Abschließend kann nun ein Vergleich der drei verwendeten Methoden hinsichtlich ihrer Laufzeit und der erzielten Genauigkeiten durchgeführt werden. Dieser ist in Tabelle \ref{tab:exp_cross_comparison_results} zu finden. Die jeweils  besten Ergebnisse sind hervorgehoben. Die \textit{ESN}s erzielen für beide Modelle den geringsten Fehler, also die höchste Genauigkeit. Dabei liegt der NRMSE bei beiden Modellen unter $10\%$. Im Austausch für diese hohe Genauigkeit ist allerdings die benötigte Zeit für die Vorhersage höher als bei den Konkurrenten. Unter der Voraussetzung, dass die Rechenzeit nur eine untergeordnete Rolle spielt, so ergeben sich die \textit{ESN}s als bester Ansätze für die Kreuz-Prädiktion.
+\begin{table}[h]
+	\centering
+	\captionsetup{width=0.9\linewidth}
+	\begin{tabular}{|c|c|c|c|c|c|c|c|}
+		\multicolumn{1}{c|}{} & \multicolumn{3}{c|}{Barkley} & \multicolumn{3}{c|}{Mitchell-Schaeffer}		\\
+		\cline{2-7}
+		\multicolumn{1}{c|}{} & NN & RBF & ESN & NN & RBF & ESN \\
+		
+		\hline
+		\hline
+		
+		Laufzeit [s] 	& \textbf{40} 		& 1430		& 3604		& 5252		& \textbf{1434} 		& 3823 \\
+		\hline
+		MSE 			& 0.00105	& 0.00064	& \textbf{0.00001} 	& 0.01353	& 0.00890 	& \textbf{0.00175} \\
+		\hline
+		NRMSE 			& 0.1367	& 0.1069	& \textbf{0.0462} 	& 0.7438	& 0.2679 	& \textbf{0.0718} \\
+		\hline 
+	\end{tabular} 
+	\caption{Vergleich der benötigten Laufzeit und der erreichten Fehlers der drei Ansätze für das \textit{Mitchell-Schaeffer}- und das \textit{Barkley}-Modell, welche zu den geringsten Fehlern führen.}
+	\label{tab:exp_cross_comparison_results}
+\end{table}
+
+\FloatBarrier

@@ -13,20 +13,6 @@ Abschließend wird die Spannungsvariable der inneren Punkte eines Quadrates nur 
 \label{sc:experiments_general}
 Das Ziel aller drei Aufgaben besteht jeweils darin ein zweidimensionales Feld vorherzusagen. Eine naheliegende Möglichkeit dies zu schaffen besteht darin wirklich den gesamten Inhalt des $150 \times 150$ Einheiten großen Feldes auf einmal vorherzusagen. Da dabei die Ausgabe der Vorhersage aus einem $22500$-dimensionalen Vektor besteht werden sehr viele Trainingsdaten benötigt, um genügend Informationen über eine solch hochdimensionale Ausgabe zu erhalten. Um dieses Problem zu umgehen wird stattdessen ein Verfahren benutzt, bei dem jeder Punkt einzeln vorhergesagt wird. Dies hat zudem den Vorteil, dass aus einer monströsen Vorhersage, welche mitunter viel Arbeitsspeicher verbrauchen würde, in viele kleine Vorhersagen aufteilt. Hierdurch sinkt der zur Berechnung benötigte Bedarf an Arbeitsspeicher drastisch.\\
 
-Des Weiteren kann angenommen werden, dass die Dynamiken einen ausgeprägten lokalen Charakter besitzen, sodass zumindest bei den ersten beiden Aufgaben weit entfernte Punkte keinen unmittelbaren Einfluss auf die Vorhersage haben. Darauf basierend kann eine sogenannte \textit{Messsondentechnik} entwickelt und für diese genutzt werden. Hierbei werden nicht nur die Informationen an einem Punkt $(i, j)$ für die Vorhersage, sondern auch die benachbarten Punkte, welche in einem Quadrat um $(i, j)$ liegen, genutzt. Eine Veranschaulichung ist in \ref{fig:probe_illustration_no_gaps} zu finden. Die Größe des Quadrates wird durch den Parameter $\sigma$ bestimmt, und ergibt sich zu $\sigma^2$. Da direkt Nachbarn unter Umständen durch den geringen Abstand sehr ähnliche Informationen beinhalten können, wird zudem ein Parameter $\Delta \sigma$ eingeführt, welche den Abstand zweier benachbarter Punkte, deren Information simultan verwendet werden, angibt. Eine beispielhafte Darstellung hiervon ist für $\sigma = 5, \Delta \sigma=2$ in Abbildung \ref{fig:probe_illustration_gaps} dargestellt. Dabei werden nur die Zeitreihen der Gitterpunkte genutzt, welche dunkelgrau hinterlegt sind, und die hellgrauen Informationen verworfen. Die Parameter, welche für die ersten beiden Aufgaben überprüft werden, sind in Tabelle \ref{tab:probe_sigma_values} aufgelistet. Dabei ist anzumerken, dass die Diskretisierung des Diffusionstermes in den Differentialgleichungen einem Wert $\sigma=3$ entsprechen würde.\\
-Durch dieses Vorgehen kann für jeden Gitterpunkt ein ${\left \lceil{\frac{\sigma}{\Delta \sigma}}\right \rceil}^2$-dimensionaler Eingabevektor erstellt und für die ersten beiden Vorhersage-Aufgaben genutzt werden.
-
-\begin{table}[h]
-\centering
-\begin{tabular}{c||c|c|c|c|c|c|c|}
-$\sigma$ & 1 & 3 & \multicolumn{2}{c|}{5} & \multicolumn{3}{c|}{7} \\
-\hline
-$\Delta \sigma$ & 1 & 1 & 1 & 2 & 1 & 2 & 3 \\
-\end{tabular} 
-\caption{In den ersten beiden Aufgaben verwendete Parameter $\sigma$ und $\Delta \sigma$ für die \textit{Messsondentechnik}.}
-\label{tab:probe_sigma_values}
-\end{table} 
-
 \begin{figure}[h]
 \centering
 \begin{subfigure}{.5\textwidth}
@@ -45,9 +31,48 @@ $\Delta \sigma$ & 1 & 1 & 1 & 2 & 1 & 2 & 3 \\
 \label{fig:probe_illustration}
 \end{figure}
 
-\subsection{Echo State Network}
-\textit{Echo State Networks} besitzen viele verschiedene Hyperparameter, welche die Qualität der Vorhersage beeinflussen können. Dazu zählen nach \ref{sc:esn} die Reservoirgröße $N$, der Spektralradius $\rho$, die Verlustrate $\alpha$, die Amplitude der zufälligen Störung $\nu$, die Stärke der Regularisierung $\lambda$ und der Anteil der vorhandenen internen Verbindungen $\epsilon$. Da es zum aktuellen Zeitpunkt noch keinen zufriendenstellenden mathematischen Algorithmus für das das selbstständige optimale Einstellen eines \textsc{ESN}s gibt, müssen die Parameter manuell ermittelt werden. Hierfür wird in dieser Arbeit eine \textsc{GridSearch} benutzt. Bei diesem Verfahren wird der Hyperparameterraum in festgelegten Schritten abgetastet und die Leistung des somit entstehenden Netzwerke evaluiert und somit die besten Parameter ermittelt. Durch die hohe Anzahl der einstellbaren Hyperparameter und die nicht zu vernachlässigende Rechenzeit für das Trainieren und Evaluieren eines Netzwerkes, ist es nicht sinnvoll diese Suche für alle Datenpunkte gleichzeitig durchzuführen. Stattdessen wird zuerst unter der Annahme, dass die Dynamik sich lokal an allen Punkten ähnlich verhält, ein Punkt in der Mitte des Feldes ausgewählt, und nur versucht dieses einen einzelnen Punkt vorherzusagen. Diese Aufgabe kann deutlich schneller berechnet werden, sodass nun die optimalen Hyperparameter mit einer \textsc{GridSearch} gesucht werden können. Anschließend können die Hyperparameter des  zuvor ermittelten \textsc{ESN} für die Vorhersage aller Punkte genutzt werden.
+Des Weiteren kann angenommen werden, dass die Dynamiken einen ausgeprägten lokalen Charakter besitzen, sodass zumindest bei den ersten beiden Aufgaben weit entfernte Punkte keinen unmittelbaren Einfluss auf die Vorhersage haben. Darauf basierend kann eine sogenannte \textit{Messsondentechnik} entwickelt und für diese genutzt werden. Hierbei werden nicht nur die Informationen an einem Punkt $(i, j)$ für die Vorhersage, sondern auch die benachbarten Punkte, welche in einem Quadrat um $(i, j)$ liegen, genutzt. Eine Veranschaulichung ist in \ref{fig:probe_illustration_no_gaps} zu finden. Die Größe des Quadrates wird durch den Parameter $\sigma$ bestimmt, und ergibt sich zu $\sigma^2$. Da direkt Nachbarn unter Umständen durch den geringen Abstand sehr ähnliche Informationen beinhalten können, wird zudem ein Parameter $\Delta \sigma$ eingeführt, welche den Abstand zweier benachbarter Punkte, deren Information simultan verwendet werden, angibt. Eine beispielhafte Darstellung hiervon ist für $\sigma = 5, \Delta \sigma=2$ in Abbildung \ref{fig:probe_illustration_gaps} dargestellt. Dabei werden nur die Zeitreihen der Gitterpunkte genutzt, welche dunkelgrau hinterlegt sind, und die hellgrauen Informationen verworfen. Die Parameter, welche für die ersten beiden Aufgaben überprüft werden, sind in Tabelle \ref{tab:probe_sigma_values} aufgelistet. Dabei ist anzumerken, dass die Diskretisierung des Diffusionstermes in den Differentialgleichungen einem Wert $\sigma=3$ entsprechen würde.\\
+Durch dieses Vorgehen kann für jeden Gitterpunkt ein ${\left \lceil{\frac{\sigma}{\Delta \sigma}}\right \rceil}^2$-dimensionaler Eingabevektor erstellt und für die ersten beiden Vorhersage-Aufgaben genutzt werden.\\
 
+\begin{table}[h]
+\centering
+\begin{tabular}{c||c|c|c|c|c|c|c|}
+$\sigma$ & 1 & 3 & \multicolumn{2}{c|}{5} & \multicolumn{3}{c|}{7} \\
+\hline
+$\Delta \sigma$ & 1 & 1 & 1 & 2 & 1 & 2 & 3 \\
+\end{tabular} 
+\caption{In den ersten beiden Aufgaben verwendete Parameter $\sigma$ und $\Delta \sigma$ für die \textit{Messsondentechnik}.}
+\label{tab:probe_sigma_values}
+\end{table} 
+
+Der Trainingsvorgang wird jeweils über $N_{Training}=15000$ Zeitschritte durchgeführt und der Anschließende Evaluationsdurchgang auf $N_{Testing} = 2000$ Zeitschritte.
+Zur Bewertung der Leistung einer Vorhersage werden die beiden Fehlergrößen MSE und NRMSE eingeführt. Im Allgemeinen ist der MSE (\textit{Mean Squared Error}) durch
+\begin{align}
+MSE(y) = \sum_i^m \sum_t^{N_{Testing}} \left(y(t)_i - \hat{y}(t)_i \right)^2
+\end{align}
+definiert und charakterisiert die Genauigkeit einer Vorhersage $\hat{y}$ im Vergleich zu dem tatsächlichen Wert $y \in \mathbb{R}^m$ über den Zeitraum $N_{Testing}$. Der NRMSE normiert diesen Fehler noch auf eine Vorhersage, bei der der Mittelwert $\langle y \rangle$ über die Trainingsphase als vorhergesagten Wert genutzt wird. Er ist als
+\begin{align}
+NRMSE(y) = \sqrt{\frac{MSE(y)}{MSE\left(\langle y \rangle\right)}}
+\end{align}
+definiert.
+
+Unter der Kenntnis, dass in den Modellen nur Werte zwischen $0$ und $1$ angenommen werden dürfen beziehungsweise angenommen werden, werden die Vorhersagen auf das Intervall $[0, 1]$ beschränkt. Dafür werden die Werte beider Variablen der Systeme sowohl nach unten als auch nach oben hin nach 
+\begin{align}
+x = \begin{cases}
+	0,& \text{wenn } x \leq 0\\
+	x,& \text{wenn } x \geq 0 \land \leq 1\\
+    1,& \text{wenn } x \geq 1
+\end{cases}
+\end{align}
+abgeschnitten, wobei $x$ für eine der beiden Variablen in dem jeweiligen Modell steht.
+
+\FloatBarrier
+\subsection{Echo State Network}
+\label{sec:exp_general_esn}
+\textit{Echo State Networks} besitzen viele verschiedene Hyperparameter, welche die Qualität der Vorhersage beeinflussen können. Dazu zählen nach \ref{sc:esn} die Reservoirgröße $N$, der Spektralradius $\rho$, die Verlustrate $\alpha$, die Amplitude der zufälligen Störung $\nu$, die Stärke der Regularisierung $\lambda$ und der Anteil der vorhandenen internen Verbindungen $\epsilon$. Da es zum aktuellen Zeitpunkt noch keinen zufriendenstellenden mathematischen Algorithmus für das das selbstständige optimale Einstellen eines \textsc{ESN}s gibt, müssen die Parameter manuell ermittelt werden. Hierfür wird in dieser Arbeit eine \textsc{GridSearch} benutzt. Bei diesem Verfahren wird der Hyperparameterraum in festgelegten Schritten abgetastet und die Leistung des somit entstehenden Netzwerke evaluiert und somit die besten Parameter ermittelt. Durch die hohe Anzahl der einstellbaren Hyperparameter und die nicht zu vernachlässigende Rechenzeit für das Trainieren und Evaluieren eines Netzwerkes, ist es nicht sinnvoll diese Suche für alle Komponenten des hochdimensionalen Zielvektors gleichzeitig durchzuführen. Stattdessen wird zuerst unter der Annahme, dass die Dynamik sich lokal an allen Punkten ähnlich verhält, ein Punkt in der Mitte des Feldes ausgewählt, und nur versucht diesen einen einzelnen Punkt vorherzusagen. Diese Aufgabe kann deutlich schneller berechnet werden, sodass nun die optimalen Hyperparameter mit einer \textsc{GridSearch} gesucht werden können. Im Anschluss können die Hyperparameter des  zuvor ermittelten \textsc{ESN} für die Vorhersage aller Punkte genutzt werden. Abschließend wird noch einmal Versucht das gefundene Reservoir manuell zu verbessern, indem die Parameter $N$ und $\lambda$ noch einmal variiert werden.\\
+Es ist zu erwarten, dass die hierbei gefundenen Hyperparameter eine akzeptable Leistung für die jeweiligen Probleme erzielen können. Da allerdings bei dem zuvor beschriebenen Verfahren bei weitem nicht alle sinnvollen Hyperparameter getestet werden können, besteht die Möglichkeit, dass es noch besser geeignete Reservoirs mit anderen Hyperparametern gibt, welche eine noch höhere Leistung erzielen können.
+
+\FloatBarrier
 \subsection{Klassische Methoden}
 Die klassischen Methoden sind nicht von alleine aus in der Lage zeitlich ausgeprägte Dynamiken vorherzusagen, da den Methoden a priori keine Informationen über die vorherigen Zustände vorliegen. Um dieses Problem zu lösen können Verzögerungs-Koordinaten mittels der in Abschnitt \ref{sc:delay_reconstruction} beschriebenen \textit{Delay Reconstruction} für die in Abschnitt \ref{sc:experiments_general} beschriebenen Vektoren aufgestellt werden. Die über die Autokorrelation ermittelte zeitliche Verzögerung $\tau$ ist für beide Systeme in Tabelle \ref{tab:delay_reconstruction_tau} dargestellt.     
 
@@ -64,6 +89,6 @@ $\tau_{Barkley}$ & $\tau_{Mitchell-Schaeffer}$ \\
 \label{tab:delay_reconstruction_tau}
 \end{table} 
 
-\include{content/cross_pred.tex}
-\include{content/inner_cross_pred.tex}
-\include{content/unblur_pred.tex}
+\input{content/cross_pred.tex}
+\input{content/inner_cross_pred.tex}
+\input{content/unblur_pred.tex}
