@@ -35,6 +35,21 @@
 
 \usepackage{amsmath,amssymb} %% zusaetzliche Mathe-Symbole
 
+%for the TODO notes:
+\usepackage{xargs}                      % Use more than one optional parameter in a new commands
+\usepackage[pdftex,dvipsnames]{xcolor}  % Coloured text etc.
+% 
+\usepackage[colorinlistoftodos,prependcaption,textsize=tiny]{todonotes}
+\newcommandx{\unsure}[2][1=]{\todo[linecolor=red,backgroundcolor=red!25,bordercolor=red,#1]{#2}}
+\newcommandx{\change}[2][1=]{\todo[linecolor=blue,backgroundcolor=blue!25,bordercolor=blue,#1]{#2}}
+\newcommandx{\info}[2][1=]{\todo[linecolor=OliveGreen,backgroundcolor=OliveGreen!25,bordercolor=OliveGreen,#1]{#2}}
+\newcommandx{\improvement}[2][1=]{\todo[linecolor=Plum,backgroundcolor=Plum!25,bordercolor=Plum,#1]{#2}}
+
+
+
+
+
+
 %to use multirows in tables
 \usepackage{multirow}
 
@@ -102,16 +117,16 @@
 \PlaceOfBirth{Recklinghausen}
 %% Titel Arbeit. Das erste Argument ist der deutsche, das zweite der
 %% englische Titel.
-\ThesisTitle{Spezialisierungspraktikum}{} % second brackets: english title
+\ThesisTitle{Vorhersage raumzeitlicher Dynamik mittels Reservoir Computing}{Preidicting spatio-temporal dynamics using reservoir computing} % second brackets: english title
 %% Erst- und Zweitgutacher/in
 %% Ist der/die Betreuer/in nicht identisch mit dem/r Erstgutachter/in,
 %% muss diese/r als optionales Argument angegeben werden.
 \FirstReferee{Prof.\ Dr.\ Ulrich Parlitz}
 \Institute{Max-Planck-Institut für Dynamik und Selbstorganisation}
-\SecondReferee{nicht vorhanden}
+\SecondReferee{Prof.\ Dr.\ Florentin Wörgötter}
 %% Beginn und Ende des Anfertigungszeitraumes
-\ThesisBegin{1}{4}{2009}
-\ThesisEnd{15}{7}{2009}
+\ThesisBegin{1}{6}{2017}
+\ThesisEnd{15}{9}{2017}
 %% DO NOT TOUCH THESE LINES!!!!
 \frontmatter
 \maketitle
@@ -159,5 +174,7 @@
 %% Dieser Befehl MUSS am Ende stehen und erzeugt die Erklaerung ueber die
 %% benutzten Mittel
 %\Declaration
+
+\listoftodos[Notes]
 
 \end{document}

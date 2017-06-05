@@ -1,15 +1,16 @@
 \section{Radiale Basisfunktionen}
-Eine weitere Methode um einen solchen funktionalen Zusammenhang $F : X \rightarrow Y$ zu finden, welcher Daten der Menge $X \in \mathbb{R}^n$ auf Elemente aus $Y \in \mathbb{R}^m$ eindeutig abbildet, bieten die \textit{radialen Basisfunktionen} an. Auch hierfür Daten benötigt, anhand derer der Zusammenhang erlernt werden kann. Diese Trainingsdaten sollen im Folgenden aus $N$ Datensätzen bestehen.\\
+Eine weitere Methode um einen solchen funktionalen Zusammenhang $F : X \rightarrow Y$ zu finden, welcher Daten der Menge $X \in \mathbb{R}^n$ auf Elemente aus $Y \in \mathbb{R}^m$ eindeutig abbildet, bieten die \textit{radialen Basisfunktionen} (im Folgenden als \textsc{RBF} abgekürzt) an. Auch hierfür Daten benötigt, anhand derer der Zusammenhang erlernt werden kann. Diese Trainingsdaten sollen im Folgenden aus $N$ Datensätzen bestehen.\\
 
 Bei diesem Ansatz wird die gesuchte Funktion $F$ als Linearkombination aus vielen radialen Funktionen approximiert. Dafür werden $l$ Elemente $\{\vec{x}_i\}, i=1,...,l$ aus den Trainingsdaten ausgewählt und diese als so genannte \textit{Zentren} $\{\vec{z}_i\}$ genutzt. Hiermit lassen sich die Funktionen als $\phi_i(\vec{x}) = \phi(||\vec{x}-\vec{z}_i||), i=1,\ldots ,l$ darstellen \citep{lowe2multi}. Eine mögliche Wahl der Basisfunktionen sind zum Beispiel Gaußfunktionen
 \begin{align*}
-\phi_i(\vec{x}) = \exp \left( - \frac{||\vec{x}-\vec{z}_i||}{\sigma_i^2} \right).
+\phi_i(\vec{x}) = \exp \left( - \frac{||\vec{x}-\vec{z}_i||}{\sigma_{RBF, i}^2} \right).
 \end{align*}
 Die Linearkombination führt zu dem Ansatz 
 \begin{align}
 \label{eq:rbf_lincomb}
-\vec{y} = F(\vec{x}) = \sum^l_{i=1} \vec{\omega}_i \phi(||\vec{x} - \vec{z}_i||).
+\vec{y} = F(\vec{x}) = \sum^l_{i=1} \vec{\omega}_i \phi(||\vec{x} - \vec{z}_i||),
 \end{align}
+wobei $\sigma_{RBF, i}$ für die Breite der $i$-ten Gaußfunktion steht.
 Die $\vec{\omega}_i \in \mathbb{R}^m$ stehen hierbei für die \textit{Gewichtsvektoren} der einzelnen Basisfunktionen $\phi_i$ im Rahmen der Linearkombination.\\
 
 Das Ziel besteht jetzt darin die Gewichtsvektoren $\omega_i$ approximativ zu bestimmen. Dafür werden zunächst drei Matrizen definiert, durch die das Problem ausgedrückt werden kann.\\

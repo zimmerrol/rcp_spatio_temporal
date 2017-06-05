@@ -42,6 +42,7 @@ Bei der Durchführung von invitro Experimenten mit Herzen gibt es verschiedene M
 \end{figure} 
 
 \subsection{Nächste Nachbar Vorhersage}
+Zuerst wird diese Aufgabe erneut mit dem \textsc{NN}-Ansatz betrachtet. Die besten gefundenen Hyperparameter dafür sind in Tabelle \ref{tab:exp_unblur_nn_results} aufgelistet. Bemerkenswert ist erneut die geringe Laufzeit dieses Ansatzes. Dies wird durch die verhältnismäßig geringe Dimensionalität des Eingabe-Vektors begünstigt. Allerdings sind die Fehlerwerte sehr hoch, sodass die Vorhersage kaum besser ist, als eine Schätzung mit dem Mittelwert als Vorhersage.
 
 \begin{table}[h]
 	\centering
@@ -72,7 +73,7 @@ Bei der Durchführung von invitro Experimenten mit Herzen gibt es verschiedene M
 
 \FloatBarrier
 \subsection{Radiale Basisfunktionen}
-
+Als nächstes sind nun die radialen Basisfunktionen ebenfalls auf das Problem angewendet worden. Die dabei gefundenen Hyperparameter sind in Tabelle \ref{tab:exp_unblur_rbf_results} präsentiert.
 
 \begin{table}[h]
 	\centering
@@ -102,6 +103,7 @@ Bei der Durchführung von invitro Experimenten mit Herzen gibt es verschiedene M
 
 \FloatBarrier
 \subsection{Echo State Network}
+Nachdem die klassischen Methoden bereits auf dieses Problem angewendet worden sind, kann das Problem nun mittels der \textsc{ESN}s erneut betrachtet werden. Hierfür sind die verwendeten Hyperparameter erneut nach Abschnitt \ref{sec:exp_general_esn} gesucht worden. Die Ergebnisse sind in Tabelle \ref{tab:exp_unblur_esn_results} zu finden. Auffällig ist hierbei, dass die optimale Größe $N$ des Reservoirs für beiden Modelle unter der maximal betrachteten Größe $N \leq 400$ liegt. Dies kann ein Anzeichen dafür sein, dass für das Bewältigen der Aufgabe kein ausgeprägtes Langzeitgedächtnis vorhanden sein muss. \improvement{Mention long time memory vs N dependency in theory.}
 
 \begin{table}[h]
 	\centering

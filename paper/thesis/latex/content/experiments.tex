@@ -1,6 +1,6 @@
 \chapter{Anwendungen}
 
-Die zuvor in Kapitel \ref{ch:theory} eingeführten Methoden werden nun durch drei verschiedene Szenarien ausprobiert und verglichen. Hierbei liegt der Fokus auf der Verwendung und Erprobung der \textsc{ESN}s. Da die klassischen Methoden der \textit{nächsten Nachbarn} und der \textit{radialen Basisfunktionen} bereits seit längerer Zeit bekannt sind und populäre Lösung solcher Problemfälle darstellen, dienen sie als Bezugsgröße.\\
+Die zuvor in Kapitel \ref{ch:theory} eingeführten Methoden werden nun durch drei verschiedene Szenarien ausprobiert und verglichen. Hierbei liegt der Fokus auf der Verwendung und Erprobung der \textsc{ESN}s. Da die klassischen Methoden der \textit{nächsten Nachbarn} (\textsc{NN}) und der \textit{radialen Basisfunktionen} (\textsc{RBF}) bereits seit längerer Zeit bekannt sind und populäre Lösung solcher Problemfälle darstellen, dienen sie als Bezugsgröße.\\
 
 Jedes der drei Szenarien wird sowohl auf ein \textit{Barkley}-System als auch auf ein System nach dem \textit{Mitchell-Schaeffer}-Modell angewendet. Diese Systeme bestehen aus $150$ Gitterpunkten und nutzen die zuvor beschriebenen Parameter. Für ihre Startverteilung werden die Felder der beiden Systemvariablen in $100$ Quadrate unterteilt, und diese mit Zufallswerten zwischen $0$ und $1$ initialisiert. Anschließend werden die Systeme über $2000$ Zeitschritte ($\widehat{=} 400.0$ Zeiteinheiten) simuliert um ein transientes Verhalten abzuwarten. Durch das weitere Simulieren der Systeme werden die Test und Trainingsdaten ermittelt. Dabei wird für das \textit{Barkley} eine Samplingzeit von $0.1$ und für das \textit{Mitchell-Schaeffer}-Modell von $1.0$ Zeiteinheiten benutzt.\\
  
@@ -8,7 +8,7 @@ Die erste Aufgabe besteht darin aus der Kenntnis einer der beiden Systemvariable
 Im zweiten Szenario werden die Techniken verwendet um aus Messdaten einer simulierten Fernfeldmessung der Spannungsvariable  diese wiederherzustellen. Diese Fernfeldmessung wird durch eine gaußsche Unschärfe simuliert.\\
 Abschließend wird die Spannungsvariable der inneren Punkte eines Quadrates nur durch die Kenntnis der Randwerte des Systems vorhergesagt.\\
 
-%TODO ADD SUBCHAPTER?
+\unsure{Add subchapter?}
 \section{Allgemeines Vorgehen}
 \label{sc:experiments_general}
 Das Ziel aller drei Aufgaben besteht jeweils darin ein zweidimensionales Feld vorherzusagen. Eine naheliegende Möglichkeit dies zu schaffen besteht darin wirklich den gesamten Inhalt des $150 \times 150$ Einheiten großen Feldes auf einmal vorherzusagen. Da dabei die Ausgabe der Vorhersage aus einem $22500$-dimensionalen Vektor besteht werden sehr viele Trainingsdaten benötigt, um genügend Informationen über eine solch hochdimensionale Ausgabe zu erhalten. Um dieses Problem zu umgehen wird stattdessen ein Verfahren benutzt, bei dem jeder Punkt einzeln vorhergesagt wird. Dies hat zudem den Vorteil, dass aus einer monströsen Vorhersage, welche mitunter viel Arbeitsspeicher verbrauchen würde, in viele kleine Vorhersagen aufteilt. Hierdurch sinkt der zur Berechnung benötigte Bedarf an Arbeitsspeicher drastisch.\\
@@ -54,7 +54,7 @@ definiert und charakterisiert die Genauigkeit einer Vorhersage $\hat{y}$ im Verg
 \begin{align}
 NRMSE(y) = \sqrt{\frac{MSE(y)}{MSE\left(\langle y \rangle\right)}}
 \end{align}
-definiert.
+definiert. Zusätzlich zu diesen Fehlermaßen werden im Folgenden oftmals auch die Laufzeiten der Ansätze angegeben. Hierbei ist zu beachten, dass diese nicht über mehrere Ausführungen des identischen Programmes gemittelt worden sind, und deshalb nicht als statistisch relevante Information sondern nur als ein Hinweis gesehen werden können.\\
 
 Unter der Kenntnis, dass in den Modellen nur Werte zwischen $0$ und $1$ angenommen werden dürfen beziehungsweise angenommen werden, werden die Vorhersagen auf das Intervall $[0, 1]$ beschränkt. Dafür werden die Werte beider Variablen der Systeme sowohl nach unten als auch nach oben hin nach 
 \begin{align}
@@ -90,5 +90,5 @@ $\tau_{Barkley}$ & $\tau_{Mitchell-Schaeffer}$ \\
 \end{table} 
 
 \input{content/cross_pred.tex}
-\input{content/inner_cross_pred.tex}
 \input{content/unblur_pred.tex}
+\input{content/inner_cross_pred.tex}
