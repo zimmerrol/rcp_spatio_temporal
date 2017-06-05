@@ -125,7 +125,8 @@ def show_results(packedData, forced_clim=None):
             sposition.set_val(i)
         return [mat]
 
-    fig, ax = plt.subplots()
+    fig = plt.figure("main")
+    ax = fig.add_subplot(111)
     mat = plt.imshow(data[0][1][0], origin="lower", interpolation="none")
     clb = plt.colorbar(mat)
     clb.set_clim(vmin=0, vmax=1)
@@ -153,9 +154,37 @@ def show_results(packedData, forced_clim=None):
 
             bswitchsource.label.set_text(data[image_mode][0])
 
+        def save_frame(self, event):
+            nonlocal pause
+            oldPause = pause
+            pause = True
+
+            from tkinter import Tk
+
+            Tk().withdraw()
+            import tkinter.filedialog as tkFileDialog
+            path = tkFileDialog.asksaveasfilename(defaultextension=".pdf")
+            if path is None: # asksaveasfile return `None` if dialog closed with "cancel".
+                return
+
+            savefig = plt.figure("save")
+            ax = savefig.add_subplot(111)
+            savemat = ax.imshow(data[image_mode][1][i], origin="lower", interpolation="none")
+            saveclb = plt.colorbar(savemat)
+            saveclb.set_clim(vmin=0, vmax=1)
+            saveclb.draw_all()
+            savefig.savefig(path, bbox_inches='tight')
+            saveclb.remove()
+            savefig.gca().cla()
+
+            plt.figure("main")
+
+            pause = oldPause
+
     callback = UICallback()
     axplaypause = plt.axes([0.145, 0.91, 0.10, 0.05])
     axswitchsource = plt.axes([0.645, 0.91, 0.10, 0.05])
+    axsaveframe = plt.axes([0.75, 0.91, 0.15, 0.05])
     axposition = plt.axes([0.275, 0.91, 0.30, 0.05])
 
     bplaypause = Button(axplaypause, "Pause")
@@ -164,8 +193,12 @@ def show_results(packedData, forced_clim=None):
     bswitchsource = Button(axswitchsource, data[0][0])
     bswitchsource.on_clicked(callback.switchsource)
 
+    bsaveframe = Button(axsaveframe, "Save frame")
+    bsaveframe.on_clicked(callback.save_frame)
+
     sposition = Slider(axposition, 'n', 0, shape[0], valinit=0, valfmt='%1.0f')
     sposition.on_changed(callback.position_changed)
+
 
     ani = animation.FuncAnimation(fig, update_new, interval=1, save_count=50)
 
