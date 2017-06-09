@@ -33,12 +33,16 @@ class GridSearchP:
                 test_mse.append(np.mean((testOutput - out_pred)**2))
 
             test_mse = np.mean(test_mse)
+
+            dat = (test_mse, training_acc, params)
         except:
             print("Unexpected error:", sys.exc_info()[0])
             import traceback
             print(traceback.format_exc())
 
-        dat = (test_mse, training_acc, params)
+            dat = ([np.nan]*len(testingDataSequence), [np.nan]*len(testingDataSequence), params)
+
+
         GridSearchP._get_score.q.put(dat)
 
         return dat
