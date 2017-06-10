@@ -203,3 +203,156 @@ def show_results(packedData, forced_clim=None):
     ani = animation.FuncAnimation(fig, update_new, interval=1, save_count=50)
 
     plt.show()
+
+def show_results_splitscreen(packedData, forced_clim=None, name=None):
+    shape = None
+    data = []
+
+    if (type(packedData) is dict):
+        for key, value in packedData.items():
+            tmpItem = [key,value]
+            if (type(value) is not np.ndarray):
+                raise ValueError("Item for key '{0}' is not of the type numpy.ndarray".format(key))
+            if (shape == None):
+                shape = value.shape
+            else:
+                if (shape != value.shape):
+                    raise ValueError("Item for key '{0}' has the shape {1} and not {2}".format(key, value.shape, shape))
+            data.append(tmpItem)
+    else:
+        data = packedData
+
+        for i in range(len(data)):
+            if (type(data[i][1]) is not np.ndarray):
+                    raise ValueError("Item for key '{0}' is not of the type numpy.ndarray".format(data[i][0]))
+
+        shape = data[0][1].shape
+
+    if (len(packedData) < 2):
+        print("Less than two fields submitted - switching to normal mode.")
+        show_results(data, forced_clim)
+
+    i = 0
+    pause = False
+    image_mode = [0, 1]
+
+    def update_new(nextFrame):
+        nonlocal i
+
+        for n in range(2):
+            matarr[n].set_data(data[image_mode[n]][1][i])
+
+            if (forced_clim is None):
+                if (i < shape[0]-50 and i > 50):
+                    clbarr[n].set_clim(vmin=0, vmax=np.max(data[image_mode[n]][1][i-50:i+50]))
+            else:
+                clbarr[n].set_clim(vmin = forced_clim[0], vmax=forced_clim[1])
+            clbarr[n].draw_all()
+
+
+        if (not pause):
+            i = (i+1) % shape[0]
+            sposition.set_val(i)
+        return None
+
+    matarr = []
+    clbarr = []
+    fig, axarr = plt.subplots(1,2)
+
+    if (name == None):
+        fig.canvas.set_window_title('Results')
+    else:
+        fig.canvas.set_window_title('Results ({0})'.format(name))
+
+    plt.tight_layout()
+    fig.subplots_adjust(top=0.85)
+    from mpl_toolkits.axes_grid1 import make_axes_locatable
+    for n in range(2):
+        mat = axarr[n].imshow(data[n][1][0], origin="lower", interpolation="none")
+        matarr.append(mat)
+        cax = make_axes_locatable(axarr[n]).append_axes("bottom", size="07.5%", pad=0.25)
+        clb = plt.colorbar(mat, cax=cax, orientation="horizontal")
+        cax.xaxis.set_ticks_position('bottom')
+        clb.set_clim(vmin=0, vmax=1)
+        clb.draw_all()
+        clbarr.append(clb)
+    axarr[0].set_title(data[0][0])
+    axarr[1].set_title(data[1][0])
+
+    from matplotlib.widgets import Button
+    from matplotlib.widgets import Slider
+    class UICallback(object):
+        def position_changed(self, value):
+            nonlocal i
+            value = int(value)
+            i = value % shape[0]
+
+        def playpause(self, event):
+            nonlocal pause, bplaypause
+            pause = not pause
+            bplaypause.label.set_text("Play" if pause else "Pause")
+
+        def switchsource(self, event):
+            nonlocal image_mode, bswitchsource
+            if (event.button == 1):
+                image_mode[1] = image_mode[0]
+                image_mode[0] = (image_mode[0] + 1) % len(data)
+            else:
+                image_mode[0] = image_mode[1]
+                image_mode[1] = (image_mode[1] - 1) % len(data)
+
+            axarr[0].set_title(data[image_mode[0]][0])
+            axarr[1].set_title(data[image_mode[1]][0])
+
+        def save_frame(self, event, image_index):
+            nonlocal pause
+            oldPause = pause
+            pause = True
+
+            from tkinter import Tk
+
+            Tk().withdraw()
+            import tkinter.filedialog as tkFileDialog
+            path = tkFileDialog.asksaveasfilename(defaultextension=".pdf")
+            if path is None: # asksaveasfile return `None` if dialog closed with "cancel".
+                return
+
+            savefig = plt.figure("save")
+            ax = savefig.add_subplot(111)
+            savemat = ax.imshow(data[image_mode[image_index]][1][i], origin="lower", interpolation="none")
+            saveclb = plt.colorbar(savemat)
+            saveclb.set_clim(vmin=0, vmax=1)
+            saveclb.draw_all()
+            savefig.savefig(path, bbox_inches='tight')
+            saveclb.remove()
+            savefig.gca().cla()
+
+            plt.figure("main")
+
+            pause = oldPause
+
+    callback = UICallback()
+    axsaveframeleft = plt.axes([0.074, 0.895, 0.10, 0.075])
+    axplaypause = plt.axes([0.180, 0.91, 0.10, 0.05])
+    axposition = plt.axes([0.31, 0.91, 0.375, 0.05])
+    axswitchsource = plt.axes([0.75, 0.91, 0.10, 0.05])
+    axsaveframeright = plt.axes([0.86, 0.895, 0.10, 0.075])
+
+    bplaypause = Button(axplaypause, "Pause")
+    bplaypause.on_clicked(callback.playpause)
+
+    bswitchsource = Button(axswitchsource, "switch")
+    bswitchsource.on_clicked(callback.switchsource)
+
+    bsaveframeleft = Button(axsaveframeleft, "Save\nframe")
+    bsaveframeleft.on_clicked(lambda event: callback.save_frame(event, 0))
+
+    bsaveframeright = Button(axsaveframeright, "Save\nframe")
+    bsaveframeright.on_clicked(lambda event: callback.save_frame(event, 1))
+
+    sposition = Slider(axposition, 'n', 0, shape[0], valinit=0, valfmt='%1.0f')
+    sposition.on_changed(callback.position_changed)
+
+    ani = animation.FuncAnimation(fig, update_new, interval=1, save_count=50)
+
+    plt.show()
