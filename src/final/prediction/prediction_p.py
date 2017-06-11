@@ -1,6 +1,6 @@
 """
-    Parses the arguments and sets the constants etc. to run the real cross prediction
-    code (in cross_prediction_mt_p.py) on a unix device.
+    Parses the arguments and sets the constants etc. to run the real prediction
+    code (in prediction_mt_p.py) on a unix device.
 """
 
 import os
@@ -29,26 +29,26 @@ def parse_arguments():
     print("Prediction via {0}: {1}".format(pmtp.predictionMode, pmtp.direction))
 
 def setup_constants():
-    id = pmtp.id
+    sge_id = pmtp.id
     direction = pmtp.direction
 
     print("Using parameters:")
 
-    if (pmtp.predictionMode == "ESN"):
-        pmtp.n_units = {"u": [500], "v": []}[direction][id-1]
-        pmtp.sparseness = {"u": [.05], "v": []}[direction][id-1]
-        pmtp.random_seed = {"u": [41], "v": []}[direction][id-1]
+    if pmtp.predictionMode == "ESN":
+        pmtp.n_units = {"u": [500], "v": []}[direction][sge_id-1]
+        pmtp.sparseness = {"u": [.05], "v": []}[direction][sge_id-1]
+        pmtp.random_seed = {"u": [41], "v": []}[direction][sge_id-1]
 
-        pmtp.spectral_radius = {"u": [1.2], "v": []}[direction][id-1]
-        pmtp.regression_parameter = {"u": [3e-8], "v": []}[direction][id-1]
-        pmtp.leaking_rate = {"u": [.95], "v": []}[direction][id-1]
-        pmtp.noise_level = {"u": [.0001], "v": []}[direction][id-1]
+        pmtp.spectral_radius = {"u": [1.2], "v": []}[direction][sge_id-1]
+        pmtp.regression_parameter = {"u": [3e-8], "v": []}[direction][sge_id-1]
+        pmtp.leaking_rate = {"u": [.95], "v": []}[direction][sge_id-1]
+        pmtp.noise_level = {"u": [.0001], "v": []}[direction][sge_id-1]
 
-        pmtp.sigma = [1, 3, 5, 5, 7, 7, 7][id-1]
-        pmtp.sigma_skip = [1, 1, 1, 2, 1, 2, 3][id-1]
+        pmtp.sigma = [1, 3, 5, 5, 7, 7, 7][sge_id-1]
+        pmtp.sigma_skip = [1, 1, 1, 2, 1, 2, 3][sge_id-1]
 
         print("\t trainLength \t = {0} \n\t sigma \t = {1}\n\t sigma_skip \t = {2}\n\t n_units \t = {3}\n\t regular. \t = {4}"
-                .format(pmtp.trainLength, pmtp.sigma, pmtp.sigma_skip, pmtp.n_units, pmtp.regression_parameter))
+              .format(pmtp.trainLength, pmtp.sigma, pmtp.sigma_skip, pmtp.n_units, pmtp.regression_parameter))
 
     else:
         raise ValueError("No valid predictionMode choosen! (Value is now: {0})".format(pmtp.predictionMode))

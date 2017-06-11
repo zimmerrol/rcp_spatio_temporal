@@ -1,4 +1,4 @@
-import os,sys,inspect
+import os, sys, inspect
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)
 grandparentdir = os.path.dirname(parentdir)
@@ -17,8 +17,10 @@ import dill as pickle
 from ESN import *
 from RBF import *
 from NN import *
+from GridSearchP import GridSearchP
 
-from multiprocessing import Process, Queue, Manager, Pool #we require Pathos version >=0.2.6. Otherwise we will get an "EOFError: Ran out of input" exception
+#We require Pathos version >=0.2.6. Otherwise we will get an "EOFError: Ran out of input" exception
+from multiprocessing import Process, Queue, Manager, Pool
 import multiprocessing
 import ctypes
 from multiprocessing import process
@@ -28,7 +30,7 @@ import barkley_helper as bh
 import mitchell_helper as mh
 import argparse
 
-from GridSearchP import GridSearchP
+
 
 N = 150
 ndata = 30000
