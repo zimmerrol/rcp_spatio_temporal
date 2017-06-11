@@ -1,11 +1,12 @@
 """
-Parses the arguments and sets the constants etc. to run the real cross prediction code (in cross_prediction_mt_p.py) on a unix device.
+    Parses the arguments and sets the constants etc. to run the real cross prediction
+code (in cross_prediction_mt_p.py) on a unix device.
 """
 
-import prediction_mt_p as pmtp
 import os
 import argparse
 import numpy as np
+import prediction_mt_p as pmtp
 
 def parse_arguments():
     pmtp.id = int(os.getenv("SGE_TASK_ID", 0))
@@ -37,7 +38,7 @@ def setup_constants():
         pmtp.n_units = {"u": [500], "v": []}[direction][id-1]
         pmtp.sparseness = {"u": [.05], "v": []}[direction][id-1]
         pmtp.random_seed = {"u": [41], "v": []}[direction][id-1]
-        
+
         pmtp.spectral_radius = {"u": [1.2], "v": []}[direction][id-1]
         pmtp.regression_parameter = {"u": [3e-8], "v": []}[direction][id-1]
         pmtp.leaking_rate = {"u": [.95], "v": []}[direction][id-1]
@@ -46,7 +47,8 @@ def setup_constants():
         pmtp.sigma = [1, 3, 5, 5, 7, 7, 7][id-1]
         pmtp.sigma_skip = [1, 1, 1, 2, 1, 2, 3][id-1]
 
-        print("\t trainLength \t = {0} \n\t sigma \t = {1}\n\t sigma_skip \t = {2}\n\t n_units \t = {3}\n\t regular. \t = {4}".format(pmtp.trainLength, pmtp.sigma, pmtp.sigma_skip, pmtp.n_units, pmtp.regression_parameter))
+        print("\t trainLength \t = {0} \n\t sigma \t = {1}\n\t sigma_skip \t = {2}\n\t n_units \t = {3}\n\t regular. \t = {4}"
+                .format(pmtp.trainLength, pmtp.sigma, pmtp.sigma_skip, pmtp.n_units, pmtp.regression_parameter))
 
     else:
         raise ValueError("No valid predictionMode choosen! (Value is now: {0})".format(pmtp.predictionMode))

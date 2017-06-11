@@ -26,12 +26,11 @@ from helper import *
 import barkley_helper as bh
 import mitchell_helper as mh
 
+if __name__== '__main__':
+    print("Do not call prediction_mt_p.py on its own. Set the constants and arguments according to prediction_p.py" \
+            "and then call the mainFunction here.")
+    exit()
 
-#get V animation data -> [N, 150, 150]
-#create 2d delay coordinates -> [N, 150, 150, d]
-#create new dataset with small data groups -> [N, 150, 150, d*sigma*sigma]
-#create d*sigma*sigma-k tree from this data
-#search nearest neighbours (1 or 2) and predict new U value
 
 #set the temporary buffer for the multiprocessing module manually to the shm
 #to solve "no enough space"-problems
@@ -51,7 +50,6 @@ def setup_arrays():
     global shared_input_data_base, shared_output_data_base, shared_prediction_base
     global shared_input_data, shared_output_data, shared_prediction
 
-    ###print("setting up arrays...")
     shared_input_data_base = multiprocessing.Array(ctypes.c_double, ndata*N*N)
     shared_input_data = np.ctypeslib.as_array(shared_input_data_base.get_obj())
     shared_input_data = shared_input_data.reshape(-1, N, N)
@@ -63,7 +61,6 @@ def setup_arrays():
     shared_prediction_base = multiprocessing.Array(ctypes.c_double, testLength*N*N)
     shared_prediction = np.ctypeslib.as_array(shared_prediction_base.get_obj())
     shared_prediction = shared_prediction.reshape(-1, N, N)
-    ###print("setting up finished")
 setup_arrays()
 
 def generate_data(N, Ngrid):
@@ -233,7 +230,7 @@ def mainFunction():
     print("test error: {0}".format(mse))
     print("inner test error: {0}".format(np.mean((diff[:, patch_radius:N-patch_radius, patch_radius:N-patch_radius])**2)))
 
-    viewData = [("Orig", shared_output_data[trainLength:]), ("Pred", shared_prediction), ("Source", shared_input_data[trainLength:]), ("Diff", diff)]
+    viewData = [("Orig", shared_output_data[trainLength:trainLength+testLength]), ("Pred", shared_prediction), ("Source", shared_input_data[trainLength:trainLength+testLength]), ("Diff", diff)]
 
     """
     model = "barkley" if direction in ["uv", "vu"] else "mitchell"
@@ -250,6 +247,3 @@ def mainFunction():
 
     show_results(viewData)
     print("done")
-
-if __name__== '__main__':
-    mainFunction()
