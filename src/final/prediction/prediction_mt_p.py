@@ -81,8 +81,8 @@ def generate_data(N, Ngrid):
 
     #fill the first ndata-predictionLength items with the real data and leave the last predictionLength items free
     #these items will never be used, and are only created to reduce the needed code
-    shared_input_data[:predictionLength] = data[0, :-predictionLength]
-    shared_output_data[:predictionLength] = data[0, predictionLength:]
+    shared_input_data[:-predictionLength] = data[0, :-predictionLength]
+    shared_output_data[:-predictionLength] = data[0, predictionLength:]
 
 def prepare_predicter(y, x, training_data_in, training_data_out):
     if (predictionMode == "ESN"):
