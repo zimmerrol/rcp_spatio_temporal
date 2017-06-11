@@ -58,19 +58,19 @@ def generate_data(N, trans, sample_rate, Ngrid):
     data = None
 
     if (direction in ["uv", "vu"]):
-        if (os.path.exists("../../cache/barkley/raw/{0}_{1}.uv.dat.npy".format(N, Ngrid)) == False):
+        if not os.path.exists("../../cache/barkley/raw/{0}_{1}.uv.dat.npy".format(N, Ngrid)):
             data = bh.generate_uv_data(N, 50000, 5, Ngrid=Ngrid)
             np.save("../../cache/barkley/raw/{0}_{1}.uv.dat.npy".format(N, Ngrid), data)
         else:
             data = np.load("../../cache/barkley/raw/{0}_{1}.uv.dat.npy".format(N, Ngrid))
     else:
-        if (os.path.exists("../../cache/mitchell/raw/{0}_{1}.vh.dat.npy".format(N, Ngrid)) == False):
+        if not os.path.exists("../../cache/mitchell/raw/{0}_{1}.vh.dat.npy".format(N, Ngrid)):
             data = mh.generate_vh_data(N, 20000, 50, Ngrid=Ngrid)
             np.save("../../cache/mitchell/raw/{0}_{1}.vh.dat.npy".format(N, Ngrid), data)
         else:
             data = np.load("../../cache/mitchell/raw/{0}_{1}.vh.dat.npy".format(N, Ngrid))
 
-    #at the moment we are doing a u -> v / v -> h cross prediction.
+    #at the moment we are doing a u -> v / v -> h cross prediction (index 0 -> index 1)
     if (direction in ["vu", "hv"]):
         #switch the entries for the v -> u / h -> v prediction
         tmp = data[0].copy()
@@ -80,37 +80,34 @@ def generate_data(N, trans, sample_rate, Ngrid):
     return data
 
 def mainFunction():
-    global output_weights, frame_output_weights, last_states
-
     data = generate_data(ndata, 20000, 50, Ngrid=N)
 
     training_data = data[:, :trainLength]
-    test_data = data[:,trainLength:trainLength+testLength]
-
+    test_data = data[:, trainLength:trainLength+testLength]
 
     sigma, sigma_skip = [(1, 1), (3, 1), (5, 1), (5, 2), (7, 1), (7, 2), (7, 3)][id-1]
     patch_radius = sigma//2
     input_size = [1, 9, 25, 9, 49, 16, 9][id-1]
 
     param_grid = {"n_reservoir": [50, 200, 400], "spectral_radius": [0.1, 0.5, 0.8, 0.95, 1.1, 1.5, 3.0], "leak_rate": [.05, .2, .5 , .7, .9, .95],
-                "random_seed": [42,41,40,39],  "sparseness": [.1, .2], "noise_level": [0.0001, 0.00001], "regression_parameters": [[5e-2],[5e-3],[5e-4],[5e-5],[5e-6]]}
+                  "random_seed": [42, 41, 40, 39],  "sparseness": [.1, .2], "noise_level": [0.0001, 0.00001], "regression_parameters": [[5e-2], [5e-3], [5e-4], [5e-5], [5e-6]]}
     fixed_params = {"n_output": 1, "n_input": input_size, "solver": "lsqr", "weight_generation": "advanced"}
 
-    gs = GridSearchP(param_grid, fixed_params, esnType=ESN)
+    gridsearch = GridSearchP(param_grid, fixed_params, esnType=ESN)
 
     print("start fitting...")
 
     sys.stdout.flush()
-    results = gs.fit(
-                training_data[1, :, N//2-patch_radius:N//2+patch_radius+1, N//2-patch_radius:N//2+patch_radius+1][:, ::sigma_skip, ::sigma_skip].reshape((trainLength, -1)), training_data[0, :, N//2, N//2].reshape((trainLength, 1)),
-                [(test_data[1, :, N//2-patch_radius:N//2+patch_radius+1, N//2-patch_radius:N//2+patch_radius+1][:, ::sigma_skip, ::sigma_skip].reshape((testLength, -1)), test_data[0, :, N//2, N//2].reshape((testLength, 1)))],
-                printfreq=100, verbose=2, n_jobs=16)
+    results = gridsearch.fit(
+        training_data[0, :, N//2-patch_radius:N//2+patch_radius+1, N//2-patch_radius:N//2+patch_radius+1][:, ::sigma_skip, ::sigma_skip].reshape((trainLength, -1)), training_data[1, :, N//2, N//2].reshape((trainLength, 1)),
+        [(test_data[0, :, N//2-patch_radius:N//2+patch_radius+1, N//2-patch_radius:N//2+patch_radius+1][:, ::sigma_skip, ::sigma_skip].reshape((testLength, -1)), test_data[1, :, N//2, N//2].reshape((testLength, 1)))],
+        printfreq=100, verbose=2, n_jobs=16)
     print("results:\r\n")
     print(results)
     print("")
 
-    print("\r\nBest result (mse =  {0}):\r\n".format(gs._best_mse))
-    print("best parameters {0}".format(gs._best_params))
+    print("\r\nBest result (mse =  {0}):\r\n".format(gridsearch._best_mse))
+    print("best parameters {0}".format(gridsearch._best_params))
 
 class ForceIOStream:
     def __init__(self, stream):
