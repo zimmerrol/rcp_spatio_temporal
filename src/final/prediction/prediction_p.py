@@ -1,6 +1,6 @@
 """
     Parses the arguments and sets the constants etc. to run the real cross prediction
-code (in cross_prediction_mt_p.py) on a unix device.
+    code (in cross_prediction_mt_p.py) on a unix device.
 """
 
 import os
@@ -56,7 +56,7 @@ def setup_constants():
     pmtp.eff_sigma = int(np.ceil(pmtp.sigma/pmtp.sigma_skip))
     pmtp.patch_radius = pmtp.sigma//2
 
-if __name__== '__main__':
+if __name__ == '__main__':
     parse_arguments()
     setup_constants()
 
