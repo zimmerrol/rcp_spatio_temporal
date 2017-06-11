@@ -29,152 +29,15 @@ import barkley_helper as bh
 import mitchell_helper as mh
 import argparse
 
+#set the temporary buffer for the multiprocessing module manually to the shm
+#to solve "no enough space"-problems
+process.current_process()._config['tempdir'] =  '/dev/shm/'
+
 tau = {"u" : 32, "v" : 119}
 N = 150
 ndata = 30000
 testLength = 2000
 trainLength = 15000
-
-def parse_arguments():
-    global id, predictionMode, direction
-
-    id = int(os.getenv("SGE_TASK_ID", 0))
-
-    parser = argparse.ArgumentParser(description='')
-    parser.add_argument('mode', nargs=1, type=str, help="Can be: NN, RBF, ESN")
-    parser.add_argument('direction', default="u", nargs=1, type=str, help="u: unblur u, v: unblurr v")
-    args = parser.parse_args()
-
-    if args.direction[0] not in ["u", "v"]:
-        raise ValueError("No valid direction choosen! (Value is now: {0})".format(args.direction[0]))
-    else:
-        direction = args.direction[0]
-
-    if args.mode[0] not in ["ESN", "NN", "RBF", "RBF2"]:
-        raise ValueError("No valid predictionMode choosen! (Value is now: {0})".format(args.mode[0]))
-    else:
-        predictionMode = args.mode[0]
-
-    print("Prediction via {0}".format(predictionMode))
-parse_arguments()
-
-def setup_constants():
-    global id
-    global k, ddim, sigma, sigma_skip, eff_sigma, patch_radius, n_units, regression_parameter
-    global innerSize, halfInnerSize, borderSize, center, rightBorderAdd
-    global n_units, seed, regression_parameter, spectral_radius, leak_rate, sparseness, noise_level
-    global width, basisPoints, predictionMode
-
-    #there is a difference between odd and even numbers for the innerSize
-    #odd size  => there is a center point and the left and the right area without this center are even spaced
-    #even size => right and left half of the square are even spaced
-
-    """
-    even      odd
-    aaaaaaaa  aaaaaaaaa
-    a┌────┐a  a┌─────┐a
-    a│ooxx│a  a│oo0xx│a
-    a│ooxx│a  a│oo0xx│a
-    a│ooxx│a  a│oo0xx│a
-    a│ooxx│a  a│oo0xx│a
-    a└────┘a  a│oo0xx│a
-    aaaaaaaa  a└─────┘a
-              aaaaaaaaa
-    """
-
-    print("Using parameters:")
-
-    if (predictionMode == "ESN"):
-        n_units = {"u": [400,400,50,50,50,200,400,400,50,50,50,200,400,400,50,50,50,200,50,50,50],
-                   "v": [50,50,200,200,50,400,50,50,200,200,50,50,50,200,200,200,50,400,200,200,200]}[direction][id-1]
-        seed = {"u": [40,39,42,41,41,39,40,39,42,41,41,39,40,39,42,41,41,39,40,40,42],
-                "v": [40,40,42,41,40,41,40,40,42,41,40,40,40,42,41,41,40,41,39,39,39]}[direction][id-1]
-        regression_parameter = {"u": [5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-2,5e-6],
-                                "v": [5e-2,5e-2,5e-2,5e-3,5e-3,5e-2,5e-2,5e-2,5e-2,5e-3,5e-3,5e-2,5e-2,5e-2,5e-3,5e-3,5e-3,5e-2,5e-2,5e-2,5e-2]}[direction][id-1]
-        spectral_radius = {"u": [0.1,3,3,0.1,3,1.5,0.1,3,3,0.1,3,1.5,0.1,3,3,0.1,0.5,1.5,0.1,0.1,0.8],
-                           "v": [0.8,3,3,3,1.5,1.5,0.8,3,3,3,1.5,0.8,3,3,3,3,1.5,1.5,0.1,0.1,1.5,]}[direction][id-1]
-        leak_rate = {"u": [.95,.9,.9,.05,.5,.95,.95,.9,.9,.05,.5,.95,.95,.9,.9,.05,.5,.95,.2,.2,.05],
-                     "v": [.95,.5,.05,.2,.2,.7,.95,.5,.05,.2,.2,.95,.5,.05,.2,.2,.2,.7,.5,.5,.05]}[direction][id-1]
-        sparseness = {"u": [2,2,2,1,2,2,2,2,2,1,2,2,2,2,2,1,2,2,1,1,1],
-                      "v": [1,1,2,1,2,2,1,1,2,1,2,1,1,2,1,1,2,2,2,2,2]}[direction][id-1]/10
-        noise_level = {"u": [1e-4,1e-5,1e-4,1e-5,1e-5,1e-5,1e-4,1e-5,1e-4,1e-5,1e-5,1e-5,1e-4,1e-5,1e-4,1e-5,1e-5,1e-5,1e-5,1e-5,1e-5,],
-                       "v": [1e-5,1e-5,1e-5,1e-4,1e-5,1e-4,1e-5,1e-5,1e-5,1e-4,1e-5,1e-5,1e-5,1e-5,1e-4,1e-4,1e-5,1e-4,1e-4,1e-4,1e-4,]}[direction][id-1]
-        innerSize = [4,8,16,32,64,128, 4,8,16,32,64,128, 4,8,16,32,64,128, 146,146,148][id-1]
-        borderSize = [1,1,1,1,1,1, 2,2,2,2,2,2, 3,3,3,3,3,3, 1,2,1][id-1]
-
-        print("\t trainLength \t = {0} \n\t sigma \t = {1}\n\t sigma_skip \t = {2}\n\t n_units \t = {3}\n\t regular. \t = {4}".format(trainLength, innerSize, borderSize, n_units, regression_parameter))
-    elif (predictionMode == "NN"):
-        #3*30 elements
-        ddim = [3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,
-                4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
-                5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,][id-1]
-        k = [4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,  5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,
-             4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,  5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,
-             4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,  5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,][id-1]
-        innerSize = [4,4,4, 8,8,8, 16,16,16, 32,32,32, 64,64,64,  4,4,4, 8,8,8, 16,16,16, 32,32,32, 64,64,64,
-                     4,4,4, 8,8,8, 16,16,16, 32,32,32, 64,64,64,  4,4,4, 8,8,8, 16,16,16, 32,32,32, 64,64,64,
-                     4,4,4, 8,8,8, 16,16,16, 32,32,32, 64,64,64,  4,4,4, 8,8,8, 16,16,16, 32,32,32, 64,64,64,][id-1]
-        borderSize = [1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,
-                      1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,
-                      1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  ][id-1]
-
-        print("\t trainLength \t = {0} \n\t innerSize \t = {1}\n\t borderSize \t = {2}\n\t ddim \t = {3}\n\t k \t = {4}".format(trainLength, innerSize, borderSize, ddim, k))
-    elif (predictionMode == "RBF"):
-        basisPoints = 100
-
-        superId = 0
-        while (id > 90):
-            id -= 90
-            superId += 1
-
-        ddim = [3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,
-                4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
-                5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,][id-1]
-        width = [[0.5, 1.0], [3.0, 5.0], [7.0, 9.0]][superId][[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-                 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-                 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,][id-1]]
-        innerSize = [4,4,4, 8,8,8, 16,16,16, 32,32,32, 64,64,64,  4,4,4, 8,8,8, 16,16,16, 32,32,32, 64,64,64,
-                     4,4,4, 8,8,8, 16,16,16, 32,32,32, 64,64,64,  4,4,4, 8,8,8, 16,16,16, 32,32,32, 64,64,64,
-                     4,4,4, 8,8,8, 16,16,16, 32,32,32, 64,64,64,  4,4,4, 8,8,8, 16,16,16, 32,32,32, 64,64,64,][id-1]
-        borderSize = [1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,
-                      1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,
-                      1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  ][id-1]
-        print("\t trainLength \t = {0} \n\t innerSize \t = {1}\n\t borderSize \t = {2}\n\t ddim \t = {3}\n\t width \t = {4}".format(trainLength, innerSize, borderSize, ddim, width))
-
-    elif (predictionMode == "RBF2"):
-        basisPoints = 100
-
-        predictionMode = "RBF"
-
-        #id: 1-108
-
-        superId = 0
-        while (id > 36):
-            id -= 12
-            superId += 1
-
-        ddim = [3,3,3,3,3,3,3,3,3,3,3,3,
-                4,4,4,4,4,4,4,4,4,4,4,4,
-                5,5,5,5,5,5,5,5,5,5,5,5,][id-1]
-        width = [[0.5, 1.0], [3.0, 5.0], [7.0, 9.0]][superId][[0,0,0,0,0,0,  1,1,1,1,1,1,
-                 0,0,0,0,0,0,  1,1,1,1,1,1,
-                 0,0,0,0,0,0,  1,1,1,1,1,1,][id-1]]
-        innerSize = [128,128,128,  146,146, 148,  128,128,128,  146,146, 148,
-                     128,128,128,  146,146, 148,  128,128,128,  146,146, 148,
-                     128,128,128,  146,146, 148,  128,128,128,  146,146, 148,][id-1]
-        borderSize = [1,2,3,  1,2,  1,  1,2,3,  1,2,  1,
-                      1,2,3,  1,2,  1,  1,2,3,  1,2,  1,
-                      1,2,3,  1,2,  1,  1,2,3,  1,2,  1,][id-1]
-        print("\t trainLength \t = {0} \n\t innerSize \t = {1}\n\t borderSize \t = {2}\n\t ddim \t = {3}\n\t width \t = {4}".format(trainLength, innerSize, borderSize, ddim, width))
-
-    else:
-        raise ValueError("No valid predictionMode choosen! (Value is now: {0})".format(predictionMode))
-
-    halfInnerSize = int(np.floor(innerSize / 2))
-    borderSize = 1
-    center = N//2
-    rightBorderAdd = 1 if innerSize != 2*halfInnerSize else 0
-setup_constants()
 
 def setup_arrays():
     global shared_input_data_base, shared_data_base, prediction_base
@@ -290,8 +153,6 @@ def process_thread_results(q, numberOfResults):
         bar.update(finishedResults)
 
 def mainFunction():
-    global shared_training_data, shared_test_data
-
     generate_data(ndata, 20000, 50, Ngrid=N)
 
     queue = Queue() # use manager.queue() ?
@@ -336,8 +197,6 @@ def mainFunction():
         f = open("../../cache/{0}/viewdata/inner_cross_pred/{1}/{2}_viewdata_{3}_{4}_{5}_{6}_{7}.dat".format(model, direction, predictionMode.lower(), trainLength, innerSize, borderSize, regression_parameter, n_units), "wb")
     pickle.dump(viewData, f)
     f.close()
-
-    #show_results(viewData)
 
 if __name__== '__main__':
     mainFunction()

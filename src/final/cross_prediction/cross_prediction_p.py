@@ -1,3 +1,7 @@
+"""
+Parses the arguments and sets the constants etc. to run the real cross prediction code (in cross_prediction_mt_p.py) on a unix device.
+"""
+
 import cross_prediction_mt_p as cpmtp
 import os
 import argparse
@@ -22,7 +26,6 @@ def parse_arguments():
         cpmtp.predictionMode = args.mode[0]
 
     print("Prediction via {0}: {1}".format(cpmtp.predictionMode, cpmtp.direction))
-
 
 def setup_constants():
     id = cpmtp.id

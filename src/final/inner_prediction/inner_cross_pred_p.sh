@@ -16,20 +16,20 @@ export PYTHONUNBUFFERED=1
 #$ -j yes
 
 # Standard name of the job (if none is given on the command line):
-#$ -N cross_pred_rbf_placements_vh
+#$ -N inner_cross_pred_esn_u
 
 # Path for the output files
-#$ -o /home/roland/q-out_cross_rbf_placements
+#$ -o /home/roland/q-out_inner_cross/
 
 # Limit memory usage
 #$ -hard -l h_vmem=62G
 
 # array range
-#$ -t 1-132
+#$ -t 1-21
 
 # parallel
 #$ -pe mvapich2-grannus05 16
 
 #$ -q mvapich2-grannus05.q
 
-python cross_prediction_mt_p.py RBF2 vh
+python inner_cross_pred_p.py ESN u
