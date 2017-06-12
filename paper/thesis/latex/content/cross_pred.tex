@@ -1,4 +1,5 @@
 \section{Kreuz-Prädiktion}
+\label{sec:exp_cross_pred}
 Momentan ist es durch invitro Experimente bereits möglich die Ausbreitung der elektrischen Erregung auf der Oberfläche des Herzmuskels experimentell aufzuzeichnen. Nun stellt sich die Frage, ob anhand beispielsweise der Messung der Membramspannung weitere Variablen des Systems wie die Kalium-Konzentration oder ähnliches ermittelt werden kann. Diese Fragestellung wird in der ersten Aufgabe betrachtet. Es wird die Vorhersage von der Spannungsvariable auf die zweite Variable des jeweiligen Modells sowohl für das \textit{Barkley}- als auch für das \textit{Mitchell-Schaeffer}-Modell durchgeführt. Dabei wird zuerst die Nächste Nachbar Methode, anschließend die radialen Basisfunktionen und schlussendlich die \textit{ESN}s verwendet. Es werden sowohl die einzelnen Ergebnisse präsentiert als auch ein abschließender Vergleich durchgeführt.
  
 \subsection{Nächste Nachbar Vorhersage}
@@ -95,7 +96,7 @@ Bei der Verwendung radialer Basisfunktionen stellt zudem die Breite $\sigma_{RBF
 		\hline 
 		\rule[-1ex]{0pt}{2.5ex} \textbf{MSE} & \textbf{0.00064} & \textbf{0.00890} \\ 
 		\hline 
-		\rule[-1ex]{0pt}{2.5ex} \textbf{NRMSE} & \textbf{0.1069} & \textbf{0.2679} \\ 
+		\rule[-1ex]{0pt}{2.5ex} \textbf{NRMSE} & \textbf{0.1069} & \textbf{0.6034} \\ 
 		\hline 
 	\end{tabular} 
 	\caption{Gefundene Hyperparameter der radialen Basisfunktionen für das \textit{Mitchell-Schaeffer}- und das \textit{Barkley}-Modell, welche zu den geringsten Fehlern führen.}
@@ -155,36 +156,39 @@ Abschließend ist dieses Problem nun mit den \textit{ESN}s gelöst worden. Dazu 
 	\begin{tabular}{|c|c|c|}
 		\multicolumn{1}{c|}{} &  Barkley & Mitchell-Schaeffer \\ 
 		\hline \hline 
-		\rule[-1ex]{0pt}{2.5ex} $\sigma$ & $5$ & $3$ \\ 
+		\rule[-1ex]{0pt}{2.5ex} $\sigma$ & $3$ & $3$ \\ 
 		\hline 
-		\rule[-1ex]{0pt}{2.5ex} $\Delta \sigma$ & $2$ & $1$ \\ 
+		\rule[-1ex]{0pt}{2.5ex} $\Delta \sigma$ & $1$ & $1$ \\ 
 		\hline 
 		\rule[-1ex]{0pt}{3.5ex} $N$ & $400$ & $400$ \\ 
 		\hline 
-		\rule[-1ex]{0pt}{3.5ex} $\rho(|\mathbf{W}|)$ & $1.10$ & $1.50$\\ 
+		\rule[-1ex]{0pt}{3.5ex} $\rho(|\mathbf{W}|)$ & $0.95$ & $0.95$\\ 
 		\hline 
-		\rule[-1ex]{0pt}{3.5ex} $\alpha$ & $0.20$ & $0.05$ \\ 
+		\rule[-1ex]{0pt}{3.5ex} $\alpha$ & $0.05$ & $0.05$ \\ 
 		\hline 
 		\rule[-1ex]{0pt}{3.5ex} $\epsilon$ & $0.1$ & $0.1$ \\ 
 		\hline 
-		\rule[-1ex]{0pt}{3.5ex} $\nu_{max}$ & $\num{1e-5}$ & $\num{1e-4}$\\ 
+		\rule[-1ex]{0pt}{3.5ex} $\nu_{max}$ & $\num{1e-4}$ & $\num{1e-4}$\\ 
 		\hline 
-		\rule[-1ex]{0pt}{3.5ex} $\lambda$ & $\num{5e-6}$ & $\num{5e-4}$\\ 
+		\rule[-1ex]{0pt}{3.5ex} $\lambda$ & $\num{5e-6}$ & $\num{5e-6}$\\ 
 		\hline 
-		\rule[-1ex]{0pt}{2.5ex} Laufzeit [s] & $3604$ & $3823$ \\ 
+		\rule[-1ex]{0pt}{2.5ex} Laufzeit [s] & $3710$ & $3733$ \\ 
 		\hline 
-		\rule[-1ex]{0pt}{2.5ex} \textbf{MSE} & \textbf{0.00001} & \textbf{0.00175} \\ 
+		\rule[-1ex]{0pt}{2.5ex} \textbf{MSE} & \textbf{\num{1.95e-7}} & \textbf{0.00075} \\ 
 		\hline
-		\rule[-1ex]{0pt}{2.5ex} \textbf{NRMSE} & \textbf{0.0462} & \textbf{0.0718} \\ 
+		\rule[-1ex]{0pt}{2.5ex} \textbf{NRMSE} & \textbf{\num{3.47e-6}} & \textbf{0.1753} \\ 
 		\hline 
 	\end{tabular} 
 	\caption{Gefundene Hyperparameter des \textsc{ESN} für das \textit{Mitchell-Schaeffer}- und das \textit{Barkley}-Modell, welche zu den geringsten Fehlern führen.}
 	\label{tab:exp_cross_esn_results}
 \end{table}
 
+Auffällig ist, dass für beide Modelle die gleichen Hyperparameter die höchste Genauigkeit erzielen. 
+\improvement{Add more details?}
+
 \FloatBarrier
 \subsection{Vergleich}
-Abschließend kann nun ein Vergleich der drei verwendeten Methoden hinsichtlich ihrer Laufzeit und der erzielten Genauigkeiten durchgeführt werden. Dieser ist in Tabelle \ref{tab:exp_cross_comparison_results} zu finden. Die jeweils  besten Ergebnisse sind hervorgehoben. Die \textit{ESN}s erzielen für beide Modelle den geringsten Fehler, also die höchste Genauigkeit. Dabei liegt der NRMSE bei beiden Modellen unter $10\%$. Im Austausch für diese hohe Genauigkeit ist allerdings die benötigte Zeit für die Vorhersage höher als bei den Konkurrenten. Unter der Voraussetzung, dass die Rechenzeit nur eine untergeordnete Rolle spielt, so ergeben sich die \textit{ESN}s als bester Ansätze für die Kreuz-Prädiktion.
+Abschließend kann nun ein Vergleich der drei verwendeten Methoden hinsichtlich ihrer Laufzeit und der erzielten Genauigkeiten durchgeführt werden. Dieser ist in Tabelle \ref{tab:exp_cross_comparison_results} zu finden. Die jeweils  besten Ergebnisse sind hervorgehoben. Die \textit{ESN}s erzielen für beide Modelle den geringsten Fehler, also die höchste Genauigkeit. Dabei ist der NRMSE für das \textit{Barkley}-Modell mehrere Größenordnung kleiner als bei den Konkurrenz-Ansätzen. Diese überaus hohe Genauigkeit ist für das \textit{Mitchell-Schaeffer}-Modell nicht erreicht worden. Hier beträgt der Fehler trotzdem etwa nur ein Drittel von dem der anderen Ansätze. Im Austausch für diese hohe Genauigkeit ist allerdings die benötigte Zeit für die Vorhersage höher als bei den Konkurrenten. Unter der Voraussetzung, dass die Rechenzeit nur eine untergeordnete Rolle spielt, so ergeben sich die \textit{ESN}s als bester Ansätze für die Kreuz-Prädiktion.
 \begin{table}[h]
 	\centering
 	\captionsetup{width=0.9\linewidth}
@@ -196,11 +200,11 @@ Abschließend kann nun ein Vergleich der drei verwendeten Methoden hinsichtlich 
 		\hline
 		\hline
 		
-		Laufzeit [s] 	& \textbf{40} 		& 1430		& 3604		& 5252		& \textbf{1434} 		& 3823 \\
+		Laufzeit [s] 	& \textbf{40} 		& 1430		& 3710		& 5252		& \textbf{1434} 		& 3733 \\
 		\hline
-		MSE 			& 0.00105	& 0.00064	& \textbf{0.00001} 	& 0.01353	& 0.00890 	& \textbf{0.00175} \\
+		MSE 			& 0.00105	& 0.00064	& \textbf{\num{1.95e-7}} 	& 0.01353	& 0.00890 	& \textbf{0.00075} \\
 		\hline
-		NRMSE 			& 0.1367	& 0.1069	& \textbf{0.0462} 	& 0.7438	& 0.2679 	& \textbf{0.0718} \\
+		NRMSE 			& 0.1367	& 0.1069	& \textbf{\num{3.47e-6}} 	& 0.7438	& 0.6034 	& \textbf{0.1753} \\
 		\hline 
 	\end{tabular} 
 	\caption{Vergleich der benötigten Laufzeit und der erreichten Fehlers der drei Ansätze für das \textit{Mitchell-Schaeffer}- und das \textit{Barkley}-Modell, welche zu den geringsten Fehlern führen.}

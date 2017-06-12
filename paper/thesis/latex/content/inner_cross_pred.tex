@@ -1,4 +1,5 @@
 \section{Kreuz-Prädiktion innere Dynamiken}
+\label{sec:exp_inner_prediction}
 Bei Messungen der elektrischen Erregung des Herzens können nach aktuellen Stand meistens nur die Erregungen auf der Herzoberfläche gemessen werden. Die Ausbreitungen im Inneren des räumlich ausgedehnten Herzens bleiben somit verborgen. Zudem ist anzunehmen, dass die Gesamtdynamik nicht nur durch die Oberfläche, sondern auch durch die Erregung im Inneren bestimmt und charakterisiert wird. Somit wird die Frage aufgeworfen, ob die innere Erregung des Herzens nur durch die Kenntnis der Oberflächendynamik vorhergesagt werden kann. In diesem Abschnitt soll versucht werden, diese Fragestellung erneut mit den \textsc{ESN}s und den klassischen Methoden zu untersuchen. Dabei wird diese Frage statt an einem dreidimensionalen Systems an den zuvor bereits benutzten zweidimensionalen Modellen untersucht.\\
 
 \begin{figure}[h]
@@ -136,7 +137,7 @@ Analog zu den vorherigen Ausführungen sind die radialen Basisfunktionen ebenfal
 Es ist anzumerken, dass der NRMSE für beide Modelle und alle betrachteten Größen $a$ kleiner als $1.0$ bleibt. Nichtsdestotrotz steigt er ebenfalls mit wachsendem $a$ an, wie schon bei den nächsten Nachbarn. Für die größten beiden $a$-Werte ist in beiden Modellen der Fehler allerdings schon so groß, dass die Vorhersage kaum nützliche Informationen liefert.
 
 \subsection{Echo State Network}
-Im Gegensatz zu den anderen beiden Methoden wächst die benötigte Rechenzeit bei der Verwendung der \textsc{ESN}s nicht so schnell an, sodass hiermit auch deutlich größere innere Felder betrachtet werden können. Zur Optimierung des Ansatzes ist erneut das in Abschnitt \ref{sec:exp_general_esn} beschriebene Verfahren durchgeführt worden.
+Im Gegensatz zu den anderen beiden Methoden wächst die benötigte Rechenzeit bei der Verwendung der \textsc{ESN}s nicht so schnell an, sodass hiermit auch deutlich größere innere Felder betrachtet werden können. Zur Optimierung des Ansatzes ist erneut das in Abschnitt \ref{sec:exp_general_esn} beschriebene Verfahren durchgeführt worden. Dabei ist ersichtlich geworden, dass der untersuchte Bereich der Regularisierung $\lambda \in [\num{5e-2},\num{5e-6}]$ zu gering ist, da der optimale Wert stets am linken Rand des Intervalls gefunden worden ist. Deswegen ist noch einmal eine Suche auf dem größeren Parameterbereich $\lambda \in [\num{5e-4},\num{5e+4}]$ durchgeführt worden.
 
 \begin{table}[h]
 	\centering
@@ -208,9 +209,31 @@ Es ist anzunehmen, dass für die Vorhersage eines Punktes der weit von den bekan
 Hier kann erneut der Trend beobachtet werden, dass der Fehler mit steigendem $a$ ebenso zunimmt. Für das \textit{Mitchell-Schaffer}-Modell sind alle NRMSE-Werte kleiner als $1.0$. Dies ist beim \textit{Barkley-Modell} nicht mehr der Fall für die beiden größten Werte von $a$. 
 
 \subsection{Vergleich}
-Für einen Vergleich der drei Methoden bietet es sich an die Ergebnisse für die größten Wert für $a$ durchzuführen, der mit allen drei Ansätzen betrachtet worden ist. Dies entspricht $a=64$. 
+Für einen Vergleich der drei Methoden bietet es sich an die Ergebnisse für die größten Wert für $a$ durchzuführen, der mit allen drei Ansätzen betrachtet worden ist. Dies entspricht dem Wert $a=64$. Eine Übersicht der verschiedenen Ergebnisse ist in Tabelle \ref{tab:exp_inner_cross_comparison_results} zu finden.
 
-\improvement{Add table to compare the results}
+\begin{table}[h]
+	\centering
+	\captionsetup{width=0.9\linewidth}
+	\begin{tabular}{|c|c|c|c|c|c|c|c|}
+		\multicolumn{1}{c|}{} & \multicolumn{3}{c|}{Barkley} & \multicolumn{3}{c|}{Mitchell-Schaeffer}		\\
+		\cline{2-7}
+		\multicolumn{1}{c|}{} & NN & RBF & ESN & NN & RBF & ESN \\
+		
+		\hline
+		\hline
+		
+		Laufzeit [s] 	& 20272 	& 1756		& \textbf{1089}		& 14754		&  	1845	& \textbf{1206} \\
+		\hline
+		MSE 			& 0.09284	& 0.05588	& 	\textbf{0.05389} 		& 0.24599	& 0.13615 	& \textbf{0.12975}	 \\
+		\hline
+		NRMSE 			& 1.1837	& 0.9184	& \textbf{0.9019} 			& 1.3042	& 0.9703 	& \textbf{0.9472} \\
+		\hline 
+	\end{tabular} 
+	\caption{Vergleich der benötigten Laufzeit und der erreichten Fehlers der drei Ansätze für das \textit{Mitchell-Schaeffer}- und das \textit{Barkley}-Modell, welche zu den geringsten Fehlern führen, für $a=64$.}
+	\label{tab:exp_inner_cross_comparison_results}
+\end{table}
 
-Des Weiteren ist das Anwachsen des Fehlers mit steigender Größe des vorherzusagenden Bereiches auch eine Gemeinsamkeit aller drei Ansätze. Es ist somit zu vermuten, dass dies nicht eine reine Beschränkung der einzelnen Methoden ist, sondern dass dies womöglich eine Eigenschaft der betrachteten Modelle ist. 
+Es zeigt sich erneut, dass die Vorhersagen der klassischen Methoden einen höheren Fehler haben. Während der \textsc{NN}-Ansatz bei beiden Modellen schlechtere Ergebnisse als die Vorhersage mittels des Mittelwertes liefert, sind die radialen Basisfunktionen und die \textsc{ESN}s leicht besser als diese. Dabei erreichen die \textsc{ESN}s und radialen Basisfunktionen in etwa die gleiche Genauigkeit. Diese reicht allerdings auch nicht aus, um dies Methoden tatsächlich sinnvoll verwenden zu können. 
+
+Des Weiteren wächst der Fehlers mit steigender Größe des vorherzusagenden Bereiches auch bei allen drei Ansätze an. Es ist somit zu vermuten, dass dies nicht nur eine reine Beschränkung der einzelnen Methoden ist, sondern dass es womöglich eine Eigenschaft der betrachteten Modelle ist. 
 \improvement{Add comparison images}
