@@ -76,15 +76,13 @@ def generate_data(N, trans, sample_rate, Ngrid):
         else:
             data = np.load("../../cache/mitchell/raw/{0}_{1}.vh.dat.npy".format(N, Ngrid))
 
-    data = data[0]
-
-    return data
+    return data[0]
 
 def mainFunction():
     data = generate_data(ndata, 20000, 50, Ngrid=N)
 
-    input_data = data[0, :-prediction_length, N//2-patch_radius:N//2+patch_radius+1, N//2-patch_radius:N//2+patch_radius+1][:, ::sigma_skip, ::sigma_skip].reshape((trainLength, -1))
-    output_data = data[0, prediction_length:, N//2, N//2].reshape((-1, 1))
+    input_data = data[:-prediction_length, N//2-patch_radius:N//2+patch_radius+1, N//2-patch_radius:N//2+patch_radius+1][:, ::sigma_skip, ::sigma_skip].reshape((trainLength, -1))
+    output_data = data[prediction_length:, N//2, N//2].reshape((-1, 1))
 
     param_grid = {"n_reservoir": [50, 200, 300, 400], "spectral_radius": [0.1, 0.5, 0.8, 0.95, 1.0, 1.1, 1.2, 1.5, 1.75, 2.5, 3.0],
                   "leak_rate": [.05, .2, .5, .7, .9, .95], "random_seed": [42, 41, 40, 39], "sparseness": [.05, .1, .2],
