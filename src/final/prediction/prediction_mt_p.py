@@ -43,7 +43,7 @@ useInputScaling = False
 predictionLength = 100
 
 #will be set by the *_p.py file
-direction, predictionMode, patch_radius, eff_sigma, sigma, sigma_skip = None, None, None, None, None, None
+direction, patch_radius, eff_sigma, sigma, sigma_skip = None, None, None, None, None,
 n_units, spectral_radius, leaking_rate, random_seed, noise_level, regression_parameter, sparseness = None, None, None, None, None, None, None
 
 def setup_arrays():
@@ -212,7 +212,7 @@ def mainFunction():
     model = "barkley" if direction == "u" else "mitchell"
 
     output_file = open("../../cache/{0}/viewdata/predict_{1}/{2}_viewdata_{3}_{4}_{5}_{6}_{7}.dat".format(
-        model, direction, predictionMode.lower(), trainLength, sigma, sigma_skip, regression_parameter, n_units), "wb")
+        model, direction, "esn", trainLength, sigma, sigma_skip, regression_parameter, n_units), "wb")
     pickle.dump(view_data, output_file)
     output_file.close()
 
