@@ -81,7 +81,7 @@ def generate_data(N, trans, sample_rate, Ngrid):
 def mainFunction():
     data = generate_data(ndata, 20000, 50, Ngrid=N)
 
-    input_data = data[:-prediction_length, N//2-patch_radius:N//2+patch_radius+1, N//2-patch_radius:N//2+patch_radius+1][:, ::sigma_skip, ::sigma_skip].reshape((trainLength, -1))
+    input_data = data[:-prediction_length, N//2-patch_radius:N//2+patch_radius+1, N//2-patch_radius:N//2+patch_radius+1][:, ::sigma_skip, ::sigma_skip].reshape((-1, input_size))
     output_data = data[prediction_length:, N//2, N//2].reshape((-1, 1))
 
     param_grid = {"n_reservoir": [50, 200, 300, 400], "spectral_radius": [0.1, 0.5, 0.8, 0.95, 1.0, 1.1, 1.2, 1.5, 1.75, 2.5, 3.0],
