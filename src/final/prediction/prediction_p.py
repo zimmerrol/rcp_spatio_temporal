@@ -39,6 +39,8 @@ def setup_constants():
     pmtp.sigma = [1, 3, 5, 5, 7, 7, 7][sge_id-1]
     pmtp.sigma_skip = [1, 1, 1, 2, 1, 2, 3][sge_id-1]
 
+    pmtp.useInputScaling = True
+
     print("\t trainLength \t = {0} \n\t sigma \t = {1}\n\t sigma_skip \t = {2}\n\t n_units \t = {3}\n\t regular. \t = {4}"
           .format(pmtp.trainLength, pmtp.sigma, pmtp.sigma_skip, pmtp.n_units, pmtp.regression_parameter))
 

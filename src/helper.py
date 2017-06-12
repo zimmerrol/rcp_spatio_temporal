@@ -1,3 +1,7 @@
+"""
+
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
@@ -24,7 +28,7 @@ def calculate_mutualinformation(x, y, bins):
     return MI
 
 def calculate_esn_mi_input_scaling(input_data, output_data):
-    if (len(input_data) != len(output_data)):
+    if len(input_data) != len(output_data):
         raise ValueError("input_data and output_data do not have the same length -  {0} vs. {1}".format(len(input_data), len(output_data)))
 
     #Scott's rule to calculate nbins
@@ -33,7 +37,7 @@ def calculate_esn_mi_input_scaling(input_data, output_data):
 
     mi = np.zeros(input_data.shape[1])
     for i in range(len(mi)):
-         mi[i] = calculate_mutualinformation(input_data[:, i], output_data, nbins)
+        mi[i] = calculate_mutualinformation(input_data[:, i], output_data, nbins)
     scaling = mi / np.max(mi)
 
     return scaling
@@ -43,7 +47,7 @@ def create_2d_delay_coordinates(data, delay_dimension, tau):
 
     for n in range(1, delay_dimension):
         result[:, :, :, n] = np.roll(result[:, :, :, n], n*tau, axis=0)
-    result[0:delay_dimension-1,:,:] = 0
+    result[0:delay_dimension-1, :, :] = 0
 
     return result
 
@@ -52,7 +56,7 @@ def create_1d_delay_coordinates(data, delay_dimension, tau):
 
     for n in range(1, delay_dimension):
         result[:, :, n] = np.roll(result[:, :, n], n*tau, axis=0)
-    result[0:delay_dimension-1,:,:] = 0
+    result[0:delay_dimension-1, :, :] = 0
 
     return result
 
@@ -61,7 +65,7 @@ def create_0d_delay_coordinates(data, delay_dimension, tau):
 
     for n in range(1, delay_dimension):
         result[:, n] = np.roll(result[:, n], n*tau, axis=0)
-    result[0:delay_dimension-1,:] = 0
+    result[0:delay_dimension-1, :] = 0
 
     return result
 
@@ -90,23 +94,23 @@ def show_results(packedData, forced_clim=None):
     shape = None
     data = []
 
-    if (type(packedData) is dict):
+    if type(packedData) is dict:
         for key, value in packedData.items():
-            tmpItem = [key,value]
-            if (type(value) is not np.ndarray):
+            tmpItem = [key, value]
+            if type(value) is not np.ndarray:
                 raise ValueError("Item for key '{0}' is not of the type numpy.ndarray".format(key))
-            if (shape == None):
+            if shape == None:
                 shape = value.shape
             else:
-                if (shape != value.shape):
+                if shape != value.shape:
                     raise ValueError("Item for key '{0}' has the shape {1} and not {2}".format(key, value.shape, shape))
             data.append(tmpItem)
     else:
         data = packedData
 
-        for i in range(len(data)):
-            if (type(data[i][1]) is not np.ndarray):
-                    raise ValueError("Item for key '{0}' is not of the type numpy.ndarray".format(data[i][0]))
+        for item in data:
+            if type(item[1]) is not np.ndarray:
+                raise ValueError("Item for key '{0}' is not of the type numpy.ndarray".format(item[0]))
 
         shape = data[0][1].shape
 
@@ -119,14 +123,14 @@ def show_results(packedData, forced_clim=None):
 
         mat.set_data(data[image_mode][1][i])
 
-        if (forced_clim is None):
-            if (i < shape[0]-50 and i > 50):
-                clb.set_clim(vmin=0, vmax=np.max(data[image_mode][1][i-50:i+50]))
+        if forced_clim is None:
+            if i < shape[0]-50 and i > 50:
+                clb.set_clim(vmin=min(0, np.min(data[image_mode][1][i-50:i+50])), vmax=np.max(data[image_mode][1][i-50:i+50]))
         else:
-            clb.set_clim(vmin = forced_clim[0], vmax=forced_clim[1])
+            clb.set_clim(vmin=forced_clim[0], vmax=forced_clim[1])
         clb.draw_all()
 
-        if (not pause):
+        if not pause:
             i = (i+1) % shape[0]
             sposition.set_val(i)
         return [mat]
@@ -206,7 +210,7 @@ def show_results(packedData, forced_clim=None):
     sposition.on_changed(callback.position_changed)
 
 
-    ani = animation.FuncAnimation(fig, update_new, interval=1, save_count=50)
+    animation.FuncAnimation(fig, update_new, interval=1, save_count=50)
 
     plt.show()
 
@@ -214,27 +218,25 @@ def show_results_splitscreen(packedData, forced_clim=None, name=None):
     minLength = np.inf
     data = []
 
-    if (type(packedData) is dict):
+    if type(packedData) is dict:
         for key, value in packedData.items():
             tmpItem = [key,value]
-            if (type(value) is not np.ndarray):
+            if type(value) is not np.ndarray:
                 raise ValueError("Item for key '{0}' is not of the type numpy.ndarray".format(key))
-            if (shape == None):
-                shape = value.shape
             else:
-                if (shape != value.shape):
+                if shape != value.shape:
                     raise ValueError("Item for key '{0}' has the shape {1} and not {2}".format(key, value.shape, shape))
             data.append(tmpItem)
             minLength = min(minLength, len(tmpItem[1]))
     else:
         data = packedData
 
-        for i in range(len(data)):
-            if (type(data[i][1]) is not np.ndarray):
-                raise ValueError("Item for key '{0}' is not of the type numpy.ndarray".format(data[i][0]))
-            minLength = min(minLength, len(data[i][1]))
+        for item in data:
+            if type(item[1]) is not np.ndarray:
+                raise ValueError("Item for key '{0}' is not of the type numpy.ndarray".format(item[0]))
+            minLength = min(minLength, len(item[1]))
 
-    if (len(packedData) < 2):
+    if len(packedData) < 2:
         print("Less than two fields submitted - switching to normal mode.")
         show_results(data, forced_clim)
 
@@ -248,15 +250,15 @@ def show_results_splitscreen(packedData, forced_clim=None, name=None):
         for n in range(2):
             matarr[n].set_data(data[image_mode[n]][1][i])
 
-            if (forced_clim is None):
-                if (i < minLength-50 and i > 50):
+            if forced_clim is None:
+                if i < minLength-50 and i > 50:
                     clbarr[n].set_clim(vmin=min(0, np.min(data[image_mode[n]][1][i-50:i+50])), vmax=np.max(data[image_mode[n]][1][i-50:i+50]))
             else:
-                clbarr[n].set_clim(vmin = forced_clim[0], vmax=forced_clim[1])
+                clbarr[n].set_clim(vmin=forced_clim[0], vmax=forced_clim[1])
             clbarr[n].draw_all()
 
 
-        if (not pause):
+        if not pause:
             i = (i+1) % minLength
             sposition.set_val(i)
         return None
@@ -265,7 +267,7 @@ def show_results_splitscreen(packedData, forced_clim=None, name=None):
     clbarr = []
     fig, axarr = plt.subplots(1,2)
 
-    if (name == None):
+    if name is None:
         fig.canvas.set_window_title('Results')
     else:
         fig.canvas.set_window_title('Results ({0})'.format(name))
@@ -359,6 +361,6 @@ def show_results_splitscreen(packedData, forced_clim=None, name=None):
     sposition = Slider(axposition, 'n', 0, minLength, valinit=0, valfmt='%1.0f')
     sposition.on_changed(callback.position_changed)
 
-    ani = animation.FuncAnimation(fig, update_new, interval=1, save_count=50)
+    animation.FuncAnimation(fig, update_new, interval=1, save_count=50)
 
     plt.show()
