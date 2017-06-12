@@ -250,7 +250,7 @@ def show_results_splitscreen(packedData, forced_clim=None, name=None):
 
             if (forced_clim is None):
                 if (i < minLength-50 and i > 50):
-                    clbarr[n].set_clim(vmin=min(0, np.min(data[image_mode[n]][1][i-50:i+50]), vmax=np.max(data[image_mode[n]][1][i-50:i+50]))
+                    clbarr[n].set_clim(vmin=min(0, np.min(data[image_mode[n]][1][i-50:i+50])), vmax=np.max(data[image_mode[n]][1][i-50:i+50]))
             else:
                 clbarr[n].set_clim(vmin = forced_clim[0], vmax=forced_clim[1])
             clbarr[n].draw_all()
