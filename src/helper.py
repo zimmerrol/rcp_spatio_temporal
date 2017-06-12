@@ -211,7 +211,7 @@ def show_results(packedData, forced_clim=None):
     plt.show()
 
 def show_results_splitscreen(packedData, forced_clim=None, name=None):
-    minLength = 0
+    minLength = np.inf
     data = []
 
     if (type(packedData) is dict):
