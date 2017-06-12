@@ -47,15 +47,17 @@ def parse_arguments():
     print("Prediction via: {0}".format(direction))
 parse_arguments()
 
+sigma, sigma_skip, patch_radius, input_size, prediction_length = 0, 0, 0, 0, 0
 def setup_constants():
-    global innerSize, halfInnerSize, borderSize, center, rightBorderAdd
+    global sigma, sigma_skip, patch_radius, input_size, prediction_length
 
     sge_id = int(os.getenv("SGE_TASK_ID", 0))
 
-    halfInnerSize = int(np.floor(innerSize / 2))
-    borderSize = 1
-    center = N//2
-    rightBorderAdd = 1 if innerSize != 2*halfInnerSize else 0
+    prediction_length = 100
+
+    sigma, sigma_skip = [(1, 1), (3, 1), (5, 1), (5, 2), (7, 1), (7, 2), (7, 3)][sge_id-1]
+    patch_radius = sigma//2
+    input_size = [1, 9, 25, 9, 49, 16, 9][sge_id-1]
 setup_constants()
 
 def generate_data(N, trans, sample_rate, Ngrid):
@@ -81,17 +83,12 @@ def generate_data(N, trans, sample_rate, Ngrid):
 def mainFunction():
     data = generate_data(ndata, 20000, 50, Ngrid=N)
 
-    prediction_length = 100
-
-    sigma, sigma_skip = [(1, 1), (3, 1), (5, 1), (5, 2), (7, 1), (7, 2), (7, 3)][id-1]
-    patch_radius = sigma//2
-    input_size = [1, 9, 25, 9, 49, 16, 9][id-1]
-
     input_data = data[0, :-prediction_length, N//2-patch_radius:N//2+patch_radius+1, N//2-patch_radius:N//2+patch_radius+1][:, ::sigma_skip, ::sigma_skip].reshape((trainLength, -1))
     output_data = data[0, prediction_length:, N//2, N//2].reshape((-1, 1))
 
-    param_grid = {"n_reservoir": [50, 200, 300, 400], "spectral_radius": [0.1, 0.5, 0.8, 0.95, 1.0, 1.1, 1.2, 1.5, 1.75, 2.5, 3.0], "leak_rate": [.05, .2, .5 , .7, .9, .95],
-                  "random_seed": [42, 41, 40, 39], "sparseness": [.05, .1, .2], "noise_level": [0.0001, 0.00001], "regression_parameters": [[5e-2], [5e-3], [5e-4], [5e-5], [5e-6], [5e-7], [5e-8]]}
+    param_grid = {"n_reservoir": [50, 200, 300, 400], "spectral_radius": [0.1, 0.5, 0.8, 0.95, 1.0, 1.1, 1.2, 1.5, 1.75, 2.5, 3.0],
+                  "leak_rate": [.05, .2, .5, .7, .9, .95], "random_seed": [42, 41, 40, 39], "sparseness": [.05, .1, .2],
+                  "noise_level": [0.0001, 0.00001], "regression_parameters": [[5e-2], [5e-3], [5e-4], [5e-5], [5e-6], [5e-7], [5e-8]]}
     fixed_params = {"n_output": 1, "n_input": input_size, "solver": "lsqr", "weight_generation": "advanced"}
 
     gridsearch = GridSearchP(param_grid, fixed_params, esnType=ESN)
