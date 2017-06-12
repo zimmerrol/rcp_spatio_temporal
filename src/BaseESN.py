@@ -43,6 +43,21 @@ class BaseESN(object):
                 self.output_input_scaling = output_input_scaling
                 self._create_reservoir(weight_generation, feedback)
 
+    def create_random_rotation_matrix(self):
+        h = rnd.randint(low=0, high=self.n_reservoir)
+        k = rnd.randint(low=0, high=self.n_reservoir)
+
+        phi = rnd.rand(1)*2*np.pi
+
+        Q = np.identity(self.n_reservoir)
+        Q[h, h] = np.cos(phi)
+        Q[k, k] = np.cos(phi)
+
+        Q[h, k] = -np.sin(phi)
+        Q[k, h] = np.sin(phi)
+
+        return Q
+
     def _create_reservoir(self, weight_generation, feedback=False, verbose=False):
         if (weight_generation == 'naive'):
             #random weight matrix from -0.5 to 0.5
@@ -54,6 +69,18 @@ class BaseESN(object):
 
             _W_eigenvalues = np.abs(np.linalg.eig(self._W)[0])
             self._W *= self.spectral_radius / np.max(_W_eigenvalues)
+        elif (weight_generation == "SORM"):
+            self._W = np.identity(self.n_reservoir)
+
+            number_nonzero_elements = self.sparseness * self.n_reservoir * self.n_reservoir
+            i = 0
+
+            while (np.count_nonzero(self._W) < number_nonzero_elements):
+                i += 1
+                Q = self.create_random_rotation_matrix()
+                self._W = Q.dot(self._W)
+            print(i)
+            self._W *= self.spectral_radius
 
         elif (weight_generation == 'advanced'):
             #two create W we must follow some steps:
@@ -69,11 +96,17 @@ class BaseESN(object):
             #set sparseness% to zero
             mask = rnd.rand(self.n_reservoir, self.n_reservoir) > self.sparseness
             self._W[mask] = 0.0
-   
+
+            from scipy.sparse.linalg.eigen.arpack.arpack import ArpackNoConvergence
             #just calculate the largest EV - hopefully this is the right code to do so...
-            _W_eigenvalue = np.max(np.abs(sp.sparse.linalg.eigs(self._W, k=1)[0]))
+            try:
+                #this is just a bood approximation, so this code might fail
+                _W_eigenvalue = np.max(np.abs(sp.sparse.linalg.eigs(self._W, k=1)[0]))
+            except ArpackNoConvergence:
+                #this is the safe fall back method to calculate the EV
+                _W_eigenvalue = np.max(np.abs(sp.linalg.eigvals(self._W)))
             #_W_eigenvalue = np.max(np.abs(np.linalg.eig(self._W)[0]))
- 
+
             self._W *= self.spectral_radius / _W_eigenvalue
 
             if (verbose):
