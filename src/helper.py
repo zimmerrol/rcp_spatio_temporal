@@ -257,7 +257,7 @@ def show_results_splitscreen(packedData, forced_clim=None, name=None):
 
 
         if (not pause):
-            i = (i+1) % shape[0]
+            i = (i+1) % minLength
             sposition.set_val(i)
         return None
 
@@ -356,7 +356,7 @@ def show_results_splitscreen(packedData, forced_clim=None, name=None):
     bsaveframeright = Button(axsaveframeright, "Save\nframe")
     bsaveframeright.on_clicked(lambda event: callback.save_frame(event, 1))
 
-    sposition = Slider(axposition, 'n', 0, shape[0], valinit=0, valfmt='%1.0f')
+    sposition = Slider(axposition, 'n', 0, minLength, valinit=0, valfmt='%1.0f')
     sposition.on_changed(callback.position_changed)
 
     ani = animation.FuncAnimation(fig, update_new, interval=1, save_count=50)
