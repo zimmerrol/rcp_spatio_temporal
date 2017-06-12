@@ -210,7 +210,7 @@ def show_results(packedData, forced_clim=None):
     sposition.on_changed(callback.position_changed)
 
 
-    animation.FuncAnimation(fig, update_new, interval=1, save_count=50)
+    ani = animation.FuncAnimation(fig, update_new, interval=1, save_count=50)
 
     plt.show()
 
@@ -361,6 +361,6 @@ def show_results_splitscreen(packedData, forced_clim=None, name=None):
     sposition = Slider(axposition, 'n', 0, minLength, valinit=0, valfmt='%1.0f')
     sposition.on_changed(callback.position_changed)
 
-    animation.FuncAnimation(fig, update_new, interval=1, save_count=50)
+    ani = animation.FuncAnimation(fig, update_new, interval=1, save_count=50)
 
     plt.show()
