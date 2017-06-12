@@ -6,7 +6,7 @@ import os
 
 parser = argparse.ArgumentParser(description='Shows the visualisation of the results of a 2D field predicted by ML algorithms.')
 parser.add_argument('file', type=str,help='the file of the saved visualisation dictionary', nargs=1)
-parser.add_argument('clim', default=None, nargs="*", type=int)
+parser.add_argument('clim', default=None, nargs="2", type=float)
 parser.add_argument('-splitscreen', action='store_true')
 args = parser.parse_args()
 

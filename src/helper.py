@@ -65,6 +65,12 @@ def create_0d_delay_coordinates(data, delay_dimension, tau):
 
     return result
 
+def create_rectangle_indices(range_x, range_y):
+    ind_x = np.tile(range(range_x[0], range_x[1]), range_y[1] - range_y[0])
+    ind_y = np.repeat(range(range_y[0], range_y[1]), range_x[1] - range_x[0])
+
+    return ind_y, ind_x
+
 def create_patch_indices(outer_range_x, outer_range_y, inner_range_x, inner_range_y):
     outer_ind_x = np.tile(range(outer_range_x[0], outer_range_x[1]), outer_range_y[1]-outer_range_y[0])
     outer_ind_y = np.repeat(range(outer_range_y[0], outer_range_y[1]), outer_range_x[1]-outer_range_x[0])
@@ -205,7 +211,7 @@ def show_results(packedData, forced_clim=None):
     plt.show()
 
 def show_results_splitscreen(packedData, forced_clim=None, name=None):
-    shape = None
+    minLength = 0
     data = []
 
     if (type(packedData) is dict):
@@ -219,14 +225,14 @@ def show_results_splitscreen(packedData, forced_clim=None, name=None):
                 if (shape != value.shape):
                     raise ValueError("Item for key '{0}' has the shape {1} and not {2}".format(key, value.shape, shape))
             data.append(tmpItem)
+            minLength = min(minLength, len(tmpItem[1]))
     else:
         data = packedData
 
         for i in range(len(data)):
             if (type(data[i][1]) is not np.ndarray):
-                    raise ValueError("Item for key '{0}' is not of the type numpy.ndarray".format(data[i][0]))
-
-        shape = data[0][1].shape
+                raise ValueError("Item for key '{0}' is not of the type numpy.ndarray".format(data[i][0]))
+            minLength = min(minLength, len(data[i][1]))
 
     if (len(packedData) < 2):
         print("Less than two fields submitted - switching to normal mode.")
@@ -243,7 +249,7 @@ def show_results_splitscreen(packedData, forced_clim=None, name=None):
             matarr[n].set_data(data[image_mode[n]][1][i])
 
             if (forced_clim is None):
-                if (i < shape[0]-50 and i > 50):
+                if (i < minLength-50 and i > 50):
                     clbarr[n].set_clim(vmin=0, vmax=np.max(data[image_mode[n]][1][i-50:i+50]))
             else:
                 clbarr[n].set_clim(vmin = forced_clim[0], vmax=forced_clim[1])
@@ -285,7 +291,7 @@ def show_results_splitscreen(packedData, forced_clim=None, name=None):
         def position_changed(self, value):
             nonlocal i
             value = int(value)
-            i = value % shape[0]
+            i = value % minLength
 
         def playpause(self, event):
             nonlocal pause, bplaypause
