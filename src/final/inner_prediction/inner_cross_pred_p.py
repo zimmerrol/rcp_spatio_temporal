@@ -150,5 +150,6 @@ def setup_constants():
 if __name__ == '__main__':
     parse_arguments()
     setup_constants()
+    icpmtp.setup_arrays()
 
     icpmtp.mainFunction()
