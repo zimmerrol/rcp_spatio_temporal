@@ -99,6 +99,10 @@ def generate_data(N, Ngrid):
         data[0] = data[1].copy()
         data[1] = tmp.copy()
 
+    global means_train
+    means_train = np.mean(data[:trainLength], axis=(1, 2))
+    data -= np.repeat(means_train, N*N).reshape(2, N, N)
+
     shared_input_data[:] = data[0]
     shared_output_data[:] = data[1]
 
@@ -240,6 +244,8 @@ def mainFunction():
     pool.close()
 
     process_results_process.join()
+
+    shared_prediction += means_train[1]
 
     shared_prediction[shared_prediction < 0.0] = 0.0
     shared_prediction[shared_prediction > 1.0] = 1.0
