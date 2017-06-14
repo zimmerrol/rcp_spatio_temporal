@@ -145,7 +145,7 @@ def mainFunction():
 
     predicter = ESN(n_input=input_size, n_output=1, n_reservoir=n_units,
                     weight_generation="naive", leak_rate=leaking_rate, spectral_radius=spectral_radius,
-                    random_seed=random_seed, noise_level=noise_level, sparseness=sparseness, input_scaling=input_scaling,
+                    random_seed=random_seed, noise_level=noise_level, sparseness=sparseness,
                     regression_parameters=[regression_parameter], solver="lsqr")
     print("start fitting...")
 
