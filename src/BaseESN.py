@@ -144,13 +144,6 @@ class BaseESN(object):
         returns the UNSCALED but reshaped input of this step
         """
         u = inputData.reshape(self.n_input, 1)
-        print(self._x)
-        print(self.leak_rate)
-        print(self._W_input)
-        print(self.bias)
-        print(self._W)
-        print(self.noise_level)
-
         self._x = (1.0-self.leak_rate)*self._x + self.leak_rate*np.arctan(np.dot(self._W_input, np.vstack((self.bias, u))) + np.dot(self._W, self._x) +
                                                                           (np.random.rand()-0.5)*self.noise_level)
 
