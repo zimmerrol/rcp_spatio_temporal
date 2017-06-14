@@ -237,3 +237,39 @@ Es zeigt sich erneut, dass die Vorhersagen der klassischen Methoden einen höher
 
 Des Weiteren wächst der Fehlers mit steigender Größe des vorherzusagenden Bereiches auch bei allen drei Ansätze an. Es ist somit zu vermuten, dass dies nicht nur eine reine Beschränkung der einzelnen Methoden ist, sondern dass es womöglich eine Eigenschaft der betrachteten Modelle ist. 
 \improvement{Add comparison images}
+
+\begin{figure}[h]
+	\centering
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[height=2.5in]{figures/results/inner_cross_prediction/barkley_u_inner_original.pdf}
+		\setcapmargin[1cm]{0.5cm}
+		\caption{Echte Erregung des Modells}
+		\label{fig:exp_inner_cross_barkley_result_orig}
+	\end{subfigure}%
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[height=2.5in]{figures/results/inner_cross_prediction/barkley_u_inner_nn.pdf}
+		\setcapmargin[1cm]{0.5cm}
+  		\caption{Vorhersage des \textsc{NN}-Ansatzes}
+  		\label{fig:exp_inner_cross_barkley_result_nn_pred}
+	\end{subfigure}
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[height=2.5in]{figures/results/inner_cross_prediction/barkley_u_inner_rbf.pdf}
+		\setcapmargin[1cm]{0.5cm}
+  		\caption{Vorhersage des \textsc{RBF}-Ansatzes}
+  		\label{fig:exp_inner_cross_barkley_result_rbf_pred}
+	\end{subfigure}%
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[height=2.5in]{figures/results/inner_cross_prediction/barkley_u_inner_esn.pdf}
+		\setcapmargin[1cm]{0.5cm}
+  		\caption{Vorhersage des \textsc{ESN}}
+  		\label{fig:exp_inner_cross_barkley_result_esn_pred}
+	\end{subfigure}
+	\caption{Graphische Darstellung der $u$-Variable des \textit{Barkley}-Modells für den $1000$. Zeitschritt des Testdatensatzes. Oben links ist das tatsächliche Feld des Modells zu sehen. Danach folgenden im Uhrzeigersinn die Vorhersagen des \textsc{NN}-Ansatzes, des \textsc{RBF}-Ansatzes und des \textsc{ESN}.}
+	\label{fig:exp_inner_cross_barkley_result}
+\end{figure} 
+
+In Abbildung \ref{fig:exp_inner_cross_barkley_result} werden exemplarisch die aus den drei Ansätzen resultierenden Felder der Spannungsvariable $u(t)$ des \textit{Barkley}-Modells zusammen mit dem originalen Feld dargestellt. Hierbei fällt auf, dass sowohl die Vorhersage der \textbf{RBF} als auch die des \textit{ESN} stark verschwommen sind und kaum Details zeigen. Im Gegensatz dazu gibt der \textit{NN}-Ansatz eine sehr scharfe Vorhersage. Dies ist dahingehend interessant, als das zum einen jeder Bildpunkt einzeln vorhersagt wird, und zum anderen immer die nächsten fünf Nachbarn genutzt werden. Daraus können zwei Konsequenzen folgen. Erstens spricht die hohe Auflösung dafür, dass die Vorhersage beinahe perfekt ein Bereich aus den Trainingsdaten ist. Da die Vorhersage aber (zumindest in diesem Moment) nicht gut mit dem Original übereinstimmt bedeutet dies, dass die Verzögerungskoordinaten, die genutzt worden sind, den Bereich nicht eindeutig beschreiben. Zweitens kann daraus auch gefolgert werden, dass für diese Aufgabe die Länge der Trainingsdaten zu gering gewählt worden ist. 
