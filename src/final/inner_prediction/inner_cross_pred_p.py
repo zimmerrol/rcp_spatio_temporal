@@ -94,6 +94,8 @@ def setup_constants():
         icpmtp.innerSize = [4,8,16,32,64,128, 4,8,16,32,64,128, 4,8,16,32,64,128, 146,146,148][sge_id-1]
         icpmtp.borderSize = [1,1,1,1,1,1, 2,2,2,2,2,2, 3,3,3,3,3,3, 1,2,1][sge_id-1]
 
+        icpmtp.constants_setup = True
+
         print("\t trainLength \t = {0} \n\t a \t = {1}\n\t b \t = {2}\n\t n_units \t = {3}\n\t regular. \t = {4}".format(icpmtp.trainLength, icpmtp.innerSize, icpmtp.borderSize, icpmtp.n_units, icpmtp.regression_parameter))
 
     elif (icpmtp.prediction_mode == "NN"):

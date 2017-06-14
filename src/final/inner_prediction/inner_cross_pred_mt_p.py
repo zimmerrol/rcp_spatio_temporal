@@ -39,13 +39,17 @@ testLength = 2000
 trainLength = 15000
 
 #will be set by the *_p.py file
-direction, prediction_mode, patch_radius, eff_sigma, sigma, sigma_skip, ddim = 0, 0, 0, 0, 0, 0, 0
-n_units, spectral_radius, leaking_rate, random_seed, noise_level, regression_parameter, sparseness = 0, 0, 0, 0, 0, 0, 0
-border_size, inner_size, center, half_inner_size, right_border_add, basis_points, width, k = 0, 0, 0, 0, 0, 0, 0, 0
+direction, prediction_mode, patch_radius, eff_sigma, sigma, sigma_skip, ddim = None, None, None, None, None, None, None
+n_units, spectral_radius, leaking_rate, random_seed, noise_level, regression_parameter, sparseness = None, None, None, None, None, None, None
+border_size, inner_size, center, half_inner_size, right_border_add, basis_points, width, k = None, None, None, None, None, None, None, None
+constants_setup = False
 
 def setup_arrays():
     global shared_input_data_base, shared_data_base, prediction_base
     global shared_input_data, shared_data, prediction
+
+    if not constants_setup:
+        return
 
     if prediction_mode in ["NN", "RBF"]:
         shared_input_data_base = multiprocessing.Array(ctypes.c_double, ddim*ndata*2*border_size*(inner_size+(inner_size+2*border_size)))
