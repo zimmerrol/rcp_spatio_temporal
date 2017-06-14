@@ -52,6 +52,11 @@ def setup_arrays():
     if not constants_setup:
         return
 
+    print (ddim)
+    print(ndata)
+    print(border_size)
+    print(inner_size)
+
     if prediction_mode in ["NN", "RBF"]:
         shared_input_data_base = multiprocessing.Array(ctypes.c_double, ddim*ndata*2*border_size*(inner_size+(inner_size+2*border_size)))
         shared_input_data = np.ctypeslib.as_array(shared_input_data_base.get_obj())
