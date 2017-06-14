@@ -42,6 +42,7 @@ trainLength = 15000
 direction, prediction_mode, patch_radius, eff_sigma, sigma, sigma_skip, ddim = None, None, None, None, None, None, None
 n_units, spectral_radius, leaking_rate, random_seed, noise_level, regression_parameter, sparseness = None, None, None, None, None, None, None
 border_size, inner_size, center, half_inner_size, right_border_add, basis_points, width, k = None, None, None, None, None, None, None, None
+shared_input_data, shared_data, prediction = None, None, None
 constants_setup = False
 
 def setup_arrays():
