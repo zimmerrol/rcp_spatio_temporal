@@ -155,6 +155,7 @@ def plot_errors(predicter, trainDataX, trainDataY, testDataX, testDataY):
         predicter.spectral_radius = sr_values[i]
 
         for j in range(steps):
+            print("{0}, {1}".format(i, j))
             predicter.leaking_rate = lr_values[j]
             grid[0, i, j] = predicter.fit(trainDataX, trainDataY)
             grid[1, i, j] = np.mean((predicter.predict(testDataX)-testDataY)**2)
