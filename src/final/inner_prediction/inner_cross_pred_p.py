@@ -96,7 +96,7 @@ def setup_constants():
 
         icpmtp.constants_setup = True
 
-        print("\t trainLength \t = {0} \n\t a \t = {1}\n\t b \t = {2}\n\t n_units \t = {3}\n\t regular. \t = {4}".format(icpmtp.trainLength, icpmtp.innerSize, icpmtp.borderSize, icpmtp.n_units, icpmtp.regression_parameter))
+        print("\t trainLength \t = {0} \n\t a \t = {1}\n\t b \t = {2}\n\t n_units \t = {3}\n\t regular. \t = {4}".format(icpmtp.trainLength, icpmtp.inner_size, icpmtp.border_size, icpmtp.n_units, icpmtp.regression_parameter))
 
     elif (icpmtp.prediction_mode == "NN"):
         #3*30 elements
@@ -114,7 +114,7 @@ def setup_constants():
                       1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  1,2,3,  ][sge_id-1]
 
         print("\t trainLength \t = {0} \n\t a \t = {1}\n\t b \t = {2}\n\t ddim \t = {3}\n\t k \t = {4}".format(
-            icpmtp.trainLength, icpmtp.innerSize, icpmtp.borderSize, icpmtp.ddim, icpmtp.k))
+            icpmtp.trainLength, icpmtp.inner_size, icpmtp.border_size, icpmtp.ddim, icpmtp.k))
 
     elif icpmtp.prediction_mode == "RBF":
         icpmtp.basisPoints = 100
