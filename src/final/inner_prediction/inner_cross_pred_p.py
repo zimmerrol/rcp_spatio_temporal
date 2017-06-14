@@ -142,7 +142,7 @@ def setup_constants():
     else:
         raise ValueError("No valid prediction_mode choosen! (Value is now: {0})".format(icpmtp.prediction_mode))
 
-    icpmtp.half_inner_size = int(np.floor(icpmtp.innerSize / 2))
+    icpmtp.half_inner_size = int(np.floor(icpmtp.inner_size / 2))
     icpmtp.border_size = 1
     icpmtp.center = icpmtp.N//2
     icpmtp.right_border_add = 1 if icpmtp.inner_size != 2*icpmtp.half_inner_size else 0
