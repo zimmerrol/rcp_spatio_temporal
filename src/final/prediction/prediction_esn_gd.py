@@ -117,7 +117,7 @@ def calculateSRDerivative(predicter, epsilon, trainDataX, trainDataY):
 
     return (fitErrorR - fitErrorL) / (2*epsilon)
 
-def optimize(predicter, epsilon, learningrate, trainDataX, trainDataY):
+def optimize(predicter, epsilon, learningrate, trainDataX, trainDataY, testDataX, testDataY):
     iterations = 100
     for n in range(iterations):
         lrd = calculateLRDerivative(predicter, epsilon, trainDataX, trainDataY)
@@ -135,7 +135,9 @@ def optimize(predicter, epsilon, learningrate, trainDataX, trainDataY):
 
         fitError = predicter.fit(trainDataX, trainDataY)
 
-        print("{0:.4f}\t{1:.4f}\t{2:.4f}\t{3:.4f}\t{4:.4f}".format(fitError, lrd, srd, predicter.leak_rate, predicter.spectral_radius))
+        testError = np.mean((predicter.predict(testDataX)-testDataY)**2)
+
+        print("{0:.4f}\t{1:.4f}\t{2:.4f}\t{3:.4f}c\t{4:.4f}\t{5:.4f}".format(fitError, testError, lrd, srd, predicter.leak_rate, predicter.spectral_radius))
 
 def mainFunction():
     data = generate_data(ndata, 20000, 50, Ngrid=N)
@@ -151,7 +153,7 @@ def mainFunction():
 
     sys.stdout.flush()
 
-    optimize(predicter, 1e-2, 1e-2, input_data[:trainLength], output_data[:trainLength])
+    optimize(predicter, 1e-2, 1e-2, input_data[:trainLength], output_data[:trainLength], input_data[trainLength:trainLength+testLength], output_data[trainLength:trainLength+testLength])
 
     [(input_data[trainLength:trainLength+testLength], output_data[trainLength:trainLength+testLength])],
 
