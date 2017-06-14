@@ -40,7 +40,7 @@ trainLength = 15000
 
 #will be set by the *_p.py file
 direction, prediction_mode, patch_radius, eff_sigma, sigma, sigma_skip, ddim = None, None, None, None, None, None, None
-n_units, spectral_radius, leaking_rate, random_seed, noise_level, regression_parameter, sparseness = None, None, None, None, None, None, None
+n_units, spectral_radius, leak_rate, random_seed, noise_level, regression_parameter, sparseness = None, None, None, None, None, None, None
 border_size, inner_size, center, half_inner_size, right_border_add, basis_points, width, k = None, None, None, None, None, None, None, None
 shared_input_data, shared_data, prediction = None, None, None
 constants_setup = False
@@ -107,7 +107,7 @@ def generate_data(N, trans, sample_rate, Ngrid, def_param=(shared_input_data, sh
 def prepare_predicter(y, x):
     if prediction_mode == "ESN":
         predicter = ESN(n_input=shared_input_data.shape[1], n_output=1, n_reservoir=n_units,
-                        weight_generation="advanced", leak_rate=leaking_rate, spectral_radius=spectral_radius,
+                        weight_generation="advanced", leak_rate=leak_rate, spectral_radius=spectral_radius,
                         random_seed=random_seed, noise_level=noise_level, sparseness=sparseness,
                         regression_parameters=[regression_parameter], solver="lsqr", input_density=10/shared_input_data.shape[1])
     elif prediction_mode == "NN":
