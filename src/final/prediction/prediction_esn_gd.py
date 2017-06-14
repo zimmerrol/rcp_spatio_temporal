@@ -128,14 +128,14 @@ def optimize(predicter, epsilon, learningrate, trainDataX, trainDataY):
         lrd /= magnitude
         srd /= magnitude
 
-        predicter.leak_rate += lrd*learningrate
+        predicter.leak_rate -= lrd*learningrate
 
-        predicter._W = predicter._W / predicter.spectral_radius * (predicter.spectral_radius + srd*learningrate)
-        predicter.spectral_radius += srd*learningrate
+        predicter._W = predicter._W / predicter.spectral_radius * (predicter.spectral_radius - srd*learningrate)
+        predicter.spectral_radius -= srd*learningrate
 
         fitError = predicter.fit(trainDataX, trainDataY)
 
-        print("{0:.4f}\t{1:.4f}\t{2:.4f}".format(fitError, lrd, srd))
+        print("{0:.4f}\t{1:.4f}\t{2:.4f}\t{3:.4f}\t{4:.4f}".format(fitError, lrd, srd, predicter.leak_rate, predicter.spectral_radius))
 
 def mainFunction():
     data = generate_data(ndata, 20000, 50, Ngrid=N)
@@ -151,7 +151,7 @@ def mainFunction():
 
     sys.stdout.flush()
 
-    optimize(predicter, 1e-5, 1e-5, input_data[:trainLength], output_data[:trainLength])
+    optimize(predicter, 1e-2, 1e-2, input_data[:trainLength], output_data[:trainLength])
 
     [(input_data[trainLength:trainLength+testLength], output_data[trainLength:trainLength+testLength])],
 
