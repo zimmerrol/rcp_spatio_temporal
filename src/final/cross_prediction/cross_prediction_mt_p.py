@@ -246,7 +246,7 @@ def mainFunction():
 
     process_results_process.join()
 
-    shared_prediction += means_train[1]
+    shared_prediction = shared_prediction + means_train[1]
 
     shared_prediction[shared_prediction < 0.0] = 0.0
     shared_prediction[shared_prediction > 1.0] = 1.0
