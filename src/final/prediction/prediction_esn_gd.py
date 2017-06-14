@@ -161,7 +161,10 @@ def plot_errors(predicter, trainDataX, trainDataY, testDataX, testDataY):
             grid[1, i, j] = np.mean((predicter.predict(testDataX)-testDataY)**2)
 
     fig, ax = plt.subplots()
-    mat = plt.imshow(grid, extent=(lr_range[0], lr_range[1], sr_range[1], sr_range[0]))
+    mat = plt.imshow(grid[0], extent=(lr_range[0], lr_range[1], sr_range[1], sr_range[0]))
+    clb = fig.colorbar(mat)
+    plt.show()
+    mat = plt.imshow(grid[1], extent=(lr_range[0], lr_range[1], sr_range[1], sr_range[0]))
     clb = fig.colorbar(mat)
     plt.show()
 
