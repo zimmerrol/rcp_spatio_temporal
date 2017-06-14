@@ -104,7 +104,7 @@ def prepare_predicter(y, x):
         predicter = ESN(n_input=shared_input_data.shape[1], n_output=1, n_reservoir=n_units,
                         weight_generation="advanced", leak_rate=leaking_rate, spectral_radius=spectral_radius,
                         random_seed=random_seed, noise_level=noise_level, sparseness=sparseness,
-                        regression_parameters=[regression_parameter], solver="lsqr")
+                        regression_parameters=[regression_parameter], solver="lsqr", input_density=10/shared_input_data.shape[1])
     elif prediction_mode == "NN":
         predicter = NN(k=k)
     elif prediction_mode == "RBF":

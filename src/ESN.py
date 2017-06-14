@@ -10,14 +10,17 @@ import progressbar
 
 class ESN(BaseESN):
     def __init__(self, n_input, n_reservoir, n_output,
-                spectral_radius=1.0, noise_level=0.01, input_scaling=None,
-                leak_rate=1.0, sparseness=0.2, random_seed=None,
-                out_activation=lambda x:x, out_inverse_activation=lambda x:x,
-                weight_generation='naive', bias=1.0, output_bias=1.0,
-                output_input_scaling=1.0, solver='pinv', regression_parameters={}):
+                 spectral_radius=1.0, noise_level=0.01, input_scaling=None,
+                 leak_rate=1.0, sparseness=0.2, random_seed=None,
+                 out_activation=lambda x: x, out_inverse_activation=lambda x: x,
+                 weight_generation='naive', bias=1.0, output_bias=1.0,
+                 output_input_scaling=1.0, input_density=1.0, solver='pinv', regression_parameters={}):
 
-        super(ESN, self).__init__(n_input, n_reservoir, n_output, spectral_radius, noise_level, input_scaling, leak_rate, sparseness, random_seed, out_activation,
-                out_inverse_activation, weight_generation, bias, output_bias, output_input_scaling)
+        super(ESN, self).__init__(n_input=n_input, n_reservoir=n_reservoir, n_output=n_output, spectral_radius=spectral_radius,
+                                  noise_level=noise_level, input_scaling=input_scaling, leak_rate=leak_rate, sparseness=sparseness,
+                                  random_seed=random_seed, out_activation=out_activation, out_inverse_activation=out_inverse_activation,
+                                  weight_generation=weight_generation, bias=bias, output_bias=output_bias, output_input_scaling=output_input_scaling,
+                                  input_density=input_density)
 
 
         self._solver = solver
@@ -35,7 +38,7 @@ class ESN(BaseESN):
         """
 
     def fit(self, inputData, outputData, transient_quota=0.05, verbose=0):
-        if (inputData.shape[0] != outputData.shape[0]):
+        if inputData.shape[0] != outputData.shape[0]:
             raise ValueError("Amount of input and output datasets is not equal - {0} != {1}".format(inputData.shape[0], outputData.shape[0]))
 
         trainLength = inputData.shape[0]
