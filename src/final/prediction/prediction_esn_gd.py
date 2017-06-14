@@ -145,8 +145,8 @@ def plot_errors(predicter, trainDataX, trainDataY, testDataX, testDataY):
 
     steps = 5
 
-    lr_values = np.arange(lr_range[0], lr_range[1], steps)
-    sr_values = np.arange(sr_range[0], sr_range[1], steps)
+    lr_values = np.linspace(lr_range[0], lr_range[1], steps)
+    sr_values = np.linspace(sr_range[0], sr_range[1], steps)
 
     grid = np.empty((2, steps, steps))
 
