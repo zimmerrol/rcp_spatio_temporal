@@ -101,7 +101,8 @@ def generate_data(N, Ngrid):
 
     global means_train
     means_train = np.mean(data[:trainLength], axis=(1, 2))
-    data -= np.repeat(means_train, N*N).reshape(2, N, N)
+    data[0] -= means_train[0]
+    data[1] -= means_train[1]
 
     shared_input_data[:] = data[0]
     shared_output_data[:] = data[1]
