@@ -142,7 +142,7 @@ def mainFunction():
     input_data = data[:-prediction_length, N//2-patch_radius:N//2+patch_radius+1, N//2-patch_radius:N//2+patch_radius+1][:, ::sigma_skip, ::sigma_skip].reshape((-1, input_size))
     output_data = data[prediction_length:, N//2, N//2].reshape((-1, 1))
 
-    predicter = ESN(n_input=input_dimension, n_output=1, n_reservoir=n_units,
+    predicter = ESN(n_input=input_size, n_output=1, n_reservoir=n_units,
                     weight_generation="naive", leak_rate=leaking_rate, spectral_radius=spectral_radius,
                     random_seed=random_seed, noise_level=noise_level, sparseness=sparseness, input_scaling=input_scaling,
                     regression_parameters=[regression_parameter], solver="lsqr")
