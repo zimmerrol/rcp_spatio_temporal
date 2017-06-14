@@ -137,7 +137,7 @@ def setup_constants():
                       1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2, 1,  1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2, 1,
                       1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2, 1,  1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2,3, 1,2, 1,][sge_id-1]
         print("\t trainLength \t = {0} \n\t a \t = {1}\n\t b \t = {2}\n\t ddim \t = {3}\n\t width \t = {4}".format(
-            icpmtp.trainLength, icpmtp.innerSize, icpmtp.borderSize, icpmtp.ddim, icpmtp.width))
+            icpmtp.trainLength, icpmtp.inner_size, icpmtp.border_size, icpmtp.ddim, icpmtp.width))
 
     else:
         raise ValueError("No valid prediction_mode choosen! (Value is now: {0})".format(icpmtp.prediction_mode))
