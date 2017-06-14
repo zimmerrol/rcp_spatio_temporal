@@ -176,6 +176,8 @@ def mainFunction():
                     regression_parameters=[regression_parameter], solver="lsqr")
     print("start fitting...")
 
+    plot_errors(predicter, input_data[:trainLength], output_data[:trainLength], input_data[trainLength:trainLength+testLength], output_data[trainLength:trainLength+testLength])
+
     sys.stdout.flush()
 
     optimize(predicter, 1e-2, 1e-2, input_data[:trainLength], output_data[:trainLength], input_data[trainLength:trainLength+testLength], output_data[trainLength:trainLength+testLength])
