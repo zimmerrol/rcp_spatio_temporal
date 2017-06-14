@@ -137,7 +137,32 @@ def optimize(predicter, epsilon, learningrate, trainDataX, trainDataY, testDataX
 
         testError = np.mean((predicter.predict(testDataX)-testDataY)**2)
 
-        print("{0:.4f}\t{1:.4f}\t{2:.4f}\t{3:.4f}c\t{4:.4f}\t{5:.4f}".format(fitError, testError, lrd, srd, predicter.leak_rate, predicter.spectral_radius))
+        print("{0:.4f}\t{1:.4f}\t{2:.4f}\t{3:.4f}\t{4:.4f}\t{5:.4f}".format(fitError, testError, lrd, srd, predicter.leak_rate, predicter.spectral_radius))
+
+def plot_errors(predicter, trainDataX, trainDataY, testDataX, testDataY):
+    lr_range = (0.4, 0.6)
+    sr_range = (0.4, 0.6)
+
+    steps = 5
+
+    lr_values = np.arange(lr_range[0], lr_range[1], steps)
+    sr_values = np.arange(sr_range[0], sr_range[1], steps)
+
+    grid = np.empty((2, steps, steps))
+
+    for i in range(steps):
+        predicter._W = predicter._W / predicter.spectral_radius * sr_values[i]
+        predicter.spectral_radius = sr_values[i]
+
+        for j in range(steps):
+            predicter.leaking_rate = lr_values[j]
+            grid[0, i, j] = predicter.fit(trainDataX, trainDataY)
+            grid[1, i, j] = np.mean((predicter.predict(testDataX)-testDataY)**2)
+
+    fig, ax = plt.subfigures()
+    mat = plt.imshow(grid, extent=(lr_range[0], lr_range[1], sr_range[1], sr_range[0]))
+    clb = fig.colorbar(mat)
+    plt.show()
 
 def mainFunction():
     data = generate_data(ndata, 20000, 50, Ngrid=N)
