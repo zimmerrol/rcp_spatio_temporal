@@ -123,10 +123,10 @@ def optimize(predicter, epsilon, learningrate, trainDataX, trainDataY):
         lrd = calculateLRDerivative(predicter, epsilon, trainDataX, trainDataY)
         srd = calculateSRDerivative(predicter, epsilon, trainDataX, trainDataY)
 
+        magnitude = np.sqrt(lrd**2 + srd**2)
+
         lrd /= magnitude
         srd /= magnitude
-
-        magnitude = np.sqrt(lrd**2 + srd**2)
 
         predicter.leak_rate += lrd*learningrate
 
