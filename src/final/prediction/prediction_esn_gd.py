@@ -48,6 +48,7 @@ parse_arguments()
 sigma, sigma_skip, patch_radius, input_size, prediction_length = 0, 0, 0, 0, 0
 def setup_constants():
     global sigma, sigma_skip, patch_radius, input_size, prediction_length
+    global n_units, sparseness, random_seed, spectral_radius, regression_parameter, leaking_rate, noise_level
 
     sge_id = int(os.getenv("SGE_TASK_ID", 0))
 
