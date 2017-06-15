@@ -48,7 +48,9 @@ tau = {"uv" : 32, "vu" : 32, "vh" : 119, "hv" : 119}
 N = 150
 ndata = 30000
 trainLength = 15000
-testLength = 2000
+testLength = 4000
+evaluationLength = 2000
+#the evaluationLength is included in the testLength, therefore, evaluationLength < testLength, and testlength-evaluationlength is the real testLength.
 
 useInputScaling = False
 
@@ -152,7 +154,7 @@ def get_prediction(data):
     else:
         #inner
         pred, predicter = fit_predict_inner_pixel(y, x)
-    get_prediction.q.put((y, x, pred, predicter._W_out.flatten()))
+    get_prediction.q.put((y, x, pred))#, predicter._W_out.flatten()))
 
 def prepare_fit_data(y, x, pr, skip, def_param=(shared_input_data, shared_output_data)):
     if (prediction_mode in ["NN", "RBF"]):
@@ -218,6 +220,8 @@ def process_thread_results(q, numberOfResults, def_param=(shared_prediction, sha
         if (finishedResults == numberOfResults):
             bar.finish()
 
+            """
+            uncomment this code to plot the weights of the ESN
             print("results:")
             print(len(shared_weights))
             shared_weights = np.array(shared_weights)
@@ -226,6 +230,7 @@ def process_thread_results(q, numberOfResults, def_param=(shared_prediction, sha
 
             plt.imshow(shared_weights)
             plt.show()
+            """
 
             return
 
@@ -269,16 +274,16 @@ def mainFunction():
 
     process_results_process.join()
 
-    exit()
-
     shared_prediction = shared_prediction + means_train[1]
 
     shared_prediction[shared_prediction < 0.0] = 0.0
     shared_prediction[shared_prediction > 1.0] = 1.0
 
     diff = (shared_output_data[trainLength:trainLength+testLength]-shared_prediction)
-    mse = np.mean((diff)**2)
-    print("test error: {0}".format(mse))
+    mse_test = np.mean((diff[:testLength-evaluationLength])**2)
+    mse_evaluation = np.mean((diff[testLength-evaluationLength:testLength])**2)
+    print("test error: {0}".format(mse_test))
+    print("evluation error: {0}".format(mse_evaluation))
     print("inner test error: {0}".format(np.mean((diff[:, patch_radius:N-patch_radius, patch_radius:N-patch_radius])**2)))
 
     view_data = [("Orig", shared_output_data[trainLength:]), ("Pred", shared_prediction), ("Source", shared_input_data[trainLength:]), ("Diff", diff)]
