@@ -216,6 +216,8 @@ def process_thread_results(q, numberOfResults, def_param=(shared_prediction, sha
 
     while True:
         if (finishedResults == numberOfResults):
+            bar.finish()
+
             print("results:")
             print(len(shared_weights))
             print(shared_weights)
@@ -235,7 +237,6 @@ def process_thread_results(q, numberOfResults, def_param=(shared_prediction, sha
         shared_prediction[:, ind_y, ind_x] = data
 
         shared_weights.append(weights)
-        print(len(shared_weights))
 
         bar.update(finishedResults)
 
@@ -258,8 +259,8 @@ def mainFunction():
     pool = Pool(processes=16, initializer=get_prediction_init, initargs=[queue,])
 
     jobs = []
-    for y in range(120, 130): #N)
-        for x in range(120, 130):#N):
+    for y in range(100, 130): #N)
+        for x in range(100, 130):#N):
             jobs.append((y, x))
 
     process_results_process = Process(target=process_thread_results, args=(queue, len(jobs)))
@@ -268,8 +269,6 @@ def mainFunction():
     pool.close()
 
     process_results_process.join()
-
-
 
     exit()
 
