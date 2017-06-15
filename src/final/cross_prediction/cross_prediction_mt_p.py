@@ -200,7 +200,7 @@ def fit_predict_inner_pixel(y, x, def_param=(shared_input_data, shared_output_da
     return pred, predicter
 
 def process_thread_results(q, numberOfResults, def_param=(shared_prediction, shared_output_data)):
-    global prediction
+    global prediction, shared_weights
 
     bar = progressbar.ProgressBar(max_value=numberOfResults, redirect_stdout=True, poll_interval=0.0001)
     bar.update(0)
