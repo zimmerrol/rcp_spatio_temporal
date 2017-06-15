@@ -126,13 +126,14 @@ class BaseESN(object):
         #random weight matrix for the input from -0.5 to 0.5
         self._W_input = np.random.rand(self.n_reservoir, 1+self.n_input)-0.5
 
-        #make the input matrix as dense as requested
-        input_topology = (np.zeros_like(self._W_input) == 1.0)
-        nb_non_zero_input = self.input_density * self.n_input
-        for n in range(self.n_reservoir):
-            input_topology[n][rnd.permutation(np.arange(1+self.n_input))[:nb_non_zero_input]] = True
+        if (self.input_density != 1.0):
+            #make the input matrix as dense as requested
+            input_topology = (np.zeros_like(self._W_input) == 1.0)
+            nb_non_zero_input = self.input_density * self.n_input
+            for n in range(self.n_reservoir):
+                input_topology[n][rnd.permutation(np.arange(1+self.n_input))[:nb_non_zero_input]] = True
 
-        self._W_input[input_topology] = 0.0
+            self._W_input[input_topology] = 0.0
 
         self._W_input = self._W_input.dot(self._expanded_input_scaling_matrix)
 
