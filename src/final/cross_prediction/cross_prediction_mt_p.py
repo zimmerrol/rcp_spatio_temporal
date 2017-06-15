@@ -216,6 +216,16 @@ def process_thread_results(q, numberOfResults, def_param=(shared_prediction, sha
 
     while True:
         if (finishedResults == numberOfResults):
+            print("results:")
+            print(len(shared_weights))
+            print(shared_weights)
+            shared_weights = np.array(shared_weights)
+
+            print(shared_weights.shape)
+
+            plt.imshow(shared_weights)
+            plt.show()
+
             return
 
         newData = q.get()
@@ -259,15 +269,7 @@ def mainFunction():
 
     process_results_process.join()
 
-    print("results:")
-    print(len(shared_weights))
-    print(shared_weights)
-    shared_weights = np.array(shared_weights)
 
-    print(shared_weights.shape)
-
-    plt.imshow(shared_weights)
-    plt.show()
 
     exit()
 
