@@ -85,16 +85,16 @@ def generate_data(N, trans, sample_rate, Ngrid):
     data = data[0]
 
     input_y, input_x, _, _ = create_patch_indices(
-                                                (center - (halfInnerSize+borderSize), center + (halfInnerSize+borderSize) + rightBorderAdd),
-                                                (center - (halfInnerSize+borderSize), center + (halfInnerSize+borderSize) + rightBorderAdd),
-                                                (center - (halfInnerSize), center + (halfInnerSize) + rightBorderAdd),
-                                                (center - (halfInnerSize), center + (halfInnerSize) + rightBorderAdd))
+        (center - (halfInnerSize+borderSize), center + (halfInnerSize+borderSize) + rightBorderAdd),
+        (center - (halfInnerSize+borderSize), center + (halfInnerSize+borderSize) + rightBorderAdd),
+        (center - (halfInnerSize), center + (halfInnerSize) + rightBorderAdd),
+        (center - (halfInnerSize), center + (halfInnerSize) + rightBorderAdd))
 
     _, _, output_y, output_x = create_patch_indices(
-                                                (center - (halfInnerSize+borderSize), center + (halfInnerSize+borderSize) + rightBorderAdd),
-                                                (center - (halfInnerSize+borderSize), center + (halfInnerSize+borderSize) + rightBorderAdd),
-                                                (center - (1), center + (1) + 0),
-                                                (center - (1), center + (1) + 0))
+        (center - (halfInnerSize+borderSize), center + (halfInnerSize+borderSize) + rightBorderAdd),
+        (center - (halfInnerSize+borderSize), center + (halfInnerSize+borderSize) + rightBorderAdd),
+        (center - (1), center + (1) + 0),
+        (center - (1), center + (1) + 0))
 
     inputData = data[:, input_y, input_x]
     outputData = data[:, output_y, output_x]
@@ -112,7 +112,7 @@ def mainFunction():
 
     param_grid = {"n_reservoir": [50, 200, 400], "spectral_radius": [0.1, 0.5, 0.8, 0.95, 1.0, 1.1, 1.5, 3.0], "leak_rate": [.05, .2, .5 , .7, .9, .95],
                 "random_seed": [42,41,40,39],  "sparseness": [.1, .2], "noise_level": [0.0001, 0.00001], "regression_parameters": [[5e-2],[5e-3],[5e-4],[5e-5],[5e-6]]}
-    fixed_params = {"n_output": 4, "n_input": inputData.shape[1], "solver": "lsqr", "weight_generation": "advanced"}
+    fixed_params = {"n_output": 1, "n_input": inputData.shape[1], "solver": "lsqr", "weight_generation": "advanced"}
 
     gs = GridSearchP(param_grid, fixed_params, esnType=ESN)
 
