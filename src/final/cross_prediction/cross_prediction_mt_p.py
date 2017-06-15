@@ -259,8 +259,8 @@ def mainFunction():
     pool = Pool(processes=16, initializer=get_prediction_init, initargs=[queue,])
 
     jobs = []
-    for y in range(100, 130): #N)
-        for x in range(100, 130):#N):
+    for y in range(0,20): #N)
+        for x in range(0,20):#N):
             jobs.append((y, x))
 
     process_results_process = Process(target=process_thread_results, args=(queue, len(jobs)))
