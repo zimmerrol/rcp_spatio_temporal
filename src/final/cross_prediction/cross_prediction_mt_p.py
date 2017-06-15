@@ -220,7 +220,6 @@ def process_thread_results(q, numberOfResults, def_param=(shared_prediction, sha
 
             print("results:")
             print(len(shared_weights))
-            print(shared_weights)
             shared_weights = np.array(shared_weights)
 
             print(shared_weights.shape)
@@ -259,8 +258,8 @@ def mainFunction():
     pool = Pool(processes=16, initializer=get_prediction_init, initargs=[queue,])
 
     jobs = []
-    for y in range(0,20): #N)
-        for x in range(0,20):#N):
+    for y in range(5, 25): #N)
+        for x in range(5, 25):#N):
             jobs.append((y, x))
 
     process_results_process = Process(target=process_thread_results, args=(queue, len(jobs)))
