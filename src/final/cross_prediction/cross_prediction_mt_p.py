@@ -48,9 +48,9 @@ tau = {"uv" : 32, "vu" : 32, "vh" : 119, "hv" : 119}
 N = 150
 ndata = 30000
 trainLength = 15000
-testLength = 4000
-evaluationLength = 2000
-#the evaluationLength is included in the testLength, therefore, evaluationLength < testLength, and testlength-evaluationlength is the real testLength.
+predictionLength = 4000
+testLength = 2000
+#the testLength is included in the predictionLength => testLength < predictionLength, and predictionLength-testLength is the validation length
 
 useInputScaling = False
 
@@ -72,7 +72,7 @@ def setup_arrays():
     shared_output_data = np.ctypeslib.as_array(shared_output_data_base.get_obj())
     shared_output_data = shared_output_data.reshape(-1, N, N)
 
-    shared_prediction_base = multiprocessing.Array(ctypes.c_double, testLength*N*N)
+    shared_prediction_base = multiprocessing.Array(ctypes.c_double, predictionLength*N*N)
     shared_prediction = np.ctypeslib.as_array(shared_prediction_base.get_obj())
     shared_prediction = shared_prediction.reshape(-1, N, N)
 
@@ -162,20 +162,20 @@ def prepare_fit_data(y, x, pr, skip, def_param=(shared_input_data, shared_output
         delayed_patched_input_data = delayed_patched_input_data.reshape(ndata, -1)
 
         delayed_patched_input_data_train = delayed_patched_input_data[:trainLength]
-        delayed_patched_input_data_test = delayed_patched_input_data[trainLength:trainLength+testLength]
+        delayed_patched_input_data_test = delayed_patched_input_data[trainLength:trainLength+predictionLength]
 
         training_data_in = delayed_patched_input_data_train.reshape(trainLength, -1)
-        test_data_in = delayed_patched_input_data_test.reshape(testLength, -1)
+        test_data_in = delayed_patched_input_data_test.reshape(predictionLength, -1)
 
         training_data_out = shared_output_data[:trainLength, y, x].reshape(-1,1)
-        test_data_out = shared_output_data[trainLength:trainLength+testLength, y, x].reshape(-1,1)
+        test_data_out = shared_output_data[trainLength:trainLength+predictionLength, y, x].reshape(-1,1)
 
     else:
         training_data_in = shared_input_data[:trainLength][:, y - pr:y + pr+1, x - pr:x + pr+1][:, ::skip, ::skip].reshape(trainLength, -1)
-        test_data_in = shared_input_data[trainLength:trainLength+testLength][:, y - pr:y + pr+1, x - pr:x + pr+1][:, ::skip, ::skip].reshape(testLength, -1)
+        test_data_in = shared_input_data[trainLength:trainLength+predictionLength][:, y - pr:y + pr+1, x - pr:x + pr+1][:, ::skip, ::skip].reshape(predictionLength, -1)
 
         training_data_out = shared_output_data[:trainLength][:, y, x].reshape(-1, 1)
-        test_data_out = shared_output_data[trainLength:trainLength+testLength][:, y, x].reshape(-1, 1)
+        test_data_out = shared_output_data[trainLength:trainLength+predictionLength][:, y, x].reshape(-1, 1)
 
     return training_data_in, test_data_in, training_data_out, test_data_out
 
@@ -203,7 +203,7 @@ def fit_predict_inner_pixel(y, x, def_param=(shared_input_data, shared_output_da
     except LinAlgError:
         print("(y,x) = ({0},{1}) raised a SVD error".format(y, x))
 
-        pred = np.zeros(testLength)
+        pred = np.zeros(predictionLength)
 
     return pred, predicter
 
@@ -252,7 +252,7 @@ def mainFunction():
     global shared_prediction, shared_weights
 
 
-    if trainLength + testLength > ndata:
+    if trainLength + predictionLength > ndata:
         print("Please adjust the trainig and testing phase length!")
         exit()
 
@@ -279,12 +279,12 @@ def mainFunction():
     shared_prediction[shared_prediction < 0.0] = 0.0
     shared_prediction[shared_prediction > 1.0] = 1.0
 
-    diff = (shared_output_data[trainLength:trainLength+testLength]-shared_prediction)
-    mse_test = np.mean((diff[:testLength-evaluationLength])**2)
-    mse_evaluation = np.mean((diff[testLength-evaluationLength:testLength])**2)
+    diff = (shared_output_data[trainLength:trainLength+predictionLength]-shared_prediction)
+    mse_validation = np.mean((diff[:predictionLength-testLength])**2)
+    mse_test = np.mean((diff[predictionLength-testLength:predictionLength])**2)
+    print("validation error: {0}".format(mse_validation))
     print("test error: {0}".format(mse_test))
-    print("evluation error: {0}".format(mse_evaluation))
-    print("inner test error: {0}".format(np.mean((diff[:, patch_radius:N-patch_radius, patch_radius:N-patch_radius])**2)))
+    print("inner test error: {0}".format(np.mean((diff[predictionLength-testLength:predictionLength, patch_radius:N-patch_radius, patch_radius:N-patch_radius])**2)))
 
     view_data = [("Orig", shared_output_data[trainLength:]), ("Pred", shared_prediction), ("Source", shared_input_data[trainLength:]), ("Diff", diff)]
 
