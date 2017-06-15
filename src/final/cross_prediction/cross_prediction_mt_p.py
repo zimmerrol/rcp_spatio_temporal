@@ -142,11 +142,11 @@ def get_prediction(data):
     pred = None
     if y < patch_radius or y >= N-patch_radius or x < patch_radius or x >= N-patch_radius:
         #frame
-        pred = fit_predict_frame_pixel(y, x)
+        pred, predicter = fit_predict_frame_pixel(y, x)
     else:
         #inner
-        pred = fit_predict_inner_pixel(y, x)
-    get_prediction.q.put((y, x, pred, pred._W_out.flatten()))
+        pred, predicter = fit_predict_inner_pixel(y, x)
+    get_prediction.q.put((y, x, pred, predicter._W_out.flatten()))
 
 def prepare_fit_data(y, x, pr, skip, def_param=(shared_input_data, shared_output_data)):
     if (prediction_mode in ["NN", "RBF"]):
@@ -180,7 +180,7 @@ def fit_predict_frame_pixel(y, x, def_param=(shared_input_data, shared_output_da
     pred = predicter.predict(test_data_in)
     pred = pred.ravel()
 
-    return pred
+    return pred, predicter
 
 from numpy.linalg.linalg import LinAlgError
 def fit_predict_inner_pixel(y, x, def_param=(shared_input_data, shared_output_data)):
@@ -197,7 +197,7 @@ def fit_predict_inner_pixel(y, x, def_param=(shared_input_data, shared_output_da
 
         pred = np.zeros(testLength)
 
-    return pred
+    return pred, predicter
 
 def process_thread_results(q, numberOfResults, def_param=(shared_prediction, shared_output_data)):
     global prediction
@@ -259,6 +259,8 @@ def mainFunction():
 
     plt.imshow(shared_weights)
     plt.show()
+
+    exit()
 
     shared_prediction = shared_prediction + means_train[1]
 
