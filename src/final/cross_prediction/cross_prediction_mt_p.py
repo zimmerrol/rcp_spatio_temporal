@@ -240,7 +240,7 @@ def process_thread_results(q, numberOfResults, def_param=(shared_prediction, sha
 
         shared_prediction[:, ind_y, ind_x] = data
 
-        shared_weights.append(weights)
+        #shared_weights.append(weights)
 
         bar.update(finishedResults)
 
