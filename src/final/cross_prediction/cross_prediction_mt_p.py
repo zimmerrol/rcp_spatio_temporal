@@ -253,7 +253,9 @@ def mainFunction():
 
     process_results_process.join()
 
+    print("results:")
     print(len(shared_weights))
+    print(shared_weights)
     shared_weights = np.array(shared_weights)
 
     print(shared_weights.shape)
