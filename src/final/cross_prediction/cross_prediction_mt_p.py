@@ -100,7 +100,7 @@ def generate_data(N, Ngrid):
         data[1] = tmp.copy()
 
     global means_train
-    means_train = np.mean(data[:trainLength], axis=(1, 2))
+    means_train = [0, 0] #np.mean(data[:trainLength], axis=(1, 2))
     data[0] -= means_train[0]
     data[1] -= means_train[1]
 
@@ -146,7 +146,7 @@ def get_prediction(data):
     else:
         #inner
         pred = fit_predict_inner_pixel(y, x)
-    get_prediction.q.put((y, x, pred))
+    get_prediction.q.put((y, x, pred, pred._W_out.flatten()))
 
 def prepare_fit_data(y, x, pr, skip, def_param=(shared_input_data, shared_output_data)):
     if (prediction_mode in ["NN", "RBF"]):
@@ -212,11 +212,13 @@ def process_thread_results(q, numberOfResults, def_param=(shared_prediction, sha
         if (finishedResults == numberOfResults):
             return
 
-        newData= q.get()
+        newData = q.get()
         finishedResults += 1
-        ind_y, ind_x, data = newData
+        ind_y, ind_x, data, weights = newData
 
         shared_prediction[:, ind_y, ind_x] = data
+
+        shared_weights.append(weights)
 
         bar.update(finishedResults)
 
@@ -224,6 +226,10 @@ def get_prediction_init(q):
     get_prediction.q = q
 
 def mainFunction():
+    global shared_prediction, shared_weights
+
+    shared_weights = []
+
     if trainLength + testLength > ndata:
         print("Please adjust the trainig and testing phase length!")
         exit()
@@ -235,8 +241,8 @@ def mainFunction():
     pool = Pool(processes=16, initializer=get_prediction_init, initargs=[queue,])
 
     jobs = []
-    for y in range(N):
-        for x in range(N):
+    for y in range(120, 130): #N)
+        for x in range(120, 130):#N):
             jobs.append((y, x))
 
     process_results_process = Process(target=process_thread_results, args=(queue, len(jobs)))
@@ -245,6 +251,14 @@ def mainFunction():
     pool.close()
 
     process_results_process.join()
+
+    print(len(shared_weights))
+    shared_weights = np.array(shared_weights)
+
+    print(shared_weights.shape)
+
+    plt.imshow(shared_weights)
+    plt.show()
 
     shared_prediction = shared_prediction + means_train[1]
 
