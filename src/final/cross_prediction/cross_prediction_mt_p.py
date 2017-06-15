@@ -58,8 +58,8 @@ k, width, basis_points, ddim = None, None, None, None
 n_units, spectral_radius, leaking_rate, random_seed, noise_level, regression_parameter, sparseness = None, None, None, None, None, None, None
 
 def setup_arrays():
-    global shared_input_data_base, shared_output_data_base, shared_prediction_base
-    global shared_input_data, shared_output_data, shared_prediction
+    global shared_input_data_base, shared_output_data_base, shared_prediction_base, shared_weights_base
+    global shared_input_data, shared_output_data, shared_prediction, shared_weights
 
     ###print("setting up arrays...")
     shared_input_data_base = multiprocessing.Array(ctypes.c_double, ndata*N*N)
@@ -73,6 +73,12 @@ def setup_arrays():
     shared_prediction_base = multiprocessing.Array(ctypes.c_double, testLength*N*N)
     shared_prediction = np.ctypeslib.as_array(shared_prediction_base.get_obj())
     shared_prediction = shared_prediction.reshape(-1, N, N)
+
+    """
+    shared_weights_base = multiprocessing.Array(ctypes.c_double, 10*10*(9+))
+    shared_weights = np.ctypeslib.as_array(shared_weights_base.get_obj())
+    shared_weights = shared_weights.reshape(-1, N, N)
+    """
     ###print("setting up finished")
 setup_arrays()
 
@@ -226,10 +232,10 @@ def process_thread_results(q, numberOfResults, def_param=(shared_prediction, sha
 def get_prediction_init(q):
     get_prediction.q = q
 
+shared_weights = []
 def mainFunction():
     global shared_prediction, shared_weights
 
-    shared_weights = []
 
     if trainLength + testLength > ndata:
         print("Please adjust the trainig and testing phase length!")
