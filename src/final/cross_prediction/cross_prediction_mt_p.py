@@ -220,7 +220,7 @@ def process_thread_results(q, numberOfResults, def_param=(shared_prediction, sha
 
             print("results:")
             print(len(shared_weights))
-            print(shared_weights)
+
             shared_weights = np.array(shared_weights)
 
             print(shared_weights.shape)
