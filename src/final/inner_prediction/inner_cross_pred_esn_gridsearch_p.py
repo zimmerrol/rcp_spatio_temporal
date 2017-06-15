@@ -111,7 +111,7 @@ def mainFunction():
     print(inputData.shape)
 
     param_grid = {"n_reservoir": [50, 200, 400], "spectral_radius": [0.1, 0.5, 0.8, 0.95, 1.0, 1.1, 1.5, 3.0], "leak_rate": [.05, .2, .5 , .7, .9, .95],
-                  "random_seed": [42,41,40,39],  "sparseness": [.1, .2], "noise_level": [0.0001, 0.00001], "input_density": [n/inputData.shape[1] for n in [5, 10, 15, 20, 50, 100]]/,
+                  "random_seed": [42,41,40,39],  "sparseness": [.1, .2], "noise_level": [0.0001, 0.00001], "input_density": [n/inputData.shape[1] for n in [5, 10, 15, 20, 50, 100]],
                   "regression_parameters": [[5e4], [5e3], [5e2], [5e1], [5e0], [5e-1], [5e-2],[5e-3],[5e-4]]}
     fixed_params = {"n_output": 1, "n_input": inputData.shape[1], "solver": "lsqr", "weight_generation": "advanced"}
 
