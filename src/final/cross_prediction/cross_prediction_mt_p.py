@@ -263,7 +263,7 @@ def mainFunction():
     pool = Pool(processes=16, initializer=get_prediction_init, initargs=[queue,])
 
     jobs = []
-    for y in range(N)
+    for y in range(N):
         for x in range(N):
             jobs.append((y, x))
 
