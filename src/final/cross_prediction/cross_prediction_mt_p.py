@@ -236,7 +236,7 @@ def process_thread_results(q, numberOfResults, def_param=(shared_prediction, sha
 
         newData = q.get()
         finishedResults += 1
-        ind_y, ind_x, data, weights = newData
+        ind_y, ind_x, data = newData
 
         shared_prediction[:, ind_y, ind_x] = data
 
