@@ -35,6 +35,7 @@ process.current_process()._config['tempdir'] =  '/dev/shm/'
 tau = {"u" : 32, "v" : 119}
 N = 150
 ndata = 30000
+predictionLength = 4000
 testLength = 2000
 trainLength = 15000
 
@@ -190,9 +191,11 @@ def mainFunction():
     prediction[prediction < 0.0] = 0.0
     prediction[prediction > 1.0] = 1.0
 
-    diff = (shared_data[trainLength:trainLength+testLength]-prediction)
-    mse = np.mean((diff[:, output_y, output_x])**2)
-    print("test error: {0}".format(mse))
+    diff = (shared_output_data[trainLength:trainLength+predictionLength]-shared_prediction)
+    mse_validation = np.mean((diff[:predictionLength-testLength, output_y, output_x])**2)
+    mse_test = np.mean((diff[predictionLength-testLength:predictionLength, output_y, output_x])**2)
+    print("validation error: {0}".format(mse_validation))
+    print("test error: {0}".format(mse_test))
 
     model = "barkley" if direction == "u" else "mitchell"
     view_data = [("Orig", shared_data[trainLength:trainLength+testLength]), ("Pred", prediction), ("Diff", diff)]
