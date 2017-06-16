@@ -55,9 +55,9 @@ def setup_constants():
 
     prediction_length = 100
 
-    sigma, sigma_skip = [(1, 1), (3, 1), (5, 1), (5, 2), (7, 1), (7, 2), (7, 3)][sge_id-1]
+    sigma, sigma_skip = [(1, 1), (3, 1), (5, 1), (5, 2), (7, 1), (7, 2), (7, 3), (9, 1), (9, 2), (9, 4), (11, 1), (11, 2), (11, 5), (13, 6), (15, 7)][sge_id-1]
     patch_radius = sigma//2
-    input_size = [1, 9, 25, 9, 49, 16, 9][sge_id-1]
+    input_size = [1, 9, 25, 9, 49, 16, 9, 81, 25, 9, 121, 36, 9, 9, 9][sge_id-1]
 setup_constants()
 
 def generate_data(N, trans, sample_rate, Ngrid):
