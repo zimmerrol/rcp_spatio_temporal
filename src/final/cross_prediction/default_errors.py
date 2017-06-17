@@ -1,19 +1,11 @@
-import os,sys,inspect
-currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-parentdir = os.path.dirname(currentdir)
-grandparentdir = os.path.dirname(parentdir)
-sys.path.insert(0, parentdir)
-sys.path.insert(0, grandparentdir)
-sys.path.insert(0, os.path.join(grandparentdir, "barkley"))
-sys.path.insert(0, os.path.join(grandparentdir, "mitchell"))
-
 import os
-import numpy as np
-from matplotlib import pyplot as plt
-from BarkleySimulation import BarkleySimulation
-import progressbar
+import sys
+sys.path.insert(1, os.path.join(sys.path[0], '../..'))
+sys.path.insert(1, os.path.join(sys.path[0], '../../barkley'))
+sys.path.insert(1, os.path.join(sys.path[0], '../../mitchell'))
 
-from helper import *
+import numpy as np
+
 import barkley_helper as bh
 import mitchell_helper as mh
 import argparse
@@ -35,20 +27,22 @@ else:
     direction = args.direction[0]
 
 if (direction in ["uv", "vu"]):
-    if (os.path.exists("../../cache/barkley/raw/{0}_{1}.uv.dat.npy".format(ndata, N)) == False):
+    if not os.path.exists("../../cache/barkley/raw/{0}_{1}.uv.dat.npy".format(ndata, N)):
         data = bh.generate_uv_data(ndata, 20000, 5, Ngrid=N)
         np.save("../../cache/barkley/raw/{0}_{1}.uv.dat.npy".format(ndata, N), data)
     else:
         data = np.load("../../cache/barkley/raw/{0}_{1}.uv.dat.npy".format(ndata, N))
 else:
-    if (os.path.exists("../../cache/mitchell/raw/{0}_{1}.vh.dat.npy".format(ndata, N)) == False):
+    if not os.path.exists("../../cache/mitchell/raw/{0}_{1}.vh.dat.npy".format(ndata, N)):
         data = mh.generate_vh_data(ndata, 20000, 50, Ngrid=N)
         np.save("../../cache/mitchell/raw/{0}_{1}.vh.dat.npy".format(ndata, N), data)
     else:
         data = np.load("../../cache/mitchell/raw/{0}_{1}.vh.dat.npy".format(ndata, N))
 
+print("Data loaded")
+
 #at the moment we are doing a u -> v / v -> h cross prediction.
-if (direction in ["vu", "hv"]):
+if direction in ["vu", "hv"]:
     #switch the entries for the v -> u / h -> v prediction
     tmp = data[0].copy()
     data[0] = data[1].copy()
