@@ -19,7 +19,9 @@ import mitchell_helper as mh
 import argparse
 
 N = 150
-ndata = 10000
+ndata = 30000
+ntrain = 1500
+nvalidation = 2000
 ntest = 2000
 data = None
 
@@ -52,8 +54,8 @@ if (direction in ["vu", "hv"]):
     data[0] = data[1].copy()
     data[1] = tmp.copy()
 
-training_data = data[:, :ndata-ntest]
-test_data = data[:, ndata-ntest:]
+training_data = data[:, :ntrain]
+test_data = data[:, ntrain + nvalidation:ntrain + nvalidation + ntest]
 
 #use mean value as prediciton:
 mean = np.mean(training_data[1])
