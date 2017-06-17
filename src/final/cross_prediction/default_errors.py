@@ -55,6 +55,8 @@ test_data = data[:, ntrain + nvalidation:ntrain + nvalidation + ntest]
 mean = np.mean(training_data[1])
 meanpredmse = np.mean((test_data[1] - mean)**2)
 
+print("<Prediction> = {0}".format(mean))
+
 #use h as value for v
 hvpredmse = np.mean((test_data[1] - test_data[0])**2)
 
