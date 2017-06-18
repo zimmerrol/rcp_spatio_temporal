@@ -31,7 +31,9 @@ from ESN import ESN
 
 def generate_weight(predicter):
     predicter._W = np.zeros((n_units, n_units))
-    predicter._W_input = sp.sparse.identity(n_units+1) #np.identity(n_units)
+    predicter._W_input = np.empty((n_units, n_units+1))
+    predicter._W_input[:, 1:] = np.identity(n_units)# sp.sparse.identity(n_units+1) #np.identity(n_units)
+    predicter._W_input[:, 0] = 0
 
     predicter._W_input = sp.sparse.dia_matrix(predicter._W_input)
     print("raw W setup.")
