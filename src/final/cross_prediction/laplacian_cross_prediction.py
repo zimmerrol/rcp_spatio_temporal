@@ -150,6 +150,8 @@ predicter.fit(input_data_f[:trainLength], output_data_f[:trainLength], verbose=1
 
 print("predicting...")
 prediciton_f = predicter.predict(input_data_f[trainLength:trainLength+predictionLength-testLength], verbose=1)
+prediciton_f[prediciton_f < 0.0] = 0.0
+prediciton_f[prediciton_f > 1.0] = 1.0
 prediciton = prediciton_f.reshape((predictionLength-testLength, N, N))
 
 diff = prediciton-output_data[trainLength:trainLength+predictionLength-testLength]
