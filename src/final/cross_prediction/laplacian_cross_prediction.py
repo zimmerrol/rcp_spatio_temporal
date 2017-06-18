@@ -127,8 +127,8 @@ input_data, output_data = generate_data(ndata, Ngrid=N)
 
 N = 30
 indices = hp.create_rectangle_indices((75-N//2, 75+N//2), (75-N//2, 75+N//2))
-input_data = input_data[:, indices[0], indices[1]]
-output_data = output_data[:, indices[0], indices[1]]
+input_data = input_data[:, indices[0], indices[1]].reshape((ndata, N, N))
+output_data = output_data[:, indices[0], indices[1]].reshape((ndata, N, N))
 n_units = N*N
 
 print("reshaping data...")
