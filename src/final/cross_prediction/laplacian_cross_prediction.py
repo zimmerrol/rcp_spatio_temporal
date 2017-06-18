@@ -6,6 +6,7 @@ sys.path.insert(1, os.path.join(sys.path[0], '../../mitchell'))
 
 import dill as pickle
 import numpy as np
+import scipy as sp
 import scipy.sparse.linalg as linalg
 
 N = 150
@@ -31,6 +32,8 @@ from ESN import ESN
 def generate_weight(predicter):
     predicter._W = np.zeros((n_units, n_units))
     predicter._W_input = np.identity(n_units)
+
+    predicter._W_input = sp.sparse.dia_matrix(predicter._W_input)
     print("raw W setup.")
 
     predicter._W[0, 0] = 1.0
@@ -78,9 +81,11 @@ def generate_weight(predicter):
     predicter._W[n_units-1, n_units-1] = 1.0
     predicter._W[n_units-1, n_units-2] = 1.0
 
-    print("rescaling...")
+    predicter._W = sp.sparse.dia_matrix(predicter._W)
 
+    print("calculating EV...")
     eigenvalue, _ = linalg.eigs(predicter._W, 1)
+    print("rescaling...")
     predicter._W /= eigenvalue * spectral_radius
 
 def generate_data(N, Ngrid):
