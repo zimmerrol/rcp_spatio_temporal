@@ -32,6 +32,7 @@ from ESN import ESN
 def generate_weight(predicter):
     predicter._W = np.zeros((n_units, n_units))
     predicter._W_input = np.empty((n_units, n_units+1))
+    print("setting up W_in")
     predicter._W_input[:, 1:] = np.identity(n_units)# sp.sparse.identity(n_units+1) #np.identity(n_units)
     predicter._W_input[:, 0] = 0
 
@@ -122,6 +123,8 @@ print("loading data...")
 input_data, output_data = generate_data(ndata, Ngrid=N)
 
 print("reshaping data...")
+input_data = input_data[:trainLength+predictionLength]
+output_data = output_data[:trainLength+predictionLength]
 input_data_f = input_data.reshape((ndata, -1))
 output_data_f = output_data.reshape((ndata, -1))
 
