@@ -5,14 +5,9 @@
 
 import os
 import sys
-import inspect
-currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-parentdir = os.path.dirname(currentdir)
-grandparentdir = os.path.dirname(parentdir)
-sys.path.insert(0, parentdir)
-sys.path.insert(0, grandparentdir)
-sys.path.insert(0, os.path.join(grandparentdir, "barkley"))
-sys.path.insert(0, os.path.join(grandparentdir, "mitchell"))
+sys.path.insert(1, os.path.join(sys.path[0], '../..'))
+sys.path.insert(1, os.path.join(sys.path[0], '../../barkley'))
+sys.path.insert(1, os.path.join(sys.path[0], '../../mitchell'))
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -242,7 +237,7 @@ def process_thread_results(q, nb_results, def_param=(shared_prediction, shared_o
 
         shared_prediction[:, ind_y, ind_x] = data
 
-        bar.update(finishedResults)
+        bar.update(finished_results)
 
 def get_prediction_init(q):
     get_prediction.q = q
