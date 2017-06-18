@@ -29,6 +29,10 @@ import helper as hp
 from ESN import ESN
 
 def generate_weight(predicter):
+    predicter._W = np.zeros_like(n_units, n_units)
+    print("raw W setup.")
+
+
     predicter._W[0, 0] = 1.0
     predicter._W[0, 1] = 1.0
     for i in range(1, N - 1):
@@ -40,6 +44,8 @@ def generate_weight(predicter):
         predicter._W[i, i+N+1] = 1.0
 
     for i in range(N - 1, n_units - N - 1):
+        if (i % 100 == 0):
+            print(i/n_units)
         predicter._W[i, i] = 1.0
         predicter._W[i, i-N] = 1.0
         predicter._W[i, i+N] = 1.0
