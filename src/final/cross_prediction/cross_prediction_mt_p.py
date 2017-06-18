@@ -154,7 +154,7 @@ def get_prediction(data):
     else:
         #inner
         pred, predicter = fit_predict_inner_pixel(y, x)
-    get_prediction.q.put((y, x, pred))#, predicter._W_out.flatten()))
+    get_prediction.q.put((y, x, pred, predicter._W_out.flatten()))
 
 def prepare_fit_data(y, x, pr, skip, def_param=(shared_input_data, shared_output_data)):
     if (prediction_mode in ["NN", "RBF"]):
@@ -207,21 +207,20 @@ def fit_predict_inner_pixel(y, x, def_param=(shared_input_data, shared_output_da
 
     return pred, predicter
 
-def process_thread_results(q, numberOfResults, def_param=(shared_prediction, shared_output_data)):
+def process_thread_results(q, nb_results, def_param=(shared_prediction, shared_output_data)):
     global prediction, shared_weights
 
-    bar = progressbar.ProgressBar(max_value=numberOfResults, redirect_stdout=True, poll_interval=0.0001)
+    bar = progressbar.ProgressBar(max_value=nb_results, redirect_stdout=True, poll_interval=0.0001)
     bar.update(0)
 
-    finishedWorkers = 0
-    finishedResults = 0
+    finished_results = 0
 
     while True:
-        if (finishedResults == numberOfResults):
+        if (finished_results == nb_results):
             bar.finish()
 
-            """
-            uncomment this code to plot the weights of the ESN
+
+            #uncomment this code to plot the weights of the ESN
             print("results:")
             print(len(shared_weights))
             shared_weights = np.array(shared_weights)
@@ -230,17 +229,18 @@ def process_thread_results(q, numberOfResults, def_param=(shared_prediction, sha
 
             plt.imshow(shared_weights)
             plt.show()
-            """
+
 
             return
 
-        newData = q.get()
-        finishedResults += 1
-        ind_y, ind_x, data = newData
+        new_data = q.get()
+        finished_results += 1
+
+        #ind_y, ind_x, data = new_data
+        ind_y, ind_x, data, weights = new_data
+        shared_weights.append(weights)
 
         shared_prediction[:, ind_y, ind_x] = data
-
-        #shared_weights.append(weights)
 
         bar.update(finishedResults)
 
