@@ -120,6 +120,7 @@ predicter = ESN(n_input=n_units, n_output=n_units, n_reservoir=n_units,
                 weight_generation="custom", leak_rate=leak_rate, spectral_radius=spectral_radius,
                 random_seed=random_seed, noise_level=noise_level,
                 regression_parameters=[regression_parameter], solver="lsqr")
+print("custom weights generating...")
 generate_weight(predicter)
 
 print("fitting...")
