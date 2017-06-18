@@ -72,6 +72,8 @@ def generate_weight(predicter):
     predicter._W[n_units-1, n_units-1] = 1.0
     predicter._W[n_units-1, n_units-2] = 1.0
 
+    print("rescaling...")
+
     eigenvalue, _ = linalg.eigs(predicter._W, 1)
     predicter._W /= eigenvalue * spectral_radius
 
