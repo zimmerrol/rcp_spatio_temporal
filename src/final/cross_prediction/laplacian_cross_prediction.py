@@ -100,7 +100,10 @@ def generate_data(N, Ngrid):
 
     return data
 
+print("loading data...")
 input_data, output_data = generate_data(ndata, Ngrid=N)
+
+print("reshaping data...")
 input_data_f = input_data.reshape((ndata, -1))
 output_data_f = output_data.reshape((ndata, -1))
 
