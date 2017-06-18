@@ -82,7 +82,6 @@ class BaseESN(object):
                 self._W = Q.dot(self._W)
             print(i)
             self._W *= self.spectral_radius
-
         elif weight_generation == 'advanced':
             #two create W we must follow some steps:
             #at first, create a W = |W|
@@ -119,19 +118,20 @@ class BaseESN(object):
             random_signs = np.power(-1, rnd.random_integers(self.n_reservoir, self.n_reservoir))
 
             self._W = np.multiply(self._W, random_signs)
-
+        elif weight_generation == 'custom':
+            pass
         else:
-            raise ValueError("The weight_generation property must be one of the following values: naive, advanced")
+            raise ValueError("The weight_generation property must be one of the following values: naive, advanced, SORM, custom")
 
         #random weight matrix for the input from -0.5 to 0.5
         self._W_input = np.random.rand(self.n_reservoir, 1+self.n_input)-0.5
 
         if (self.input_density != 1.0):
             #make the input matrix as dense as requested
-            input_topology = (np.zeros_like(self._W_input) == 1.0)
+            input_topology = (np.ones_like(self._W_input) == 1.0)
             nb_non_zero_input = self.input_density * self.n_input
             for n in range(self.n_reservoir):
-                input_topology[n][rnd.permutation(np.arange(1+self.n_input))[:nb_non_zero_input]] = True
+                input_topology[n][rnd.permutation(np.arange(1+self.n_input))[:nb_non_zero_input]] = False
 
             self._W_input[input_topology] = 0.0
 
