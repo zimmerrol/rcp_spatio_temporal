@@ -33,7 +33,8 @@ def generate_weight(predicter):
     predicter._W = np.zeros((n_units, n_units))
     predicter._W_input = np.empty((n_units, n_units+1))
     print("setting up W_in")
-    predicter._W_input[:, 1:] = np.identity(n_units)# sp.sparse.identity(n_units+1) #np.identity(n_units)
+    predicter._W_input = sp.sparse.csc_matrix((n_units, n_units+1))
+    predicter._W_input[:, 1:] = sp.sparse.identity(n_units)#np.identity(n_units)# sp.sparse.identity(n_units+1) #np.identity(n_units)
     predicter._W_input[:, 0] = 0
 
     predicter._W_input = sp.sparse.dia_matrix(predicter._W_input)
@@ -120,13 +121,13 @@ def generate_data(N, Ngrid):
     return data
 
 print("loading data...")
-input_data, output_data = generate_data(ndata, Ngrid=N)
+#input_data, output_data = generate_data(ndata, Ngrid=N)
 
 print("reshaping data...")
-input_data = input_data[:trainLength+predictionLength]
-output_data = output_data[:trainLength+predictionLength]
-input_data_f = input_data.reshape((ndata, -1))
-output_data_f = output_data.reshape((ndata, -1))
+#input_data = input_data[:trainLength+predictionLength]
+#output_data = output_data[:trainLength+predictionLength]
+#input_data_f = input_data.reshape((ndata, -1))
+#output_data_f = output_data.reshape((ndata, -1))
 
 print("setting up...")
 predicter = ESN(n_input=n_units, n_output=n_units, n_reservoir=n_units,
