@@ -90,7 +90,7 @@ def generate_weight(predicter):
     predicter._W = sp.sparse.dia_matrix(predicter._W)
 
     print("calculating EV...")
-    eigenvalue, _ = linalg.eigs(predicter._W, 1)
+    eigenvalue, _ = np.abs(linalg.eigs(predicter._W, 1))
     print("rescaling...")
     predicter._W /= eigenvalue * spectral_radius
 
