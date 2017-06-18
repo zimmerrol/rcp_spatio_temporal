@@ -88,6 +88,9 @@ def generate_weight(predicter):
     print("rescaling...")
     predicter._W /= eigenvalue * spectral_radius
 
+    print(predicter._W.shape)
+    print(predicter._W_input.shape)
+
 def generate_data(N, Ngrid):
     data = None
 
