@@ -29,9 +29,9 @@ import helper as hp
 from ESN import ESN
 
 def generate_weight(predicter):
-    predicter._W = np.zeros_like(n_units, n_units)
+    predicter._W = np.zeros((n_units, n_units))
+    predicter._W_input = np.identity(n_units)
     print("raw W setup.")
-
 
     predicter._W[0, 0] = 1.0
     predicter._W[0, 1] = 1.0

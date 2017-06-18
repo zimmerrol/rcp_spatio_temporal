@@ -31,7 +31,7 @@ class BaseESN(object):
                 raise ValueError("Dimension of input_scaling ({0}) does not match the input data dimension ({1})".format(len(input_scaling), n_input))
 
         self._input_scaling_matrix = np.diag(input_scaling)
-        self._expanded_input_scaling_matrix = np.diag(np.append([1.0], input_scaling))
+        self._expanded_input_scaling_matrix = np.diag(np.vstack((1.0, input_scaling.reshape(-1, 1))).flatten())
 
         self.out_activation = out_activation
         self.out_inverse_activation = out_inverse_activation
@@ -123,19 +123,21 @@ class BaseESN(object):
         else:
             raise ValueError("The weight_generation property must be one of the following values: naive, advanced, SORM, custom")
 
-        #random weight matrix for the input from -0.5 to 0.5
-        self._W_input = np.random.rand(self.n_reservoir, 1+self.n_input)-0.5
 
-        if (self.input_density != 1.0):
-            #make the input matrix as dense as requested
-            input_topology = (np.ones_like(self._W_input) == 1.0)
-            nb_non_zero_input = self.input_density * self.n_input
-            for n in range(self.n_reservoir):
-                input_topology[n][rnd.permutation(np.arange(1+self.n_input))[:nb_non_zero_input]] = False
+        if (weight_generation != 'custom'):
+            #random weight matrix for the input from -0.5 to 0.5
+            self._W_input = np.random.rand(self.n_reservoir, 1+self.n_input)-0.5
 
-            self._W_input[input_topology] = 0.0
+            if (self.input_density != 1.0):
+                #make the input matrix as dense as requested
+                input_topology = (np.ones_like(self._W_input) == 1.0)
+                nb_non_zero_input = self.input_density * self.n_input
+                for n in range(self.n_reservoir):
+                    input_topology[n][rnd.permutation(np.arange(1+self.n_input))[:nb_non_zero_input]] = False
 
-        self._W_input = self._W_input.dot(self._expanded_input_scaling_matrix)
+                self._W_input[input_topology] = 0.0
+
+            self._W_input = self._W_input.dot(self._expanded_input_scaling_matrix)
 
         if feedback:
             self._W_feedback = np.random.rand(self.n_reservoir, 1+self.n_output) - 0.5
