@@ -125,6 +125,12 @@ def generate_data(N, Ngrid):
 print("loading data...")
 input_data, output_data = generate_data(ndata, Ngrid=N)
 
+N = 30
+indices = hp.create_rectangle_indices((75-N//2, 75+N//2), (75-N//2, 75+N//2))
+input_data = input_data[:, indices[0], indices[1]]
+output_data = output_data[:, indices[0], indices[1]]
+n_units = N*N
+
 print("reshaping data...")
 input_data = input_data[:trainLength+predictionLength]
 output_data = output_data[:trainLength+predictionLength]
