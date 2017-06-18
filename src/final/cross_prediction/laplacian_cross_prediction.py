@@ -30,14 +30,16 @@ import helper as hp
 from ESN import ESN
 
 def generate_weight(predicter):
+    from scipy.linalg import toeplitz
     predicter._W = np.zeros((n_units, n_units))
     predicter._W_input = np.empty((n_units, n_units+1))
     print("setting up W_in")
-    predicter._W_input = sp.sparse.csc_matrix((n_units, n_units+1))
-    predicter._W_input[:, 1:] = sp.sparse.identity(n_units)#np.identity(n_units)# sp.sparse.identity(n_units+1) #np.identity(n_units)
-    predicter._W_input[:, 0] = 0
+    #predicter._W_input = sp.sparse.csc_matrix((n_units, n_units+1))
+    #predicter._W_input[:, 1:] = sp.sparse.identity(n_units)#np.identity(n_units)# sp.sparse.identity(n_units+1) #np.identity(n_units)
+    #predicter._W_input[:, 0] = 0
+    predicter._W_input = toeplitz([0]*n_units, [0, 1] + [0]*(n_units-1))
 
-    predicter._W_input = sp.sparse.dia_matrix(predicter._W_input)
+    #predicter._W_input = sp.sparse.dia_matrix(predicter._W_input)
     print("raw W setup.")
 
     predicter._W[0, 0] = 1.0
