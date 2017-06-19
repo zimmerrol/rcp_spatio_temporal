@@ -65,7 +65,7 @@ def generate_data(N, trans, sample_rate, Ngrid):
             data = bh.generate_uv_data(N, 50000, 50, Ngrid=Ngrid)
             np.save("../../cache/bocf/raw/{0}_{1}.uvws.dat.npy".format(N, Ngrid), data)
         else:
-            data = np.load("../../cache/barkley/raw/{0}_{1}.uv.dat.npy".format(N, Ngrid))
+            data = np.load("../../cache/bocf/raw/{0}_{1}.uvws.dat.npy".format(N, Ngrid))
     else:
         if not os.path.exists("../../cache/mitchell/raw/{0}_{1}.vh.dat.npy".format(N, Ngrid)):
             data = mh.generate_vh_data(N, 20000, 50, Ngrid=Ngrid)
