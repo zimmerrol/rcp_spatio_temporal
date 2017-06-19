@@ -1,11 +1,8 @@
-import os, sys, inspect
-currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-parentdir = os.path.dirname(currentdir)
-grandparentdir = os.path.dirname(parentdir)
-sys.path.insert(0, parentdir)
-sys.path.insert(0, grandparentdir)
-sys.path.insert(0, os.path.join(grandparentdir, "barkley"))
-sys.path.insert(0, os.path.join(grandparentdir, "mitchell"))
+import os
+import sys
+sys.path.insert(1, os.path.join(sys.path[0], '../..'))
+sys.path.insert(1, os.path.join(sys.path[0], '../../barkley'))
+sys.path.insert(1, os.path.join(sys.path[0], '../../mitchell'))
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -43,10 +40,10 @@ def parse_arguments():
     id = int(os.getenv("SGE_TASK_ID", 0))
 
     parser = argparse.ArgumentParser(description='')
-    parser.add_argument('direction', default="vu", nargs=1, type=str, help="vu: v -> u, uv: u -> v, hv: h -> v, vh: v -> h")
+    parser.add_argument('direction', default="vu", nargs=1, type=str, help="vu: v -> u, uv: u -> v, hv: h -> v, vh: v -> h, bocf_uv: BOCF u -> v, bocf_uw: BOCF u -> w, bocf_us: BOCF u -> s")
     args = parser.parse_args()
 
-    if args.direction[0] not in ["vu", "uv", "hv", "vh"]:
+    if args.direction[0] not in ["vu", "uv", "hv", "vh", "bocf_uv", "bocf_uw", "bocf_ws"]:
         raise ValueError("No valid direction choosen! (Value is now: {0})".format(args.direction[0]))
     else:
         direction = args.direction[0]
