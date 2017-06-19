@@ -83,7 +83,7 @@ def generate_data(N, trans, sample_rate, Ngrid):
         data[1] = tmp.copy()
 
     if direction in ["bocf_uv", "bocf_uw", "bocf_ws"]:
-        real_data = np.array((2, N, Ngrid, Ngrid))
+        real_data = np.empty((2, N, Ngrid, Ngrid))
         real_data[0] = data[0].copy()
 
         if direction == "bocf_uv":
