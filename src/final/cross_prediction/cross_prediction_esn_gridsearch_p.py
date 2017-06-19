@@ -64,7 +64,7 @@ def generate_data(N, trans, sample_rate, Ngrid):
             data = np.load("../../cache/barkley/raw/{0}_{1}.uv.dat.npy".format(N, Ngrid))
     elif direction in ["bocf_uv", "bocf_uw", "bocf_us"]:
         if not os.path.exists("../../cache/bocf/raw/{0}_{1}.uvws.dat.npy".format(N, Ngrid)):
-            data = bocfh.generate_uv_data(N, 50000, 50, Ngrid=Ngrid)
+            data = bocfh.generate_uvws_data(N, 50000, 50, Ngrid=Ngrid)
             np.save("../../cache/bocf/raw/{0}_{1}.uvws.dat.npy".format(N, Ngrid), data)
         else:
             data = np.load("../../cache/bocf/raw/{0}_{1}.uvws.dat.npy".format(N, Ngrid))
