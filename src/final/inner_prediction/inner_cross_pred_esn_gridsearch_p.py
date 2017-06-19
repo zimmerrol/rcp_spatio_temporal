@@ -55,13 +55,12 @@ def setup_constants():
 
     id = int(os.getenv("SGE_TASK_ID", 0))
 
-    innerSize, borderSize = [(4,1), (8,1), (16,1), (32,1), (64,1), (128,1),
-                             (4,2), (8,2), (16,2), (32,2), (64,2), (128,2),
-                             (4,3), (8,3), (16,3), (32,3), (64,3), (128,3),
-                             (146,1), (146,2), (148,1)][id-1]
+    innerSize, borderSize = [(4, 1), (8, 1), (16, 1), (32, 1), (64, 1), (128, 1),
+                             (4, 2), (8, 2), (16, 2), (32, 2), (64, 2), (128, 2),
+                             (4, 3), (8, 3), (16, 3), (32, 3), (64, 3), (128, 3),
+                             (146, 1), (146, 2), (148, 1)][id-1]
 
     halfInnerSize = int(np.floor(innerSize / 2))
-    borderSize = 1
     center = N//2
     rightBorderAdd = 1 if innerSize != 2*halfInnerSize else 0
 setup_constants()
