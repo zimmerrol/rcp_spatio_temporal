@@ -43,7 +43,7 @@ def parse_arguments():
     parser.add_argument('direction', default="vu", nargs=1, type=str, help="vu: v -> u, uv: u -> v, hv: h -> v, vh: v -> h, bocf_uv: BOCF u -> v, bocf_uw: BOCF u -> w, bocf_us: BOCF u -> s")
     args = parser.parse_args()
 
-    if args.direction[0] not in ["vu", "uv", "hv", "vh", "bocf_uv", "bocf_uw", "bocf_ws"]:
+    if args.direction[0] not in ["vu", "uv", "hv", "vh", "bocf_uv", "bocf_uw", "bocf_us"]:
         raise ValueError("No valid direction choosen! (Value is now: {0})".format(args.direction[0]))
     else:
         direction = args.direction[0]
@@ -60,6 +60,12 @@ def generate_data(N, trans, sample_rate, Ngrid):
             np.save("../../cache/barkley/raw/{0}_{1}.uv.dat.npy".format(N, Ngrid), data)
         else:
             data = np.load("../../cache/barkley/raw/{0}_{1}.uv.dat.npy".format(N, Ngrid))
+    elif direction in ["bocf_uv", "bocf_uw", "bocf_ws"]:
+        if not os.path.exists("../../cache/bocf/raw/{0}_{1}.uvws.dat.npy".format(N, Ngrid)):
+            data = bh.generate_uv_data(N, 50000, 50, Ngrid=Ngrid)
+            np.save("../../cache/bocf/raw/{0}_{1}.uvws.dat.npy".format(N, Ngrid), data)
+        else:
+            data = np.load("../../cache/barkley/raw/{0}_{1}.uv.dat.npy".format(N, Ngrid))
     else:
         if not os.path.exists("../../cache/mitchell/raw/{0}_{1}.vh.dat.npy".format(N, Ngrid)):
             data = mh.generate_vh_data(N, 20000, 50, Ngrid=Ngrid)
@@ -73,6 +79,19 @@ def generate_data(N, trans, sample_rate, Ngrid):
         tmp = data[0].copy()
         data[0] = data[1].copy()
         data[1] = tmp.copy()
+
+    if direction in ["bocf_uv", "bocf_uw", "bocf_ws"]:
+        real_data = np.array((2, N, Ngrid, Ngrid))
+        real_data[0] = data[0].copy()
+
+        if direction == "bocf_uv":
+            real_data[1] = data[1].copy()
+        elif direction == "bocf_uw":
+            real_data[1] = data[2].copy()
+        elif direction == "bocf_us":
+            real_data[1] = data[3].copy()
+
+        data = real_data
 
     return data
 
