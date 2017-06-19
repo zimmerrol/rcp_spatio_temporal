@@ -3,6 +3,7 @@ import sys
 sys.path.insert(1, os.path.join(sys.path[0], '../..'))
 sys.path.insert(1, os.path.join(sys.path[0], '../../barkley'))
 sys.path.insert(1, os.path.join(sys.path[0], '../../mitchell'))
+sys.path.insert(1, os.path.join(sys.path[0], '../../bocf'))
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -24,6 +25,7 @@ from multiprocessing import process
 
 from helper import *
 import barkley_helper as bh
+import bocf_helper as bocfh
 import mitchell_helper as mh
 import argparse
 
@@ -54,7 +56,7 @@ parse_arguments()
 def generate_data(N, trans, sample_rate, Ngrid):
     data = None
 
-    if (direction in ["uv", "vu"]):
+    if direction in ["uv", "vu"]:
         if not os.path.exists("../../cache/barkley/raw/{0}_{1}.uv.dat.npy".format(N, Ngrid)):
             data = bh.generate_uv_data(N, 50000, 5, Ngrid=Ngrid)
             np.save("../../cache/barkley/raw/{0}_{1}.uv.dat.npy".format(N, Ngrid), data)
@@ -62,7 +64,7 @@ def generate_data(N, trans, sample_rate, Ngrid):
             data = np.load("../../cache/barkley/raw/{0}_{1}.uv.dat.npy".format(N, Ngrid))
     elif direction in ["bocf_uv", "bocf_uw", "bocf_us"]:
         if not os.path.exists("../../cache/bocf/raw/{0}_{1}.uvws.dat.npy".format(N, Ngrid)):
-            data = bh.generate_uv_data(N, 50000, 50, Ngrid=Ngrid)
+            data = bocfh.generate_uv_data(N, 50000, 50, Ngrid=Ngrid)
             np.save("../../cache/bocf/raw/{0}_{1}.uvws.dat.npy".format(N, Ngrid), data)
         else:
             data = np.load("../../cache/bocf/raw/{0}_{1}.uvws.dat.npy".format(N, Ngrid))
