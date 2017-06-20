@@ -305,7 +305,7 @@ def mainFunction():
     model = "mitchell"
     if direction in ["uv", "vu"]:
         model = "barkley"
-    elif direction in ["bocf_uv"]:
+    elif direction in ["bocf_uv", "bocf_uw", "bocf_us"]:
         model = "bocf"
 
     if prediction_mode == "NN":
