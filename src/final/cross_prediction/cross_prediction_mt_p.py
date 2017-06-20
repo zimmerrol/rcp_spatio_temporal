@@ -82,12 +82,18 @@ setup_arrays()
 def generate_data(N, Ngrid):
     data = None
 
-    if (direction in ["uv", "vu"]):
+    if direction in ["uv", "vu"]:
         if not os.path.exists("../../cache/barkley/raw/{0}_{1}.uv.dat.npy".format(N, Ngrid)):
             data = bh.generate_uv_data(N, 50000, 5, Ngrid=Ngrid)
             np.save("../../cache/barkley/raw/{0}_{1}.uv.dat.npy".format(N, Ngrid), data)
         else:
             data = np.load("../../cache/barkley/raw/{0}_{1}.uv.dat.npy".format(N, Ngrid))
+    elif direction in ["bocf_uv", "bocf_uw", "bocf_us"]:
+        if not os.path.exists("../../cache/bocf/raw/{0}_{1}.uvws.dat.npy".format(N, Ngrid)):
+            data = bocfh.generate_uvws_data(N, 50000, 50, Ngrid=Ngrid)
+            np.save("../../cache/bocf/raw/{0}_{1}.uvws.dat.npy".format(N, Ngrid), data)
+        else:
+            data = np.load("../../cache/bocf/raw/{0}_{1}.uvws.dat.npy".format(N, Ngrid))
     else:
         if not os.path.exists("../../cache/mitchell/raw/{0}_{1}.vh.dat.npy".format(N, Ngrid)):
             data = mh.generate_vh_data(N, 20000, 50, Ngrid=Ngrid)
@@ -95,12 +101,25 @@ def generate_data(N, Ngrid):
         else:
             data = np.load("../../cache/mitchell/raw/{0}_{1}.vh.dat.npy".format(N, Ngrid))
 
-    #at the moment we are doing a u -> v / v -> h cross prediction.
+    #at the moment we are doing a u -> v / v -> h cross prediction (index 0 -> index 1)
     if (direction in ["vu", "hv"]):
         #switch the entries for the v -> u / h -> v prediction
         tmp = data[0].copy()
         data[0] = data[1].copy()
         data[1] = tmp.copy()
+
+    if direction in ["bocf_uv", "bocf_uw", "bocf_ws"]:
+        real_data = np.empty((2, N, Ngrid, Ngrid))
+        real_data[0] = data[0].copy()
+
+        if direction == "bocf_uv":
+            real_data[1] = data[1].copy()
+        elif direction == "bocf_uw":
+            real_data[1] = data[2].copy()
+        elif direction == "bocf_us":
+            real_data[1] = data[3].copy()
+
+        data = real_data
 
     global means_train
     means_train = [0, 0] #np.mean(data[:trainLength], axis=(1, 2))
@@ -283,7 +302,11 @@ def mainFunction():
 
     view_data = [("Orig", shared_output_data[trainLength:]), ("Pred", shared_prediction), ("Source", shared_input_data[trainLength:]), ("Diff", diff)]
 
-    model = "barkley" if direction in ["uv", "vu"] else "mitchell"
+    model = "mitchell"
+    if direction in ["uv", "vu"]:
+        model = "barkley"
+    elif direction in ["bocf_uv"]:
+        model = "bocf"
 
     if prediction_mode == "NN":
         output_file = open("../../cache/{0}/viewdata/{1}/{2}_viewdata_{3}_{4}_{5}_{6}_{7}.dat".format(
