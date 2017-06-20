@@ -233,7 +233,7 @@ def process_thread_results(q, nb_results, def_param=(shared_prediction, shared_o
         if (finished_results == nb_results):
             bar.finish()
 
-
+            """
             #uncomment this code to plot the weights of the ESN
             print("results:")
             print(len(shared_weights))
@@ -243,7 +243,7 @@ def process_thread_results(q, nb_results, def_param=(shared_prediction, shared_o
 
             plt.imshow(shared_weights)
             plt.show()
-
+            """
 
             return
 
