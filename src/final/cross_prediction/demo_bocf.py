@@ -25,7 +25,7 @@ import mitchell_helper as mh
 
 Ngrid = 150
 N = 30000
-data = np.load("../../cache/barkley/raw/{0}_{1}.uv.dat.npy".format(N, Ngrid))
+data = np.load("../../cache/bocf/raw/{0}_{1}.uvws.dat.npy".format(N, Ngrid))
 
 viewData = {"u": data[0], "v": data[1], "w": data[2], "s": data[3]}
 
