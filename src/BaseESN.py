@@ -131,7 +131,7 @@ class BaseESN(object):
             if (self.input_density != 1.0):
                 #make the input matrix as dense as requested
                 input_topology = (np.ones_like(self._W_input) == 1.0)
-                nb_non_zero_input = self.input_density * self.n_input
+                nb_non_zero_input = int(self.input_density * self.n_input)
                 for n in range(self.n_reservoir):
                     input_topology[n][rnd.permutation(np.arange(1+self.n_input))[:nb_non_zero_input]] = False
 
