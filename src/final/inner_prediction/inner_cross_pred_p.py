@@ -117,7 +117,7 @@ def setup_constants():
             icpmtp.trainLength, icpmtp.inner_size, icpmtp.border_size, icpmtp.ddim, icpmtp.k))
 
     elif icpmtp.prediction_mode == "RBF":
-        icpmtp.basisPoints = 100
+        icpmtp.basis_points = 100
 
         super_id = 0
         while sge_id > 126:#108:
