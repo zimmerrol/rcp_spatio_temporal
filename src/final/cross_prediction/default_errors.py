@@ -3,11 +3,13 @@ import sys
 sys.path.insert(1, os.path.join(sys.path[0], '../..'))
 sys.path.insert(1, os.path.join(sys.path[0], '../../barkley'))
 sys.path.insert(1, os.path.join(sys.path[0], '../../mitchell'))
+sys.path.insert(1, os.path.join(sys.path[0], '../../bocf'))
 
 import numpy as np
 
 import barkley_helper as bh
 import mitchell_helper as mh
+import bocf_helper as bocfh
 import argparse
 
 N = 150
@@ -27,23 +29,23 @@ else:
     direction = args.direction[0]
 
 if direction in ["uv", "vu"]:
-    if not os.path.exists("../../cache/barkley/raw/{0}_{1}.uv.dat.npy".format(N, Ngrid)):
-        data = bh.generate_uv_data(N, 50000, 5, Ngrid=Ngrid)
-        np.save("../../cache/barkley/raw/{0}_{1}.uv.dat.npy".format(N, Ngrid), data)
+    if not os.path.exists("../../cache/barkley/raw/{0}_{1}.uv.dat.npy".format(ndata, N)):
+        data = bh.generate_uv_data(N, 50000, 5, Ngrid=N)
+        np.save("../../cache/barkley/raw/{0}_{1}.uv.dat.npy".format(ndata, N), data)
     else:
-        data = np.load("../../cache/barkley/raw/{0}_{1}.uv.dat.npy".format(N, Ngrid))
+        data = np.load("../../cache/barkley/raw/{0}_{1}.uv.dat.npy".format(ndata, N))
 elif direction in ["bocf_uv", "bocf_uw", "bocf_us"]:
-    if not os.path.exists("../../cache/bocf/raw/{0}_{1}.uvws.dat.npy".format(N, Ngrid)):
-        data = bocfh.generate_uvws_data(N, 50000, 50, Ngrid=Ngrid)
-        np.save("../../cache/bocf/raw/{0}_{1}.uvws.dat.npy".format(N, Ngrid), data)
+    if not os.path.exists("../../cache/bocf/raw/{0}_{1}.uvws.dat.npy".format(ndata, N)):
+        data = bocfh.generate_uvws_data(N, 50000, 50, Ngrid=N)
+        np.save("../../cache/bocf/raw/{0}_{1}.uvws.dat.npy".format(ndata, N), data)
     else:
-        data = np.load("../../cache/bocf/raw/{0}_{1}.uvws.dat.npy".format(N, Ngrid))
+        data = np.load("../../cache/bocf/raw/{0}_{1}.uvws.dat.npy".format(ndata, N))
 else:
-    if not os.path.exists("../../cache/mitchell/raw/{0}_{1}.vh.dat.npy".format(N, Ngrid)):
-        data = mh.generate_vh_data(N, 20000, 50, Ngrid=Ngrid)
-        np.save("../../cache/mitchell/raw/{0}_{1}.vh.dat.npy".format(N, Ngrid), data)
+    if not os.path.exists("../../cache/mitchell/raw/{0}_{1}.vh.dat.npy".format(N, N)):
+        data = mh.generate_vh_data(N, 20000, 50, Ngrid=N)
+        np.save("../../cache/mitchell/raw/{0}_{1}.vh.dat.npy".format(ndata, N), data)
     else:
-        data = np.load("../../cache/mitchell/raw/{0}_{1}.vh.dat.npy".format(N, Ngrid))
+        data = np.load("../../cache/mitchell/raw/{0}_{1}.vh.dat.npy".format(ndata, N))
 
 print("Data loaded")
 
@@ -55,7 +57,7 @@ if (direction in ["vu", "hv"]):
     data[1] = tmp.copy()
 
 if direction in ["bocf_uv", "bocf_uw", "bocf_ws"]:
-    real_data = np.empty((2, N, Ngrid, Ngrid))
+    real_data = np.empty((2, ndata, N, N))
     real_data[0] = data[0].copy()
 
     if direction == "bocf_uv":

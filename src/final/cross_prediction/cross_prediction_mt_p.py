@@ -8,6 +8,7 @@ import sys
 sys.path.insert(1, os.path.join(sys.path[0], '../..'))
 sys.path.insert(1, os.path.join(sys.path[0], '../../barkley'))
 sys.path.insert(1, os.path.join(sys.path[0], '../../mitchell'))
+sys.path.insert(1, os.path.join(sys.path[0], '../../bocf'))
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -25,6 +26,7 @@ import ctypes
 from multiprocessing import process
 
 from helper import *
+import bocf_helper as bocfh
 import barkley_helper as bh
 import mitchell_helper as mh
 
