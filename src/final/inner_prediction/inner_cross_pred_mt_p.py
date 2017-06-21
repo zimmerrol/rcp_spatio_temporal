@@ -66,9 +66,9 @@ def setup_arrays():
     shared_data = np.ctypeslib.as_array(shared_data_base.get_obj())
     shared_data = shared_data.reshape(ndata, N, N)
 
-    prediction_base = multiprocessing.Array(ctypes.c_double, testLength*N*N)
+    prediction_base = multiprocessing.Array(ctypes.c_double, predictionLength*N*N)
     prediction = np.ctypeslib.as_array(prediction_base.get_obj())
-    prediction = prediction.reshape(testLength, N, N)
+    prediction = prediction.reshape(predictionLength, N, N)
 setup_arrays()
 
 def generate_data(N, trans, sample_rate, Ngrid, def_param=(shared_input_data, shared_data)):
@@ -122,7 +122,7 @@ def prepare_predicter(y, x):
 
 def fit_predict_pixel(y, x, predicter, def_param=(shared_input_data, shared_data)):
     training_data_in = shared_input_data[:trainLength]
-    test_data_in = shared_input_data[trainLength:trainLength+testLength]
+    test_data_in = shared_input_data[trainLength:trainLength+predictionLength]
     training_data_out = shared_data[:trainLength, y, x].reshape(-1, 1)
 
     predicter.fit(training_data_in, training_data_out)
