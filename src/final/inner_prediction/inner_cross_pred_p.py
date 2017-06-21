@@ -55,7 +55,8 @@ def setup_constants():
         """
             These constant values are the result of the GridSearch (done by inner_cross_pred_esn_g.py) and some manual tweaking of them.
             The first block of constants has arised by using a small range of values for the regression parameter lambda. The second block yields
-            much better accuracies and has arised from a GridSearch on a broader range of lambda values (including much higher values)
+            much better accuracies and has arised from a GridSearch on a broader range of lambda values (including much higher values).
+            The third block has been found after making the input matrix sparse, too.
         """
 
         """
@@ -75,6 +76,7 @@ def setup_constants():
                        "v": [1e-5,1e-5,1e-5,1e-4,1e-5,1e-4,1e-5,1e-5,1e-5,1e-4,1e-5,1e-5,1e-5,1e-5,1e-4,1e-4,1e-5,1e-4,1e-4,1e-4,1e-4,]}[direction][sge_id-1]
         """
 
+        """
         icpmtp.n_units = {"u": [400, 400, 50, 200, 400, 200, 400, 400, 50, 200, 400, 200, 400, 400, 50, 200, 400, 200, 50, 50, 400, ],
                    "v": [400, 50, 200, 50, 400, 200, 400, 50, 200, 50, 400, 200, 400, 50, 200, 50, 400, 200, 200, 200, 200, ]}[direction][sge_id-1]
         icpmtp.seed = {"u": [41, 41, 42, 40, 39, 41, 41, 41, 42, 40, 39, 41, 41, 41, 42, 40, 39, 41, 41, 41, 39, ],
@@ -89,12 +91,31 @@ def setup_constants():
                       "v": [1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, ]}[direction][sge_id-1]/10
         icpmtp.noise_level = {"u": [1e-5, 1e-5, 1e-5, 1e-4, 1e-5, 1e-5, 1e-5, 1e-5, 1e-5, 1e-4, 1e-5, 1e-5, 1e-5, 1e-5, 1e-5, 1e-4, 1e-5, 1e-5, 1e-5, 1e-4, 1e-5, ],
                        "v": [1e-4, 1e-4, 1e-5, 1e-5, 1e-4, 1e-5, 1e-4, 1e-4, 1e-5, 1e-5, 1e-4, 1e-5, 1e-4, 1e-4, 1e-5, 1e-5, 1e-4, 1e-5, 1e-4, 1e-4, 1e-5, ]}[direction][sge_id-1]
+        """
+
+        icpmtp.n_units = {"u": [400, 400, 200, 50, 50, 200, 400, 400, 400, 200, 400, 50, 400, 400, 200, 400, 50, 200, 50, 200, 50, ],
+                          "v": [400, 50, 200, 50, 400, 200, 50, 50, 50, 50, 50, 50, 50, 200, 50, 50, 200, 50, 200, 50, 50, ]}[direction][sge_id-1]
+        icpmtp.seed = {"u": [42, 41, 42, 39, 42, 39, 40, 40, 41, 39, 40, 39, 40, 42, 41, 40, 41, 39, 40, 42, 39, ],
+                       "v": [42, 41, 42, 40, 42, 39, 42, 39, 39, 42, 41, 40, 39, 39, 42, 39, 39, 41, 42, 40, 40, ]}[direction][sge_id-1]
+        icpmtp.regression_parameter = {"u": [5e-4, 5e-4, 5e-2, 5e-2, 5e4, 5e3, 5e-4, 5e-4, 5e0, 5e2, 5e4, 5e3, 5e-4, 5e-2, 5e0, 5e3, 5e4, 5e3, 5e-3, 5e2, 5e0, ],
+                                       "v": [5e+0, 5e-1, 5e+4, 5e+4, 5e+2, 5e+4, 5e-1, 5e-2, 5e+0, 5e+3, 5e+3, 5e+4, 5e-1, 5e-1, 5e+0, 5e+4, 5e+3, 5e+4, 5e+4, 5e+4, 5e+4, ]}[direction][sge_id-1]
+        icpmtp.spectral_radius = {"u": [0.1, 1, 1.1, 0.5, 1.5, 1.1, 0.5, 0.1, 1.1, 1.5, 1.1, 1.5, 0.5, 1.1, 1.1, 0.1, 1.5, 1.1, 3, 0.1, 1.5, ],
+                                  "v": [1.5, 1.1, 1.5, 1.5, 1.5, 1.1, 3, 1.5, 1.5, 1.1, 3, 1.5, 0.1, 0.1, 1.5, 1.5, 1.5, 3, 1.1, 1.5, 1.5, ]}[direction][sge_id-1]
+        icpmtp.leak_rate = {"u": [0.95, 0.95, 0.05, 0.05, 0.2, 0.2, 0.95, 0.95, 0.2, 0.05, 0.05, 0.5, 0.95, 0.95, 0.2, 0.05, 0.2, 0.05, 0.05, 0.05, 0.05, ],
+                            "v": [0.95, 0.5, 0.95, 0.5, 0.05, 0.2, 0.7, 0.95, 0.5, 0.2, 0.5, 0.2, 0.05, 0.95, 0.7, 0.5, 0.2, 0.2, 0.2, 0.2, 0.7, ]}[direction][sge_id-1]
+        icpmtp.sparseness = {"u": [0.1, 0.2, 0.2, 0.1, 0.2, 0.2, 0.2, 0.2, 0.1, 0.1, 0.2, 0.1, 0.2, 0.1, 0.2, 0.2, 0.2, 0.1, 0.1, 0.2, 0.2, ],
+                             "v": [0.1, 0.1, 0.2, 0.2, 0.1, 0.2, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.2, 0.2, 0.1, 0.2, 0.1, 0.1, 0.2, 0.1, 0.2, ]}[direction][sge_id-1]
+        icpmtp.noise_level = {"u": [1e-5, 1e-4, 1e-4, 1e-5, 1e-5, 1e-4, 1e-4, 1e-4, 1e-5, 1e-4, 1e-5, 1e-4, 1e-5, 1e-4, 1e-5, 1e-5, 1e-5, 1e-5, 1e-5, 1e-4, 1e-5, ],
+                              "v": [1e-4, 1e-5, 1e-5, 1e-5, 1e-4, 1e-4, 1e-5, 1e-4, 1e-4, 1e-4, 1e-5, 1e-5, 1e-4, 1e-4, 1e-4, 1e-4, 1e-4, 1e-4, 1e-4, 1e-5, 1e-5, ]}[direction][sge_id-1]
+        icpmtp.input_density = {"u": [15, 5, 15, 5, 20, 20, 20, 5, 5, 100, 100, 5, 20, 10, 50, 100, 100, 50, 10, 100, 10],
+                               "v": []}[direction][sge_id-1]
+
+
+
 
 
         icpmtp.inner_size = [4,8,16,32,64,128, 4,8,16,32,64,128, 4,8,16,32,64,128, 146,146,148][sge_id-1]
         icpmtp.border_size = [1,1,1,1,1,1, 2,2,2,2,2,2, 3,3,3,3,3,3, 1,2,1][sge_id-1]
-
-        icpmtp.constants_setup = True
 
         print("\t trainLength \t = {0} \n\t a \t = {1}\n\t b \t = {2}\n\t n_units \t = {3}\n\t regular. \t = {4}".format(icpmtp.trainLength, icpmtp.inner_size, icpmtp.border_size, icpmtp.n_units, icpmtp.regression_parameter))
 

@@ -40,7 +40,7 @@ testLength = 2000
 trainLength = 15000
 
 #will be set by the *_p.py file
-direction, prediction_mode, patch_radius, eff_sigma, sigma, sigma_skip, ddim = None, None, None, None, None, None, None
+direction, prediction_mode, patch_radius, eff_sigma, sigma, sigma_skip, ddim, input_density = None, None, None, None, None, None, None, None
 n_units, spectral_radius, leak_rate, random_seed, noise_level, regression_parameter, sparseness = None, None, None, None, None, None, None
 border_size, inner_size, center, half_inner_size, right_border_add, basis_points, width, k = None, None, None, None, None, None, None, None
 shared_input_data, shared_data, prediction = None, None, None
@@ -110,7 +110,7 @@ def prepare_predicter(y, x):
         predicter = ESN(n_input=shared_input_data.shape[1], n_output=1, n_reservoir=n_units,
                         weight_generation="advanced", leak_rate=leak_rate, spectral_radius=spectral_radius,
                         random_seed=random_seed, noise_level=noise_level, sparseness=sparseness,
-                        regression_parameters=[regression_parameter], solver="lsqr", input_density=10/shared_input_data.shape[1])
+                        regression_parameters=[regression_parameter], solver="lsqr", input_density=input_density/shared_input_data.shape[1])
     elif prediction_mode == "NN":
         predicter = NN(k=k)
     elif prediction_mode == "RBF":
@@ -191,7 +191,7 @@ def mainFunction():
     prediction[prediction < 0.0] = 0.0
     prediction[prediction > 1.0] = 1.0
 
-    diff = (shared_data[trainLength:trainLength+predictionLength]-shared_prediction)
+    diff = (shared_data[trainLength:trainLength+predictionLength]-prediction)
     mse_validation = np.mean((diff[:predictionLength-testLength, output_y, output_x])**2)
     mse_test = np.mean((diff[predictionLength-testLength:predictionLength, output_y, output_x])**2)
     print("validation error: {0}".format(mse_validation))
