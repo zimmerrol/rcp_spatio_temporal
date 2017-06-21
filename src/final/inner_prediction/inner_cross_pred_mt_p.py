@@ -191,7 +191,7 @@ def mainFunction():
     prediction[prediction < 0.0] = 0.0
     prediction[prediction > 1.0] = 1.0
 
-    diff = (shared_output_data[trainLength:trainLength+predictionLength]-shared_prediction)
+    diff = (shared_data[trainLength:trainLength+predictionLength]-shared_prediction)
     mse_validation = np.mean((diff[:predictionLength-testLength, output_y, output_x])**2)
     mse_test = np.mean((diff[predictionLength-testLength:predictionLength, output_y, output_x])**2)
     print("validation error: {0}".format(mse_validation))
