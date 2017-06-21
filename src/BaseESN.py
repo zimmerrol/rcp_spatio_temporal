@@ -149,6 +149,7 @@ class BaseESN(object):
         u = inputData.reshape(self.n_input, 1)
         self._x = (1.0-self.leak_rate)*self._x + self.leak_rate*np.arctan(np.dot(self._W_input, np.vstack((self.bias, u))) + np.dot(self._W, self._x) +
                                                                           (np.random.rand()-0.5)*self.noise_level)
+        self._x = np.asarray(self._x)
 
         return u
 
