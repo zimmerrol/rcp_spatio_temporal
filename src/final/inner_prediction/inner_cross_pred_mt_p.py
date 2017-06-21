@@ -102,7 +102,7 @@ def generate_data(N, trans, sample_rate, Ngrid, def_param=(shared_input_data, sh
         shared_input_data[:] = input_data[:]
 
     shared_data[:] = data[:]
-    prediction[:] = data[trainLength:trainLength+testLength]
+    prediction[:] = data[trainLength:trainLength+predictionLength]
     prediction[:, output_y, output_x] = 0.0
 
 def prepare_predicter(y, x):
