@@ -145,6 +145,7 @@ def setup_constants():
     icpmtp.half_inner_size = int(np.floor(icpmtp.inner_size / 2))
     icpmtp.center = icpmtp.N//2
     icpmtp.right_border_add = 1 if icpmtp.inner_size != 2*icpmtp.half_inner_size else 0
+    icpmtp.constants_setup = True
 
 if __name__ == '__main__':
     parse_arguments()
