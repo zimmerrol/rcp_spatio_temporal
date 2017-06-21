@@ -120,8 +120,8 @@ def setup_constants():
         icpmtp.basisPoints = 100
 
         super_id = 0
-        while sge_id > 108:
-            sge_id -= 108
+        while sge_id > 126:#108:
+            sge_id -= 126#108
             super_id += 1
 
         icpmtp.ddim = [3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,
