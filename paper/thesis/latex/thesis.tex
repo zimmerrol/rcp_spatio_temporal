@@ -46,7 +46,9 @@
 \newcommandx{\improvement}[2][1=]{\todo[linecolor=Plum,backgroundcolor=Plum!25,bordercolor=Plum,#1]{#2}}
 
 
-
+\usepackage[toc,page]{appendix}
+\addto\captionsngerman{\let\appendixtocname\appendixname%
+\let\appendixpagename\appendixname}
 
 
 
@@ -94,6 +96,7 @@
 
 %bessere option?
 \usepackage{siunitx}
+\sisetup{detect-weight=true, detect-family=true}
 
 %% Hyperlinks im Dokument; muss als eines der letzten Pakete geladen werden
 \usepackage[pdfstartview=FitH,      % Oeffnen mit fit width
@@ -162,7 +165,7 @@
 
 %\nocite{*}
 
-%\appendix
+\input{content/appendix.tex}
 
 \cleardoublepage
 %% Bibliographie. Das Argument muss der Name der BIBTeX-Datenbank stehen.
@@ -173,7 +176,7 @@
 
 %% Dieser Befehl MUSS am Ende stehen und erzeugt die Erklaerung ueber die
 %% benutzten Mittel
-%\Declaration
+\Declaration
 
 \listoftodos[Notes]
 

@@ -3,7 +3,7 @@
 
 Die zuvor in Kapitel \ref{ch:theory} eingeführten Methoden werden nun durch drei verschiedene Szenarien ausprobiert und verglichen. Hierbei liegt der Fokus auf der Verwendung und Erprobung der \textsc{ESN}s. Da die klassischen Methoden der \textit{nächsten Nachbarn} (\textsc{NN}) und der \textit{radialen Basisfunktionen} (\textsc{RBF}) bereits seit längerer Zeit bekannt sind und populäre Lösung solcher Problemfälle darstellen, dienen sie als Bezugsgröße.\\
 
-Jedes der drei Szenarien wird sowohl auf ein \textit{Barkley}-System als auch auf ein System nach dem \textit{Mitchell-Schaeffer}-Modell angewendet. Diese Systeme bestehen aus $150$ Gitterpunkten und nutzen die zuvor beschriebenen Parameter. Für ihre Startverteilung werden die Felder der beiden Systemvariablen in $100$ Quadrate unterteilt, und diese mit Zufallswerten zwischen $0$ und $1$ initialisiert. Anschließend werden die Systeme über $2000$ Zeitschritte ($\widehat{=} 400.0$ Zeiteinheiten) simuliert um ein transientes Verhalten abzuwarten. Durch das weitere Simulieren der Systeme werden die Test und Trainingsdaten ermittelt. Dabei wird für das \textit{Barkley} eine Samplingzeit von $0.1$ und für das \textit{Mitchell-Schaeffer}-Modell von $1.0$ Zeiteinheiten benutzt.\\
+Jedes der drei Szenarien wird sowohl auf ein \textit{Barkley}-System als auch auf ein System nach dem \textit{Mitchell-Schaeffer}-Modell angewendet. Diese Systeme bestehen aus $150$ Gitterpunkten und nutzen die zuvor beschriebenen Parameter. Für ihre Startverteilung werden die Felder der beiden Systemvariablen in $100$ Quadrate unterteilt, und diese mit Zufallswerten zwischen $0$ und $1$ initialisiert. Anschließend werden die Systeme über $2000$ Zeitschritte ($\widehat{=} 400.0$ Zeiteinheiten) simuliert um ein transientes Verhalten abzuwarten. Durch das weitere Simulieren der Systeme wird der wirkliche Datensatz generiert, der benutzt wird. Dieser wird in einen Trainingsdatensatz, einen Evaluationsdatensatz und einen Testdatensatz aufgeteilt. Der erste wird für das Trainieren der Modelle und Ansätze verwendet, der zweite für das Auswählen der optimalen Hyperparameter und der dritte für die finale Bewertung der Leistung eines Ansatzes. Es wird für das \textit{Barkley}- eine Samplingzeit von $0.1$ und für das \textit{Mitchell-Schaeffer}-Modell von $1.0$ Zeiteinheiten benutzt.\\
  
 Die erste Aufgabe besteht darin aus der Kenntnis einer der beiden Systemvariablen die andere Unbekannte zu ermitteln. Dabei wird die Spannungsvariable als Quelle genutzt. Dies ist in den zuvor eingeführten Modellen jeweils die Größe, welche den Diffusionsterm beinhaltet; also die $u$-Variable im \textit{Barkley}-Modell und die $v$-Variable im \textit{Mitchell-Schaeffer}-Modell.\\
 Im zweiten Szenario werden die Techniken verwendet um aus Messdaten einer simulierten Fernfeldmessung der Spannungsvariable  diese wiederherzustellen. Diese Fernfeldmessung wird durch eine gaußsche Unschärfe simuliert.\\
@@ -46,7 +46,7 @@ $\Delta \sigma$ & 1 & 1 & 1 & 2 & 1 & 2 & 3 \\
 \label{tab:probe_sigma_values}
 \end{table} 
 
-Der Trainingsvorgang wird jeweils über $N_{Training}=15000$ Zeitschritte durchgeführt und der Anschließende Evaluationsdurchgang auf $N_{Testing} = 2000$ Zeitschritte.
+Der Trainingsvorgang wird jeweils über $N_{Training}=15000$ Zeitschritte durchgeführt und der anschließende Evaluationsdurchgang auf $N_{Evaluation} = 2000$ Zeitschritte. Der finale Testvorgang ist ebenfalls $N_{Testing}=2000$ Schritte lang.
 Zur Bewertung der Leistung einer Vorhersage werden die beiden Fehlergrößen MSE und NRMSE eingeführt. Im Allgemeinen ist der MSE (\textit{Mean Squared Error}) durch
 \begin{align}
 MSE(y) = \sum_i^m \sum_t^{N_{Testing}} \left(y(t)_i - \hat{y}(t)_i \right)^2
@@ -65,7 +65,11 @@ x = \begin{cases}
     1,& \text{wenn } x \geq 1
 \end{cases}
 \end{align}
-abgeschnitten, wobei $x$ für eine der beiden Variablen in dem jeweiligen Modell steht.
+abgeschnitten, wobei $x$ für eine der beiden Variablen in dem jeweiligen Modell steht.\\
+
+Zur Erprobung verschiedener Hyperparameter innerhalb der verschiedenen Ansätze ist ein \textsc{Sun Grid Engine}-Cluster genutzt worden. Dabei besteht jeder Knoten aus zwei \textsc{Intel(R) Xeon(R) CPU E5-2650 v2} CPUs mit einem Takt von $2.650$ GHz und $64$ GB Arbeitsspeicher. Diese werden durch das Betriebssystem \textsc{SUSE Linux Enterprise Server 11} betrieben. Die angegebenen Laufzeiten beziehen sich jeweils auf die Ausführung auf einem dieser Knoten. 
+\improvement{Add moreinformation about the cluster}
+
 
 \FloatBarrier
 \subsection{Echo State Network}

@@ -83,6 +83,7 @@ Die optimalen gefundenen Hyperparameter und die damit erreichten Ergebnisse sind
 
 Dabei ist zu erkennen, dass die Qualität der Vorhersage mit steigendem $a$ stark abnimmt. So kann für das \textit{Barkley}-Modell nur für $a \in \{4,8\}$ ein NRMSE der deutlich unter $0.50$ erreicht werden. Für größere Bereiche steigt der NRMSE sogar auf $> 1.0$ an, sodass die Vorhersage nicht besser ist als wenn man den Mittelwert als Vorhersage nimmt. Die Vorhersagen des \textit{Mitchell-Schaeffer}-Modells zeigen eine gleichartige Tendenz, doch starten die Fehler hier bereits deutlich stärker. 
 
+\FloatBarrier
 \subsection{Radiale Basisfunktionen}
 Analog zu den vorherigen Ausführungen sind die radialen Basisfunktionen ebenfalls auf dieses Problem angewendet worden. Dabei ist mit einer analogen Begründung wie bei den nächsten Nachbarn nur der eingeschränkte Wertebereich für $a$ durchlaufen worden. Die dafür gefundenen Hyperparameter und die Fehler können in Tabelle \ref{tab:exp_inner_cross_rbf_results} gefunden werden.
 \begin{table}[h]
@@ -136,70 +137,52 @@ Analog zu den vorherigen Ausführungen sind die radialen Basisfunktionen ebenfal
 
 Es ist anzumerken, dass der NRMSE für beide Modelle und alle betrachteten Größen $a$ kleiner als $1.0$ bleibt. Nichtsdestotrotz steigt er ebenfalls mit wachsendem $a$ an, wie schon bei den nächsten Nachbarn. Für die größten beiden $a$-Werte ist in beiden Modellen der Fehler allerdings schon so groß, dass die Vorhersage kaum nützliche Informationen liefert.
 
+\FloatBarrier
 \subsection{Echo State Network}
-Im Gegensatz zu den anderen beiden Methoden wächst die benötigte Rechenzeit bei der Verwendung der \textsc{ESN}s nicht so schnell an, sodass hiermit auch deutlich größere innere Felder betrachtet werden können. Zur Optimierung des Ansatzes ist erneut das in Abschnitt \ref{sec:exp_general_esn} beschriebene Verfahren durchgeführt worden. Es ist allerdings so modifiziert worden, dass bei der groben Hyperparameterbestimmung des \textsc{ESN} nicht vier statt einem Punkt des inneren Quadrates betrachtet worden sind. Zudem ergibt sich bei dieser Aufgabe ein weiteres Problem, welches eine Modifikation erfordert. In den vorherigen Aufgaben ist die Dimension des Eingangssignals in das \textsc{ESN} $N_u < 50$ gewesen. Nun wächst die Dimension des Eingangssignals allerdings sehr stark mit $N_u = 4b(b+a)$ an. Dies würde bei der Konstruktion der Eingangsmatrix $\mathbf{W_{in}}$ nach Abschnitt \ref{sec:esn_structure} dazu führen, dass die inneren Einheiten des Reservoirs zu viele Eingangssignale erhalten und somit unter Umständen schnell eine Sättigung des $tanh(\cdot)$ in der zeitlichen Entwicklungsgleichung \ref{eq:esn_stateeq} ergibt. Um dies zu lösen ist ein neuer Hyperparameter $FANCY NAME$ eingeführt worden, der die Anzahl von Eingangssignalen pro innerer Einheit beschränkt. Somit wird die Matrix $\mathbf{W_{in}}$ dünn besetzt.\\
-Bei der Untersuchung ist ersichtlich geworden, dass der untersuchte Bereich der Regularisierung $\lambda \in [\num{5e-2},\num{5e-6}]$ zu gering ist, da der optimale Wert stets am linken Rand des Intervalls gefunden worden ist. Deswegen ist noch einmal eine Suche auf dem größeren Parameterbereich $\lambda \in [\num{5e-4},\num{5e+4}]$ durchgeführt worden.
+Im Gegensatz zu den anderen beiden Methoden wächst die benötigte Rechenzeit bei der Verwendung der \textsc{ESN}s nicht so schnell an, sodass hiermit auch deutlich größere innere Felder betrachtet werden können. Zur Optimierung des Ansatzes ist erneut das in Abschnitt \ref{sec:exp_general_esn} beschriebene Verfahren durchgeführt worden. Es ist allerdings so modifiziert worden, dass bei der groben Hyperparameterbestimmung des \textsc{ESN} nicht vier statt einem Punkt des inneren Quadrates betrachtet worden sind. Zudem ergibt sich bei dieser Aufgabe ein weiteres Problem, welches eine Modifikation erfordert. In den vorherigen Aufgaben ist die Dimension des Eingangssignals in das \textsc{ESN} $N_u < 50$ gewesen. Nun wächst die Dimension des Eingangssignals allerdings sehr stark mit $N_u = 4b(b+a)$ an. Dies würde bei der Konstruktion der Eingangsmatrix $\mathbf{W_{in}}$ nach Abschnitt \ref{sec:esn_structure} dazu führen, dass die inneren Einheiten des Reservoirs zu viele Eingangssignale erhalten und somit unter Umständen schnell eine Sättigung des $tanh(\cdot)$ in der zeitlichen Entwicklungsgleichung \ref{eq:esn_stateeq} ergibt. Um dies zu lösen ist ein neuer Hyperparameter $\eta$ eingeführt worden, der die Anzahl von Eingangssignalen pro innerer Einheit beschränkt. Dadurch wird die Matrix $\mathbf{W_{in}}$ dünn besetzt.\\
+Zudem ist bei der Untersuchung ersichtlich geworden, dass der untersuchte Bereich der Regularisierung $\lambda \in [\num{5e-2},\num{5e-6}]$ zu gering ist, da der optimale Wert stets am linken Rand des Intervalls gefunden worden ist. Deswegen ist zusätzlich einmal eine Suche auf dem größeren Parameterbereich $\lambda \in [\num{5e-4},\num{5e+4}]$ durchgeführt worden.
+In Tabelle \ref{tab:exp_inner_cross_esn_results} sind die Fehler und benötigten Laufzeiten für die besten Reservoirs für die beiden Modelle aufgelistet. Es kann erneut der Trend beobachtet werden, dass der Fehler mit steigendem $a$ ebenso zunimmt. Für das \textit{Mitchell-Schaffer}-Modell sind alle NRMSE-Werte kleiner als $1.0$. Dies ist beim \textit{Barkley-Modell} nicht mehr der Fall für die beiden größten Werte von $a$. 
 
 \begin{table}[h]
 	\centering
 
-	\begin{tabular}{|c|c|c|c|c|c|c|c|}
-		\multicolumn{1}{c|}{} & \multicolumn{7}{c|}{Barkley}\\ 
-		\hline \hline 
-		\rule[-1ex]{0pt}{2.5ex} $a$ & 4 & 8 & 16 & 32 & 64 & 128 & 148\\ 
-		\hline 
-		\rule[-1ex]{0pt}{2.5ex} $b$ & 1 & 1 & 1 & 1 & 1 & 1 & 1 \\ 
-		\hline 
-		\rule[-1ex]{0pt}{3.5ex} $N$ & 400 & 400 & 50 & 200 & 400 & 200 & 50\\ 
-		\hline 
-		\rule[-1ex]{0pt}{3.5ex} $\rho(|\mathbf{W}|)$ & 0.8 & 0.5 & 0.5 & 1.5 & 1.5 & 3.0 & 0.8\\ 
-		\hline 
-		\rule[-1ex]{0pt}{3.5ex} $\alpha$ & 0.70 & 0.50 & 0.20 & 0.05 & 0.05 & 0.20 & 0.05 \\ 
-		\hline 
-		\rule[-1ex]{0pt}{3.5ex} $\epsilon$ & 0.2 & 0.2 & 0.1 & 0.2 & 0.2 & 0.2 & 0.1 \\ 
-		\hline 
-		\rule[-1ex]{0pt}{3.5ex} $\nu_{max}$ & $\num{1e-5}$ & $\num{1e-5}$ & $\num{1e-5}$ & $\num{1e-4}$ & $\num{1e-5}$ & $\num{1e-5}$ &  $\num{1e-5}$\\ 
-		\hline 
-		\rule[-1ex]{0pt}{3.5ex} $\lambda$ & $\num{5e-4}$ & $\num{5e-1}$ & $\num{5e-1}$ & $\num{5e+3}$ & $\num{5e+4}$ & $\num{5e+3}$ & $\num{5e-6}$\\ 		
-		\hline 
-		\rule[-1ex]{0pt}{2.5ex} Laufzeit [s] & 5 & 15 & 20 & 131 & 1206 & 3318 & 3010\\
-		\hline 
-		\rule[-1ex]{0pt}{2.5ex} \textbf{MSE} & \textbf{0.00048} & \textbf{0.00200} & \textbf{0.03460} & \textbf{0.08561} & \textbf{0.15392} & \textbf{0.17220} & \textbf{0.18431}\\ 
-		\hline 
-		\rule[-1ex]{0pt}{2.5ex} \textbf{NRMSE} & \textbf{0.0179} & \textbf{0.1156} & \textbf{0.4827} & \textbf{0.7671} & \textbf{0.9472} & \textbf{1.0250} & \textbf{1.1153} \\ 
-		\hline 
-	\end{tabular} 
+	\resizebox{\columnwidth}{!}{%
+		\begin{tabular}{|c|c|c|c|c|c|c|c|}
+			\multicolumn{1}{c|}{} & \multicolumn{7}{c|}{Barkley}\\ 
+			\hline \hline 
+			\rule[-1ex]{0pt}{2.5ex} $a$ & 4 & 8 & 16 & 32 & 64 & 128 & 148\\ 
+			\hline 
+			\rule[-1ex]{0pt}{2.5ex} $b$ & 1 & 1 & 1 & 1 & 1 & 1 & 1 \\ 
+			\hline 
+			\rule[-1ex]{0pt}{2.5ex} Laufzeit [s] & 5 & 15 & 60 & 170 & 1922 & 3320 & 2970\\
+			\hline 
+			\rule[-1ex]{0pt}{2.5ex} \textbf{MSE} & \textbf{0.00005} & \textbf{0.00111} & \textbf{0.01447} & \textbf{0.09301} & \textbf{0.13093} & \textbf{0.15106} & \textbf{0.18380}\\ 
+			\hline 
+			\rule[-1ex]{0pt}{2.5ex} \textbf{NRMSE} & \textbf{0.0121} & \textbf{0.0801} & \textbf{0.3386} & \textbf{0.7398} & \textbf{0.9438} & \textbf{1.0098} & \textbf{1.1049} \\ 
+			\hline 
+		\end{tabular} 
+	}
 	
 	\vspace{0.75cm}
 
 	\centering
 
-	\begin{tabular}{|c|c|c|c|c|c|c|c|}
-		\multicolumn{1}{c|}{} & \multicolumn{7}{c|}{Mitchell-Schaeffer}\\ 
-		\hline \hline 
-		\rule[-1ex]{0pt}{2.5ex} $a$ & 4 & 8 & 16 & 32 & 64 & 128 & 148\\ 
-		\hline 
-		\rule[-1ex]{0pt}{2.5ex} $b$ & 1 & 1 & 1 & 1 & 1 & 1 & 1 \\ 
-		\hline 
-		\rule[-1ex]{0pt}{3.5ex} $N$ & 400 & 50 & 200 & 50 & 400 & 200 & 200\\ 
-		\hline 
-		\rule[-1ex]{0pt}{3.5ex} $\rho(|\mathbf{W}|)$ & 1.5 & 3.0 & 3.0 & 0.8 & 3.0 & 3.0 & 3.0\\ 
-		\hline 
-		\rule[-1ex]{0pt}{3.5ex} $\alpha$ & 0.95 & 0.50 & 0.05 & 0.95 & 0.20 & 0.05 & 0.05 \\ 
-		\hline 
-		\rule[-1ex]{0pt}{3.5ex} $\epsilon$ & 0.1 & 0.1 & 0.2 & 0.1 & 0.1 & 0.1 & 0.2 \\ 
-		\hline 
-		\rule[-1ex]{0pt}{3.5ex} $\nu_{max}$ & $\num{1e-4}$ & $\num{1e-5}$ & $\num{1e-5}$ & $\num{1e-5}$ & $\num{1e-4}$ & $\num{1e-5}$ &  $\num{1e-5}$\\ 
-		\hline 
-		\rule[-1ex]{0pt}{3.5ex} $\lambda$ & $\num{5e-0}$ & $\num{5e-2}$ & $\num{5e-1}$ & $\num{5e+3}$ & $\num{5e+3}$ & $\num{5e+4}$ & $\num{5e+4}$\\ 		
-		\hline 
-		\rule[-1ex]{0pt}{2.5ex} Laufzeit [s] & 5 & 15 & 20 & 131 & 1206 & 3318 & 3010\\
-		\hline 
-		\rule[-1ex]{0pt}{2.5ex} \textbf{MSE} & \textbf{0.00025} & \textbf{0.00220} & \textbf{0.01889} & \textbf{0.04240} & \textbf{0.05389} & \textbf{0.06596} & \textbf{0.06488}\\ 
-		\hline 
-		\rule[-1ex]{0pt}{2.5ex} \textbf{NRMSE} & \textbf{0.0687} & \textbf{0.1902} & \textbf{0.5343} & \textbf{0.8110} & \textbf{0.9019} & \textbf{0.9981} & \textbf{0.9844} \\ 
-		\hline 
-	\end{tabular} 
+	\resizebox{\columnwidth}{!}{%
+		\begin{tabular}{|c|c|c|c|c|c|c|c|}
+			\multicolumn{1}{c|}{} & \multicolumn{7}{c|}{Mitchell-Schaeffer}\\ 
+			\hline \hline 
+			\rule[-1ex]{0pt}{2.5ex} $a$ & 4 & 8 & 16 & 32 & 64 & 128 & 148\\ 
+			\hline 
+			\rule[-1ex]{0pt}{2.5ex} $b$ & 1 & 1 & 1 & 1 & 1 & 1 & 1 \\ 
+			\hline 
+			\rule[-1ex]{0pt}{2.5ex} Laufzeit [s] & 3 & 9 & 27 & 121 & 548 & 3322 & 3021\\
+			\hline 
+			\rule[-1ex]{0pt}{2.5ex} \textbf{MSE} & \textbf{0.00023} & \textbf{0.00177} & \textbf{0.02969} & \textbf{0.05061} & \textbf{0.06330} & \textbf{0.06842} & \textbf{0.06761}\\ 
+			\hline 
+			\rule[-1ex]{0pt}{2.5ex} \textbf{NRMSE} & \textbf{0.0661} & \textbf{0.1704} & \textbf{0.6703} & \textbf{0.8861} & \textbf{0.9775} & \textbf{1.0166} & \textbf{1.0049} \\ 
+			\hline 
+		\end{tabular} 
+	}
 
 	\caption{Gefundene Hyperparameter der \textsc{ESN}s für das \textit{Barkley}-Modell (oben) und das \textit{Mitchell-Schaeffer}-Modell (unten) für verschiedene Größen $a$ des vorherzusagenden Bereichs, welche zu den geringsten Fehlern führen.}
 \label{tab:exp_inner_cross_esn_results}
@@ -207,7 +190,34 @@ Bei der Untersuchung ist ersichtlich geworden, dass der untersuchte Bereich der 
 
 Es ist anzunehmen, dass für die Vorhersage eines Punktes der weit von den bekannten Randwerten entfernt liegt, nicht nur durch sein vorheriger Wert und die aktuellen Randwerte benötigt werden. Vielmehr werden die vergangenen Randwerte einen starken Einfluss nehmen. Dies kann an einem Beispiel schnell deutlich gemacht werden: Würde beispielsweise eine ebene Welle durch das Feld propagieren, so können weit entfernte Punkte erst deutlich nachdem die Welle durch die Ränder hindurch gelaufen ist, hiervon beeinflusst werden. Somit benötigt das System eine ausgeprägte Gedächtnisleistung. Bei den \textsc{ESN}s skaliert nach \ref{sc:esn} die Gedächtnisleistung mit der Größe $N$ des Netzwerkes. Es wäre also anzunehmen, dass möglichst große Reservoirs eine optimale Leistung erzielen können. Dies kann experimentell nicht bestätigt werden. So erzielen zwar teilweise die größtmöglichen Reservoirs ($N=400$) die besten Ergebnisse, doch tritt gibt es auch Werte für $a$ bei denen kleinere Reservoirs ($N=50$) besser arbeiten.\\
 
-Hier kann erneut der Trend beobachtet werden, dass der Fehler mit steigendem $a$ ebenso zunimmt. Für das \textit{Mitchell-Schaffer}-Modell sind alle NRMSE-Werte kleiner als $1.0$. Dies ist beim \textit{Barkley-Modell} nicht mehr der Fall für die beiden größten Werte von $a$. 
+\begin{figure}[h]
+	\centering
+	\includegraphics[height=2.5in]{figures/results/inner_cross_prediction/inner_errors.pdf}
+	\setcapmargin[1cm]{0.5cm}
+	\caption{Graphische Darstellung der Abhängigkeit des MSE für die Vorhersage der $u$-Variable des \textit{Barkley}-Modells vom Abstand zum Rand. In blau ist die Abhängigkeit für das \textsc{ESN}s mit starker und in orange für das mit schwacher Regularisierung dargestellt.}
+	\label{fig:exp_inner_cross_barkley_esn_error_dependency_comparison}
+\end{figure} 
+
+Um den Einfluss der Regularisierung hervorzuheben sind in Abbildung \ref{fig:exp_inner_cross_barkley_esn_comparison} die Vorhersagen des optimalen Reservoir mit der hohen Regularisierung ($\lambda=\num{5e4}$) und eines zuvor ermittelten Reservoirs mit einer geringeren Regularisierung ($\lambda=0.05$) exemplarisch für das \textit{Barkley}-Modell dargestellt. Es ist zu erkennen, dass im Falle der starken Regularisierung die Vorhersage stark verschwommen ist und beinahe der Mittelwert der Erregung anstelle der feineren Strukturen vorhergesagt wird. Dagegen wird bei der geringeren Regularisierung eine feinere Struktur vorhergesagt. \improvement{Add details?}
+Zudem ist in Abbildung \ref{fig:exp_inner_cross_barkley_esn_error_dependency_comparison} die Abhängigkeit des mittleren quadratischen Fehlers für jene beiden Reservoirs dargestellt. Dabei ist zu erkennen, dass im für geringe Abstände die feine Vorhersage mit der kleinen Regularisierung deutlich geringere Fehler verursacht, wohingegen ab einem Abstand von $5$ Gitterpunkten eine stärkere Regularisierung geringere Fehler erzeugt. Zudem scheint der Fehler dabei schnell gegen eine obere Schranke zu konvergieren. Dies lässt sich damit vereinbaren, dass dieses Reservoir hauptsächlich noch den Mittelwert der Dynamik vorhersagt.
+
+\begin{figure}[h]
+	\centering
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[height=2.5in]{figures/results/inner_cross_prediction/barkley_u_inner_esn_high_penalty.pdf}
+		\setcapmargin[1cm]{0.5cm}
+		\caption{Vorhersage des \textsc{ESN}s mit $\lambda=50000$}
+	\end{subfigure}%
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[height=2.5in]{figures/results/inner_cross_prediction/barkley_u_inner_esn_low_penalty.pdf}
+		\setcapmargin[1cm]{0.5cm}
+  		\caption{Vorhersage des \textsc{ESN}s mit $\lambda=0.05$}
+	\end{subfigure}
+	\caption{Graphische Darstellung der $u$-Variable des \textit{Barkley}-Modells für den $1000$. Zeitschritt des Evaluationsdatensatzes. Links ist die Vorhersagen des \textsc{ESN}s mit starker und rechts mit schwacher Regularisierung dargestellt.}
+	\label{fig:exp_inner_cross_barkley_esn_comparison}
+\end{figure} 
 
 \subsection{Vergleich}
 Für einen Vergleich der drei Methoden bietet es sich an die Ergebnisse für die größten Wert für $a$ durchzuführen, der mit allen drei Ansätzen betrachtet worden ist. Dies entspricht dem Wert $a=64$. Eine Übersicht der verschiedenen Ergebnisse ist in Tabelle \ref{tab:exp_inner_cross_comparison_results} zu finden.
@@ -269,8 +279,8 @@ Des Weiteren wächst der Fehlers mit steigender Größe des vorherzusagenden Ber
   		\caption{Vorhersage des \textsc{ESN}}
   		\label{fig:exp_inner_cross_barkley_result_esn_pred}
 	\end{subfigure}
-	\caption{Graphische Darstellung der $u$-Variable des \textit{Barkley}-Modells für den $1000$. Zeitschritt des Testdatensatzes. Oben links ist das tatsächliche Feld des Modells zu sehen. Danach folgenden im Uhrzeigersinn die Vorhersagen des \textsc{NN}-Ansatzes, des \textsc{RBF}-Ansatzes und des \textsc{ESN}.}
+	\caption{Graphische Darstellung der $u$-Variable des \textit{Barkley}-Modells für den $1000$. Zeitschritt des Evaluationsdatensatzes. Oben links ist das tatsächliche Feld des Modells zu sehen. Danach folgenden im Uhrzeigersinn die Vorhersagen des \textsc{NN}-Ansatzes, des \textsc{RBF}-Ansatzes und des \textsc{ESN}.}
 	\label{fig:exp_inner_cross_barkley_result}
 \end{figure} 
 
-In Abbildung \ref{fig:exp_inner_cross_barkley_result} werden exemplarisch die aus den drei Ansätzen resultierenden Felder der Spannungsvariable $u(t)$ des \textit{Barkley}-Modells zusammen mit dem originalen Feld dargestellt. Hierbei fällt auf, dass sowohl die Vorhersage der \textbf{RBF} als auch die des \textit{ESN} stark verschwommen sind und kaum Details zeigen. Im Gegensatz dazu gibt der \textit{NN}-Ansatz eine sehr scharfe Vorhersage. Dies ist dahingehend interessant, als das zum einen jeder Bildpunkt einzeln vorhersagt wird, und zum anderen immer die nächsten fünf Nachbarn genutzt werden. Daraus können zwei Konsequenzen folgen. Erstens spricht die hohe Auflösung dafür, dass die Vorhersage beinahe perfekt ein Bereich aus den Trainingsdaten ist. Da die Vorhersage aber (zumindest in diesem Moment) nicht gut mit dem Original übereinstimmt bedeutet dies, dass die Verzögerungskoordinaten, die genutzt worden sind, den Bereich nicht eindeutig beschreiben. Zweitens kann daraus auch gefolgert werden, dass für diese Aufgabe die Länge der Trainingsdaten zu gering gewählt worden ist. 
+In Abbildung \ref{fig:exp_inner_cross_barkley_result} werden exemplarisch die aus den drei Ansätzen resultierenden Felder der Spannungsvariable $u(t)$ des \textit{Barkley}-Modells zusammen mit dem originalen Feld dargestellt. Eine analoge Darstellung für das \textit{Mitchell-Schaeffer}-Modell ist im Anhang als Abbildung \ref{fig:apx_inner_cross_mitchell_result} zu finden. Es fällt auf, dass sowohl die Vorhersage der \textsc{RBF} als auch die des \textsc{ESN} stark verschwommen sind und kaum Details zeigen. Im Gegensatz dazu gibt der \textsc{NN}-Ansatz eine sehr scharfe Vorhersage. Dies ist dahingehend interessant, als das zum einen jeder Bildpunkt einzeln vorhersagt wird, und zum anderen immer die nächsten fünf Nachbarn genutzt werden. Daraus können zwei Konsequenzen folgen. Erstens spricht die hohe Auflösung dafür, dass die Vorhersage beinahe perfekt ein Bereich aus den Trainingsdaten ist. Da die Vorhersage aber (zumindest in diesem Moment) nicht gut mit dem Original übereinstimmt bedeutet dies, dass die Verzögerungskoordinaten, die genutzt worden sind, den Bereich nicht eindeutig beschreiben. Zweitens kann daraus auch gefolgert werden, dass für diese Aufgabe die Länge der Trainingsdaten zu gering gewählt worden ist. 

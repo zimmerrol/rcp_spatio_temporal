@@ -20,9 +20,9 @@ Die Ergebnisse für die optimalen Hyperparameter sind in Tabelle \ref{tab:exp_cr
 		\hline 
 		\rule[-1ex]{0pt}{2.5ex} Laufzeit [s] & $40$ & $5252$ \\ 
 		\hline 
-		\rule[-1ex]{0pt}{2.5ex} \textbf{MSE} & \textbf{0.00105} & \textbf{0.01353} \\ 
+		\rule[-1ex]{0pt}{2.5ex} \textbf{MSE} & \textbf{0.00098} & \textbf{0.01891} \\ 
 		\hline 
-		\rule[-1ex]{0pt}{2.5ex} \textbf{NRMSE} & \textbf{0.1367} & \textbf{0.7438} \\ 
+		\rule[-1ex]{0pt}{2.5ex} \textbf{NRMSE} & \textbf{0.1317} & \textbf{0.8795} \\ 
 		\hline 
 	\end{tabular} 
 
@@ -94,9 +94,9 @@ Bei der Verwendung radialer Basisfunktionen stellt zudem die Breite $\sigma_{RBF
 		\hline 
 		\rule[-1ex]{0pt}{2.5ex} Laufzeit [s] & $1430$ & $1434$ \\ 
 		\hline 
-		\rule[-1ex]{0pt}{2.5ex} \textbf{MSE} & \textbf{0.00064} & \textbf{0.00890} \\ 
+		\rule[-1ex]{0pt}{2.5ex} \textbf{MSE} & \textbf{0.01046} & \textbf{0.00948} \\ 
 		\hline 
-		\rule[-1ex]{0pt}{2.5ex} \textbf{NRMSE} & \textbf{0.1069} & \textbf{0.6034} \\ 
+		\rule[-1ex]{0pt}{2.5ex} \textbf{NRMSE} & \textbf{0.1023} & \textbf{0.6228} \\ 
 		\hline 
 	\end{tabular} 
 	\caption{Gefundene Hyperparameter der radialen Basisfunktionen für das \textit{Mitchell-Schaeffer}- und das \textit{Barkley}-Modell, welche zu den geringsten Fehlern führen.}
@@ -174,9 +174,9 @@ Abschließend ist dieses Problem nun mit den \textit{ESN}s gelöst worden. Dazu 
 		\hline 
 		\rule[-1ex]{0pt}{2.5ex} Laufzeit [s] & $3710$ & $3733$ \\ 
 		\hline 
-		\rule[-1ex]{0pt}{2.5ex} \textbf{MSE} & \textbf{\num{1.95e-7}} & \textbf{0.00075} \\ 
+		\rule[-1ex]{0pt}{2.5ex} \textbf{MSE} & \textbf{$\num{8.7e-7}$} & \textbf{0.00075} \\ 
 		\hline
-		\rule[-1ex]{0pt}{2.5ex} \textbf{NRMSE} & \textbf{\num{3.47e-6}} & \textbf{0.1753} \\ 
+		\rule[-1ex]{0pt}{2.5ex} \textbf{NRMSE} & \textbf{0.0039} & \textbf{0.1859} \\ 
 		\hline 
 	\end{tabular} 
 	\caption{Gefundene Hyperparameter des \textsc{ESN} für das \textit{Mitchell-Schaeffer}- und das \textit{Barkley}-Modell, welche zu den geringsten Fehlern führen.}
@@ -185,6 +185,19 @@ Abschließend ist dieses Problem nun mit den \textit{ESN}s gelöst worden. Dazu 
 
 Auffällig ist, dass für beide Modelle die gleichen Hyperparameter die höchste Genauigkeit erzielen. 
 \improvement{Add more details?}
+
+Zuvor ist die Annahme getroffen worden, dass die Dynamik sich an jedem Punkt im Inneren des Feldes lokal ähnelt. Um diese Annahme zu untersuchen bietet es sich an die unterschiedlichen trainierten Gewichtsmatrizen $\mathbf{W_{out}}$ zu betrachten. Dies ist exemplarisch für die ermittelten Hyperparameter für das \textit{Barkley}-Modell durchgeführt und in Abbildung \ref{fig:exp_cross_esn_weights} dargestellt. Dabei gibt die vertikale Achse den Index $i$ des $i$-ten Eintrages von $\mathbf{W_{out}}$ an. Dafür sind die Matrizen $\mathbf{W_{out}} \in \mathbb{R}^{(1 + N_u + N) \times 1}$ mit $N_u = 9$ jeweils spaltenweise für $900$ Pixel in einem $30 \times 30$ Einheiten messendem Quadrat in der Mitte des Feldes aufgetragen.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[height=2.7in]{figures/results/cross_prediction/weights.pdf}
+	\setcapmargin[1cm]{1cm}
+	\caption{Exemplarische Darstellung der Einträge der Gewichtsmatrix $\mathbf{W_{out}}$ des \textsc{ESN} für das \textit{Barkey}-Model anhand von $900$ verschiedene Bildpunkten. Dabei ist $\mathbf{W_{out}}$ jeweils als Spalte in der Grafik dargestellt.  .}
+	\label{fig:exp_cross_esn_weights}
+\end{figure}
+
+Dabei ist eine große Ähnlichkeit innerhalb der einzelnen Matrizen zu erkennen. So sind einige markante Linien in der Abbildung zu erkennen. So sind gewisse Einträge bei den Matrizen aller Pixel relativ stark beziehungsweise schwach. Trotzdem ist noch eine gewisse Varianz zuerkennen. Vermutlich wird sie dadurch verursacht, dass innerhalb der endlichen Trainingszeit nicht alle Dynamiken an jedem Pixel auftreten. Zusammenfassend kann dies als eine Bestätigung der Annahme der lokalen Ähnlichkeit gesehen werden. In weiteren Arbeiten bietet es sich an diese Frage weiter zu untersuchen und den Effekt dahingehend auszunutzen, als dass die Trainingsdaten mehrerer Punkte zusammengefasst werden können, sodass bereits aus einer kurzen Trainingszeit eine ausreichende Menge an Trainingsdaten gewonnen werden kann.
+\improvement{Write something about the vanishing first 9 entries?}
 
 \FloatBarrier
 \subsection{Vergleich}
@@ -202,9 +215,9 @@ Abschließend kann nun ein Vergleich der drei verwendeten Methoden hinsichtlich 
 		
 		Laufzeit [s] 	& \textbf{40} 		& 1430		& 3710		& 5252		& \textbf{1434} 		& 3733 \\
 		\hline
-		MSE 			& 0.00105	& 0.00064	& \textbf{\num{1.95e-7}} 	& 0.01353	& 0.00890 	& \textbf{0.00075} \\
+		MSE 			& 0.00098	& 0.01046	& \textbf{\num{8.7e-7}} 	& 0.01891	& 0.00948 	& \textbf{0.00075} \\
 		\hline
-		NRMSE 			& 0.1367	& 0.1069	& \textbf{\num{3.47e-6}} 	& 0.7438	& 0.6034 	& \textbf{0.1753} \\
+		NRMSE 			& 0.1317	& 0.1023	& \textbf{\num{0.0039}} 	& 0.8795	& 0.6228 	& \textbf{0.1859} \\
 		\hline 
 	\end{tabular} 
 	\caption{Vergleich der benötigten Laufzeit und der erreichten Fehlers der drei Ansätze für das \textit{Mitchell-Schaeffer}- und das \textit{Barkley}-Modell, welche zu den geringsten Fehlern führen.}

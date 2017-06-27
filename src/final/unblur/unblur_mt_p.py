@@ -223,8 +223,6 @@ def mainFunction():
     print("test error: {0}".format(mse_test))
     print("inner test error: {0}".format(np.mean((diff[predictionLength-testLength:predictionLength, patch_radius:N-patch_radius, patch_radius:N-patch_radius])**2)))
 
-
-
     view_data = [("Source", shared_input_data[trainLength:trainLength+predictionLength]), ("Orig", shared_output_data[trainLength:trainLength+predictionLength]),
                  ("Pred", shared_prediction), ("Diff", diff)]
 

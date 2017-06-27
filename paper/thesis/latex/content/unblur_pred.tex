@@ -42,6 +42,7 @@ Bei der Durchführung von invitro Experimenten mit Herzen gibt es verschiedene M
 	\label{fig:exp_unblur_mitchell_schaeffer}
 \end{figure} 
 
+\FloatBarrier
 \subsection{Nächste Nachbar Vorhersage}
 Zuerst wird diese Aufgabe erneut mit dem \textsc{NN}-Ansatz betrachtet. Die besten gefundenen Hyperparameter dafür sind in Tabelle \ref{tab:exp_unblur_nn_results} aufgelistet. Bemerkenswert ist erneut die geringe Laufzeit dieses Ansatzes. Dies wird durch die verhältnismäßig geringe Dimensionalität des Eingabe-Vektors begünstigt. Allerdings sind die Fehlerwerte sehr hoch, sodass die Vorhersage kaum besser ist, als eine Schätzung mit dem Mittelwert als Vorhersage.
 
@@ -61,9 +62,9 @@ Zuerst wird diese Aufgabe erneut mit dem \textsc{NN}-Ansatz betrachtet. Die best
 		\hline 
 		\rule[-1ex]{0pt}{2.5ex} Laufzeit [s] & $53$ & $42$ \\ 
 		\hline 
-		\rule[-1ex]{0pt}{2.5ex} \textbf{MSE} & \textbf{0.10089} & \textbf{0.06217} \\ 
+		\rule[-1ex]{0pt}{2.5ex} \textbf{MSE} & \textbf{0.10089} & \textbf{0.06452} \\ 
 		\hline 
-		\rule[-1ex]{0pt}{2.5ex} \textbf{NRMSE} & \textbf{0.8227} & \textbf{0.9136} \\ 
+		\rule[-1ex]{0pt}{2.5ex} \textbf{NRMSE} & \textbf{0.8308} & \textbf{0.9737} \\ 
 		\hline 
 	\end{tabular} 
 
@@ -74,7 +75,7 @@ Zuerst wird diese Aufgabe erneut mit dem \textsc{NN}-Ansatz betrachtet. Die best
 
 \FloatBarrier
 \subsection{Radiale Basisfunktionen}
-Als nächstes sind nun die radialen Basisfunktionen ebenfalls auf das Problem angewendet worden. Die dabei gefundenen Hyperparameter sind in Tabelle \ref{tab:exp_unblur_rbf_results} präsentiert.
+Als nächstes sind nun die radialen Basisfunktionen ebenfalls auf das Problem angewendet worden. Die dabei gefundenen Hyperparameter sind in Tabelle \ref{tab:exp_unblur_rbf_results} präsentiert. Dabei sind die optimalen Werte für $\sigma$ und $\Delta \sigma$ nicht mit denen des \textsc{NN}-Ansatzes identisch.
 
 \begin{table}[h]
 	\centering
@@ -92,9 +93,9 @@ Als nächstes sind nun die radialen Basisfunktionen ebenfalls auf das Problem an
 		\hline 
 		\rule[-1ex]{0pt}{2.5ex} Laufzeit [s] & $1840$ & $1842$ \\ 
 		\hline 
-		\rule[-1ex]{0pt}{2.5ex} \textbf{MSE} & \textbf{0.03899} & \textbf{0.03252} \\ 
+		\rule[-1ex]{0pt}{2.5ex} \textbf{MSE} & \textbf{0.03984} & \textbf{0.03384} \\ 
 		\hline 
-		\rule[-1ex]{0pt}{2.5ex} \textbf{NRMSE} & \textbf{0.5114} & \textbf{0.6913} \\ 
+		\rule[-1ex]{0pt}{2.5ex} \textbf{NRMSE} & \textbf{0.5170} & \textbf{0.7052} \\ 
 		\hline 
 	\end{tabular} 
 	\caption{Gefundene Hyperparameter der radialen Basisfunktionen für das \textit{Mitchell-Schaeffer}- und das \textit{Barkley}-Modell, welche zu den geringsten Fehlern führen.}
@@ -131,9 +132,9 @@ Nachdem die klassischen Methoden bereits auf dieses Problem angewendet worden si
 		\hline 
 		\rule[-1ex]{0pt}{2.5ex} Laufzeit [s] & $1603$ & $1540$ \\ 
 		\hline 
-		\rule[-1ex]{0pt}{2.5ex} \textbf{MSE} & \textbf{0.02347} & \textbf{0.02449} \\ 
+		\rule[-1ex]{0pt}{2.5ex} \textbf{MSE} & \textbf{0.02443} & \textbf{0.02645} \\ 
 		\hline
-		\rule[-1ex]{0pt}{2.5ex} \textbf{NRMSE} & \textbf{0.3968} & \textbf{0.3599} \\ 
+		\rule[-1ex]{0pt}{2.5ex} \textbf{NRMSE} & \textbf{0.4048} & \textbf{0.6234} \\ 
 		\hline 
 	\end{tabular} 
 	\caption{Gefundene Hyperparameter des \textsc{ESN} für das \textit{Mitchell-Schaeffer}- und das \textit{Barkley}-Modell, welche zu den geringsten Fehlern führen.}
@@ -175,7 +176,7 @@ Zusätzlich zu der Tabelle ist noch ein exemplarischer grafischer Vergleich der 
   		\caption{Vorhersage des \textsc{ESN}}
   		\label{fig:exp_unblur_barkley_result_esn_pred}
 	\end{subfigure}
-	\caption{Graphische Darstellung der $u$-Variable des \textit{Barkley}-Modells für den $100$. Zeitschritt des Testdatensatzes. Oben links ist das tatsächliche Feld des Modells zu sehen. Danach folgenden im Uhrzeigersinn die Vorhersagen des \textsc{NN}-Ansatzes, des \textsc{RBF}-Ansatzes und des \textsc{ESN}.}
+	\caption{Graphische Darstellung der $u$-Variable des \textit{Barkley}-Modells für den $100$. Zeitschritt des Evaluationsdatensatzes. Oben links ist das tatsächliche Feld des Modells zu sehen. Danach folgenden im Uhrzeigersinn die Vorhersagen des \textsc{NN}-Ansatzes, des \textsc{RBF}-Ansatzes und des \textsc{ESN}.}
 	\label{fig:exp_unblur_barkley_result}
 \end{figure} 
 
@@ -192,9 +193,9 @@ Zusätzlich zu der Tabelle ist noch ein exemplarischer grafischer Vergleich der 
 		
 		Laufzeit [s] 	& \textbf{53} 	& 1840		& 3604				& \textbf{42}	& 1842 		& 3823 \\
 		\hline
-		MSE 			& 0.10089		& 0.03899	& \textbf{0.02347} 	& 0.06217		& 0.03252 	& \textbf{0.02449} \\
+		MSE 			& 0.10089		& 0.03984	& \textbf{0.02443} 	& 0.06452		& 0.03384 	& \textbf{0.02645} \\
 		\hline
-		NRMSE 			& 0.8227		& 0.5114	& \textbf{0.3968} 	& 0.9136		& 0.6913 	& \textbf{0.3599} \\
+		NRMSE 			& 0.8308		& 0.5170	& \textbf{0.4048} 	& 0.9737		& 0.7052 	& \textbf{0.6234} \\
 		\hline 
 	\end{tabular} 
 	\caption{Vergleich der benötigten Laufzeit und der erreichten Fehlers der drei Ansätze für das \textit{Mitchell-Schaeffer}- und das \textit{Barkley}-Modell, welche zu den geringsten Fehlern führen.}
