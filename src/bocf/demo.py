@@ -7,12 +7,15 @@ from matplotlib.widgets import Slider
 
 def demo_chaotic():
     #for chaotic u^3 simulation
-    Nx = 150
-    Ny = 150
-    deltaT = 0.01#0.001
+    Nx = 500
+    Ny = 500
+    deltaT = 0.1#0.001
     deltaX = 1.0#0.1#0.25
-    D = 1.171
-    return BOCFSimulation(Nx, Ny, D, deltaT, deltaX)
+    D = 1.71#1.171
+
+    #Erzeugt sowohl mit "pb", "epi", "tnpp" als Wert für parameters eine anhaltende Dynamik, die allerdings kaum chaotisch ist.
+    #Mit "thomas" als parameters zerfällt die erregung schnell
+    return BOCFSimulation(Nx, Ny, D, deltaT, deltaX, parameters="tnpp")
 
 sim = demo_chaotic()
 sim.initialize_double_spiral()#(42, deltaX=0.1)

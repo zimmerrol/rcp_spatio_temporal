@@ -40,6 +40,9 @@ class BOCFSimulation:
                     self._v[y, x] += 0.5 * np.exp(-r*rad*0.001)
                     #self._w[y, x] += 1.0 - 0.5 * np.exp(-r*rad)
 
+        """
+            Initlisiert die Parameter mittels des Parametersatzes von Thomas
+        """
         def thomas_init():
             self._u_o = 0#13.03
             self._tau_o1 = 33.25
@@ -71,6 +74,10 @@ class BOCFSimulation:
             self._tau_w2_minus = 0.45
             self._tau_si = 0.04
             self._tau_w_plus = 0.45
+
+        """
+            Initlisiert die Parameter mittels des EPI-Parametersatzes
+        """
         def paper_init_epi():
             self._u_o = 0
             self._u_u = 1.55
@@ -100,6 +107,10 @@ class BOCFSimulation:
             self._tau_si = 1.8875
             self._tau_winfinity = 0.07
             self._w_inf_star = 0.94
+
+        """
+            Initlisiert die Parameter mittels des PB-Parametersatzes
+        """
         def paper_init_pb():
             self._u_o = 0
             self._u_u = 1.45
@@ -129,6 +140,10 @@ class BOCFSimulation:
             self._tau_si = 1.8875
             self._tau_winfinity = 0.175
             self._w_inf_star = 0.9
+
+        """
+            Initlisiert die Parameter mittels desTNPP-Parametersatzes
+        """
         def paper_init_tnnp():
             self._u_o = 0
             self._u_u = 1.58
@@ -161,11 +176,11 @@ class BOCFSimulation:
 
 
         if parameters == "thomas":
-            thomas_init
+            thomas_init()
         elif parameters == "epi":
-            paper_init_epi
+            paper_init_epi()
         elif parameters == "pb":
-            paper_init_pb
+            paper_init_pb()
         elif parameters == "tnpp":
             paper_init_tnnp()
 
@@ -178,6 +193,9 @@ class BOCFSimulation:
         self._v_infinity = None
         self._w_infinity = None
 
+    """
+        Erzeugt zufällige "Flecken" als Startdynamik
+    """
     def initialize_random(self, seed, deltaX):
         np.random.seed(seed)
 
@@ -202,6 +220,9 @@ class BOCFSimulation:
         self._w[self._w>0.4] = 1.0
         """
 
+    """
+        Erzeugt überlappende Rechtecke um mit den TNPP-Parametern eine Spirale zu erzeugen
+    """
     def initialize_spiral(self):
         Nx = self._Nx
         Ny = self._Ny
@@ -225,6 +246,9 @@ class BOCFSimulation:
 
         self._s = np.zeros((Nx, Ny))
 
+    """
+        Erzeugt eine Startbedingung um mit den TNPP-Parametern zwei Spiralen zu erzeugen
+    """
     def initialize_double_spiral(self):
         Nx = self._Nx
         Ny = self._Ny
