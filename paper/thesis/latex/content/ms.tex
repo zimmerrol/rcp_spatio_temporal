@@ -1,5 +1,5 @@
-\section{Mitchell-Schaeffer Modell}
-Das \textit{Mitchell-Schaeffer}-Modell ist ebenso wie das \textit{Barkley}-Modell ein System aus gekoppelten partiellen Differentialgleichungen. Es ist vorgeschlagen worden, um eine phänomenologisches Beschreibung der Aktionspotentiale auf der Membran von Herzzellen zu liefern. Das Modell wird durch die Membranspannung $v(t)$ und eine Kontrollvariable $h(t)$, welche das Verhalten der beteiligten Ionenkanäle steuert, definiert. Hierbei wird die Spannung als dimensionslose Größe dargestellt, die Werte zwischen $0$ und $1$ annehmen kann \citep{mitchell2003two}.\\
+\subsection{Mitchell-Schaeffer Modell}
+Das \textit{Mitchell-Schaeffer}-Modell ist ebenso wie das \textit{Barkley}-Modell ein System aus gekoppelten partiellen Differentialgleichungen. Es wurde vorgeschlagen, um eine phänomenologisches Beschreibung der Aktionspotentiale auf der Membran von Herzzellen zu liefern. Das Modell wird durch die Membranspannung $v(t)$ und eine Kontrollvariable $h(t)$, welche das Verhalten der beteiligten Ionenkanäle steuert, definiert. Hierbei wird die Spannung als dimensionslose Größe dargestellt, die Werte zwischen $0$ und $1$ annehmen kann \citep{mitchell2003two}.\\
 
 Diese Dynamik wird durch die Gleichungen 
 \begin{equation}
@@ -16,10 +16,10 @@ beschrieben. Dabei stehen die Parameter $\tau_{in}, \tau_{out}, \tau_{open}, \ta
 
 \begin{table}[H]
 \centering
-\begin{tabular}{|c|c|c|c|c|}
+\begin{tabular}{ccccc}
+\hline 
 $\tau_{in}$ & $\tau_{out}$ & $\tau_{open}$ & $\tau_{close}$ & $v_{gate}$ \\ 
-\hline 
-\hline 
+\hline
 0.3 & 6.0 & 20 & 150 & 0.13 \\ 
 \hline 
 \end{tabular} 
@@ -27,7 +27,7 @@ $\tau_{in}$ & $\tau_{out}$ & $\tau_{open}$ & $\tau_{close}$ & $v_{gate}$ \\
 \label{tab:ms_parameters}
 \end{table}
 
-Der erste Summand der zeitlichen Ableitung von $v$ beschreibt ein Diffusionsverhalten, welches durch die Diffusionsmatrix $\mathbf{D} = \text{diag}(D_x, D_y)$ beschrieben wird. Die Einführung dieser Matrix erlaubt im Allgemeinen die Verwendung von zwei verschiedenen Diffusionskontanten $D_x, D_y$, welche Richtungsabhängig sind \citep{talbot2013towards}. Im Folgenden wird für diese allerdings der gleichen Wert $D_x = D_y = D$ gesetzt.\\
+Der erste Summand der zeitlichen Ableitung von $v$ beschreibt ein Diffusionsverhalten, welches durch die Diffusionskonstante $D$ beschrieben wird \citep{talbot2013towards}.\\
 
 Die meisten, auf zellulärer Ebene aufgestellten, Gleichungen haben eine hohe Komplexität. Hierdurch werden numerische Berechnungen sehr aufwendig. In der Herleitung dieses Modells sind einige vereinfachende Annahmen eingeflossen, wodurch die Komplexität und somit auch der numerische Aufwand reduziert worden sind. Trotz des phänomenologischen Charakters des \textit{Mitchell-Schaeffer Modells} besitzen die Parameter eine physiologische Interpretation. Zudem ist es in der Lage wichtige Eigenschaften des Aktionspotentials im Vergleich zu anderen Modellen gut wiederzugeben \citep{talbot2013towards}.\\
 

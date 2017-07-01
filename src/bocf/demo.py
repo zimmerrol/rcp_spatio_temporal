@@ -7,27 +7,58 @@ from matplotlib.widgets import Slider
 
 def demo_chaotic():
     #for chaotic u^3 simulation
-    Nx = 500
-    Ny = 500
+
+    #150x150 with D=0.1 is stable
+    Nx = 300
+    Ny = 300
     deltaT = 0.1#0.001
-    deltaX = 1.0#0.1#0.25
-    D = 1.171#1.171
+    deltaX = 1#1.0#0.1#0.25
+    D = 0.2#0.2#1.71#1.171
 
     #Erzeugt sowohl mit "pb", "epi", "tnpp" als Wert für parameters eine anhaltende Dynamik, die allerdings kaum chaotisch ist.
     #Mit "thomas" als parameters zerfällt die erregung schnell
     return BOCFSimulation(Nx, Ny, D, deltaT, deltaX, parameters="tnpp")
 
 sim = demo_chaotic()
-sim.initialize_double_spiral()#(42, deltaX=0.1)
-sim.initialize_spiral()
+#sim.initialize_double_spiral()#(42, deltaX=0.1)
+sim.initialize_left_wave(2)
+#sim.initialize_right_wave(2)
+#sim.initialize_random(42, deltaX=0.05)
+
+data = np.load("TestInit_169[4605].npy")
+
+"""
+sim._u = data[:, :, 0]
+sim._v = data[:, :, 1]
+sim._w = data[:, :, 2]
+sim._s = data[:, :, 3]
+"""
+
+pace_times = []#[3000]
+vertical_wave_times = []#[3500]
+pertubation_time = 2500
 
 frame = 0
 def update_new(data):
     global sim, frame, clb
+
     for j in range(int(sskiprate.val)):
         sim.explicit_step()
         frame += 1
-    field = sim._u*85.7-84
+
+        if frame == pertubation_time:
+            #sim._u[sim._Ny//2:, :sim._Nx//2] = 0.0
+            #sim._u[:sim._Ny//2, sim._Nx//2:] = 0.0
+            sim._u[:sim._Ny//2, :] = 0.0
+
+        if frame in pace_times:
+            sim.initialize_left_wave(2)
+            #sim._u[sim._Ny//2:, :] = 0.0
+
+        if frame in vertical_wave_times:
+            sim._u[:2, :] = 1.0
+
+    field = sim._u
     mat.set_data(field)
     plt.title(frame, x = -0.15, y=-2)
     #clb.set_clim(vmin=np.min(field), vmax=np.max(field))
@@ -39,9 +70,9 @@ def update_new(data):
 
 fig, ax = plt.subplots()
 
-mat = ax.matshow(sim._u*85.7-84, vmin=-80, vmax=20, interpolation=None, origin="lower")
+mat = ax.matshow(sim._u, vmin=0, vmax=2, interpolation=None, origin="lower")
 clb = plt.colorbar(mat)
-clb.set_clim(vmin=-80, vmax=20)
+clb.set_clim(vmin=0, vmax=2)
 ani = animation.FuncAnimation(fig, update_new, interval=0, save_count=50)
 
 class StorageCallback(object):
