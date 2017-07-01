@@ -149,7 +149,7 @@ class BOCFSimulation:
             self._u_u = 1.58
             self._theta_v = 0.3
             self._theta_w = 0.015
-            self._theta_v_minus = 0.15
+            self._theta_v_minus = 0.015
             self._theta_o = 0.006
             self._tau_v1_minus = 60
             self._tau_v2_minus = 1150
@@ -266,6 +266,13 @@ class BOCFSimulation:
 
         self._s = np.zeros((Nx, Ny))
 
+    def initialize_left_wave(self, width):
+        self._u[:, 1:width+1] = 1.0
+
+    def initialize_right_wave(self, width):
+        self._u[:, -width-1:-1] = 1.0
+
+
     def _set_boundaries(self, old_fields):
         for (field, old_field) in zip((self._u, self._v, self._w, self._s), old_fields):
             field[:, 0] = old_field[:, 1]
@@ -315,7 +322,7 @@ class BOCFSimulation:
 
         J_fi = self._current_fi()
         J_so = self._current_so()
-        J_si = self._current_so()
+        J_si = self._current_si()
 
         dudt = self.D * self._laplace(self._u) - (J_fi + J_so + J_si)
         dvdt = (1.0 - self.H(self._u - self._theta_v)) * (self._v_infinity - self._v) / self._tau_v_minus - self.H(self._u - self._theta_v) * self._v / self._tau_v_plus

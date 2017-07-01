@@ -44,31 +44,26 @@ Bei der Durchführung von invitro Experimenten mit Herzen gibt es verschiedene M
 
 \FloatBarrier
 \subsection{Nächste Nachbar Vorhersage}
-Zuerst wird diese Aufgabe erneut mit dem \textsc{NN}-Ansatz betrachtet. Die besten gefundenen Hyperparameter dafür sind in Tabelle \ref{tab:exp_unblur_nn_results} aufgelistet. Bemerkenswert ist erneut die geringe Laufzeit dieses Ansatzes. Dies wird durch die verhältnismäßig geringe Dimensionalität des Eingabe-Vektors begünstigt. Allerdings sind die Fehlerwerte sehr hoch, sodass die Vorhersage kaum besser ist, als eine Schätzung mit dem Mittelwert als Vorhersage.
+Zuerst wird diese Aufgabe erneut mit dem \textsc{NN}-Ansatz betrachtet. Die besten gefundenen Hyperparameter dafür sind in Tabelle \ref{tab:exp_unblur_nn_results} aufgelistet. Bemerkenswert ist erneut die geringe Laufzeit dieses Ansatzes. Dies wird durch die verhältnismäßig geringe Dimensionalität des Eingabe-Vektors begünstigt. Allerdings sind die Fehlerwerte sehr hoch, sodass die Vorhersage kaum besser ist, als eine Schätzung mit dem Mittelwert als Vorhersage, wie an dem NRMSE $\approx 1.0$ zu erkennen ist.
 
 \begin{table}[h]
 	\centering
 
-	\begin{tabular}{|c|c|c|}
-		\multicolumn{1}{c|}{} & Barkley & Mitchell-Schaeffer \\ 
-		\hline \hline 
+	\begin{tabular}{ccc}
+		\hline		
+		\multicolumn{1}{c}{} & Barkley & Mitchell-Schaeffer \\ 
+		\hline 
 		\rule[-1ex]{0pt}{2.5ex} $\sigma$ & $1$ & $1$ \\ 
-		\hline 
 		\rule[-1ex]{0pt}{2.5ex} $\Delta \sigma$ & $1$ & $1$ \\ 
-		\hline 
 		\rule[-1ex]{0pt}{2.5ex} $\delta$ & $4$ & $3$ \\ 
-		\hline 
 		\rule[-1ex]{0pt}{2.5ex} k & $5$ & $5$ \\ 
-		\hline 
 		\rule[-1ex]{0pt}{2.5ex} Laufzeit [s] & $53$ & $42$ \\ 
-		\hline 
 		\rule[-1ex]{0pt}{2.5ex} \textbf{MSE} & \textbf{0.10089} & \textbf{0.06452} \\ 
-		\hline 
 		\rule[-1ex]{0pt}{2.5ex} \textbf{NRMSE} & \textbf{0.8308} & \textbf{0.9737} \\ 
 		\hline 
 	\end{tabular} 
 
-	\caption{Gefundene Hyperparameter der nächsten Nachbar Vorhersage für das \textit{Mitchell-Schaeffer}- und das \textit{Barkley}-Modell, welche zu den geringsten Fehlern führen.}
+	\caption{Ermittelte Hyperparameter der nächsten Nachbar Vorhersage für das \textit{Mitchell-Schaeffer}- und das \textit{Barkley}-Modell, welche zu den geringsten Fehlern führen.}
 \label{tab:exp_unblur_nn_results}
 \end{table} 
 
@@ -80,25 +75,20 @@ Als nächstes sind nun die radialen Basisfunktionen ebenfalls auf das Problem an
 \begin{table}[h]
 	\centering
 
-	\begin{tabular}{|c|c|c|}
-		\multicolumn{1}{c|}{} & Barkley & Mitchell-Schaeffer \\ 
-		\hline \hline 
+	\begin{tabular}{ccc}
+		\hline
+		\multicolumn{1}{c}{} & Barkley & Mitchell-Schaeffer \\ 
+		\hline 
 		\rule[-1ex]{0pt}{2.5ex} $\sigma$ & $3$ & $5$ \\ 
-		\hline 
 		\rule[-1ex]{0pt}{2.5ex} $\Delta \sigma$ & $1$ & $2$ \\ 
-		\hline 
 		\rule[-1ex]{0pt}{2.5ex} $\delta$ & $3$ & $3$ \\ 
-		\hline 
 		\rule[-1ex]{0pt}{2.5ex} $\sigma_{RBF}$ & $5.0$ & $9.0$ \\ 
-		\hline 
 		\rule[-1ex]{0pt}{2.5ex} Laufzeit [s] & $1840$ & $1842$ \\ 
-		\hline 
 		\rule[-1ex]{0pt}{2.5ex} \textbf{MSE} & \textbf{0.03984} & \textbf{0.03384} \\ 
-		\hline 
 		\rule[-1ex]{0pt}{2.5ex} \textbf{NRMSE} & \textbf{0.5170} & \textbf{0.7052} \\ 
 		\hline 
 	\end{tabular} 
-	\caption{Gefundene Hyperparameter der radialen Basisfunktionen für das \textit{Mitchell-Schaeffer}- und das \textit{Barkley}-Modell, welche zu den geringsten Fehlern führen.}
+	\caption{Ermittelte Hyperparameter der radialen Basisfunktionen für das \textit{Mitchell-Schaeffer}- und das \textit{Barkley}-Modell, welche zu den geringsten Fehlern führen.}
 	\label{tab:exp_unblur_rbf_results}
 \end{table} 
 
@@ -111,33 +101,24 @@ Nachdem die klassischen Methoden bereits auf dieses Problem angewendet worden si
 \begin{table}[h]
 	\centering
 	\captionsetup{width=0.9\linewidth}
-	\begin{tabular}{|c|c|c|}
-		\multicolumn{1}{c|}{} &  Barkley & Mitchell-Schaeffer \\ 
-		\hline \hline 
-		\rule[-1ex]{0pt}{2.5ex} $\sigma$ & $7$ & $7$ \\ 
-		\hline 
-		\rule[-1ex]{0pt}{2.5ex} $\Delta \sigma$ & $1$ & $1$ \\ 
-		\hline 
-		\rule[-1ex]{0pt}{3.5ex} $N$ & $200$ & $50$ \\ 
-		\hline 
-		\rule[-1ex]{0pt}{3.5ex} $\rho(|\mathbf{W}|)$ & $1.50$ & $0.10$\\ 
-		\hline 
-		\rule[-1ex]{0pt}{3.5ex} $\alpha$ & $0.20$ & $0.05$ \\ 
-		\hline 
-		\rule[-1ex]{0pt}{3.5ex} $\epsilon$ & $0.1$ & $0.1$ \\ 
-		\hline 
-		\rule[-1ex]{0pt}{3.5ex} $\nu_{max}$ & $\num{1e-5}$ & $\num{1e-4}$\\ 
-		\hline 
-		\rule[-1ex]{0pt}{3.5ex} $\lambda$ & $\num{5e-10}$ & $\num{5e-6}$\\ 
-		\hline 
-		\rule[-1ex]{0pt}{2.5ex} Laufzeit [s] & $1603$ & $1540$ \\ 
-		\hline 
-		\rule[-1ex]{0pt}{2.5ex} \textbf{MSE} & \textbf{0.02443} & \textbf{0.02645} \\ 
+	\begin{tabular}{ccc}
+		\hline		
+		\multicolumn{1}{c}{} &  Barkley & Mitchell-Schaeffer \\ 
 		\hline
+		\rule[-1ex]{0pt}{2.5ex} $\sigma$ & $7$ & $7$ \\ 
+		\rule[-1ex]{0pt}{2.5ex} $\Delta \sigma$ & $1$ & $1$ \\ 
+		\rule[-1ex]{0pt}{3.5ex} $N$ & $200$ & $50$ \\ 
+		\rule[-1ex]{0pt}{3.5ex} $\rho(|\mathbf{W}|)$ & $1.50$ & $0.10$\\ 
+		\rule[-1ex]{0pt}{3.5ex} $\alpha$ & $0.20$ & $0.05$ \\ 
+		\rule[-1ex]{0pt}{3.5ex} $\epsilon$ & $0.1$ & $0.1$ \\ 
+		\rule[-1ex]{0pt}{3.5ex} $\nu_{max}$ & $\num{1e-5}$ & $\num{1e-4}$\\ 
+		\rule[-1ex]{0pt}{3.5ex} $\lambda$ & $\num{5e-10}$ & $\num{5e-6}$\\ 
+		\rule[-1ex]{0pt}{2.5ex} Laufzeit [s] & $1603$ & $1540$ \\ 
+		\rule[-1ex]{0pt}{2.5ex} \textbf{MSE} & \textbf{0.02443} & \textbf{0.02645} \\ 
 		\rule[-1ex]{0pt}{2.5ex} \textbf{NRMSE} & \textbf{0.4048} & \textbf{0.6234} \\ 
 		\hline 
 	\end{tabular} 
-	\caption{Gefundene Hyperparameter des \textsc{ESN} für das \textit{Mitchell-Schaeffer}- und das \textit{Barkley}-Modell, welche zu den geringsten Fehlern führen.}
+	\caption{Ermittelte Hyperparameter des \textsc{ESN} für das \textit{Mitchell-Schaeffer}- und das \textit{Barkley}-Modell, welche zu den geringsten Fehlern führen.}
 	\label{tab:exp_unblur_esn_results}
 \end{table}
 
@@ -183,18 +164,16 @@ Zusätzlich zu der Tabelle ist noch ein exemplarischer grafischer Vergleich der 
 \begin{table}[h]
 	\centering
 	\captionsetup{width=0.9\linewidth}
-	\begin{tabular}{|c|c|c|c|c|c|c|c|}
-		\multicolumn{1}{c|}{} & \multicolumn{3}{c|}{Barkley} & \multicolumn{3}{c|}{Mitchell-Schaeffer}		\\
-		\cline{2-7}
-		\multicolumn{1}{c|}{} & NN & RBF & ESN & NN & RBF & ESN \\
-		
+	\begin{tabular}{cccccccc}
 		\hline
+		\multicolumn{1}{c}{} & \multicolumn{3}{c}{Barkley} & \multicolumn{3}{c}{Mitchell-Schaeffer}		\\
+		%\cline{2-7}
+		\multicolumn{1}{c}{} & NN & RBF & ESN & NN & RBF & ESN \\
+		
 		\hline
 		
 		Laufzeit [s] 	& \textbf{53} 	& 1840		& 3604				& \textbf{42}	& 1842 		& 3823 \\
-		\hline
 		MSE 			& 0.10089		& 0.03984	& \textbf{0.02443} 	& 0.06452		& 0.03384 	& \textbf{0.02645} \\
-		\hline
 		NRMSE 			& 0.8308		& 0.5170	& \textbf{0.4048} 	& 0.9737		& 0.7052 	& \textbf{0.6234} \\
 		\hline 
 	\end{tabular} 

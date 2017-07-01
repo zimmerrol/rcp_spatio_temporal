@@ -1,6 +1,7 @@
 \begin{appendices}
 
 \chapter{Tabellen}
+
 \begin{table}[h]
 	\centering
 
@@ -71,6 +72,7 @@
 \label{tab:apx_inner_cross_esn_results}
 \end{table}
 
+
 \chapter{Abbildungen}
 
 \begin{figure}[h]
@@ -99,7 +101,7 @@
 		\setcapmargin[1cm]{0.5cm}
 		\caption{Erregung für $n=150$}
 	\end{subfigure}
-	\caption{Graphische Darstellung der zeitlichen Entwicklung der $u$-Variable des \textit{Barkley}-Modells. Im Uhrzeigersinn sind die Felder der $u$-Variable für die Zeitpunkte $t=0,\, 50,\, 100,\, 150$ des Evaluationsdatensatzes dargestellt.}
+	\caption{Graphische Darstellung der zeitlichen Entwicklung der $u$-Variable des \textit{Barkley}-Modells. In Leserichtung sind die Felder der $u$-Variable für die Zeitpunkte $t=0,\, 50,\, 100,\, 150$ des Evaluationsdatensatzes dargestellt.}
 	\label{fig:apx_barkley_evolution}
 \end{figure} 
 
@@ -129,7 +131,7 @@
 		\setcapmargin[1cm]{0.5cm}
 		\caption{Erregung für $n=150$}
 	\end{subfigure}
-	\caption{Graphische Darstellung der zeitlichen Entwicklung der $u$-Variable des \textit{Mitchell-Schaeffer}-Modells. Im Uhrzeigersinn sind die Felder der $v$-Variable für die Zeitpunkte $n=0,\, 50,\, 100,\, 150$ des Evaluationsdatensatzes dargestellt.}
+	\caption{Graphische Darstellung der zeitlichen Entwicklung der $u$-Variable des \textit{Mitchell-Schaeffer}-Modells. In Leserichtung sind die Felder der $v$-Variable für die Zeitpunkte $n=0,\, 50,\, 100,\, 150$ des Evaluationsdatensatzes dargestellt.}
 	\label{fig:apx_mitchell_evolution}
 \end{figure} 
 
@@ -159,8 +161,30 @@
 		\setcapmargin[1cm]{0.5cm}
   		\caption{Vorhersage des \textsc{ESN}}
 	\end{subfigure}
-	\caption{Graphische Darstellung der $v$-Variable des \textit{Mitchell-Schaeffer}-Modells für den $1000$. Zeitschritt des Evaluationsdatensatzes. Oben links ist das tatsächliche Feld des Modells zu sehen. Danach folgenden im Uhrzeigersinn die Vorhersagen des \textsc{NN}-Ansatzes, des \textsc{RBF}-Ansatzes und des \textsc{ESN}.}
+	\caption{Graphische Darstellung der $v$-Variable des \textit{Mitchell-Schaeffer}-Modells für den $1000$. Zeitschritt des Evaluationsdatensatzes. Oben links ist das tatsächliche Feld des Modells zu sehen. Danach folgenden in Leserichtung die Vorhersagen des \textsc{NN}-Ansatzes, des \textsc{RBF}-Ansatzes und des \textsc{ESN}.}
 	\label{fig:apx_inner_cross_mitchell_result}
 \end{figure} 
 
 \end{appendices}
+
+
+\chapter{Mathematische Ausführungen}
+\section{Laufzeitanalyse}
+Im Folgenden soll die theoretische Laufzeitkomplexität $T$ des Trainings und Vorhersagevorgangs eines \textsc{ESN}s unter Veränderung von $N$ betrachtet und hergeleitet werden.
+Zuerst werden die Abkürzungen
+\begin{align*}
+\beta = T-T_{0} \qquad\qquad\qquad \gamma = 1+N_u+N
+\end{align*}
+eingeführt. Für die Matrixmultiplikation und Matrixinversion wird ein optimierter Algorithmus wie beispielsweise der \textit{Coppersmith–Winograd}-Algorithmus angenommen. Dieser hat für Matrizen $\in \mathbb{R}^{n \times n}$ eine Laufzeit $\mathcal{O}(n^{2.376})$. \improvement{Add source}\\
+Die Komplexität der Zustandsgleichung \ref{eq:esn_stateeq} wird durch die Ausdrücke $\mathbf{W_{in}} \vec{u} \in \mathcal{O}(N_U N)$ und $\mathbf{W}\vec{x} \in \mathcal{O}(N^2)$ bestimmt. Somit ergibt sich eine Gesamtkomplexität $\mathcal{O}(N_u \cdot N + N^2) = \mathcal{O}(N^2)$ für $N_u < N$.\\
+
+Im Trainingsvorgang wird zunächst die Zustandsgleichung $\beta$ Mal durchlaufen. Bei der Betrachtung der Lösungsgleichung \ref{eq:tikhonov} müssen die Laufzeiten von vier Teilausdrücken analysiert werden:
+\begin{align*}
+T\left(\mathbf{X}\mathbf{X}^T \right) = \mathcal{O}(\gamma^2 \beta) \\
+T\left((\mathbf{X}\mathbf{X})^{-1} \right) = \mathcal{O}(\gamma^{2.376}) \\
+T\left(\mathbf{Y_{target}}\mathbf{X}^T \right) = \mathcal{O}(N_y \beta \gamma).
+\end{align*}
+Somit ergibt sich für das Bestimmten der Auslesematrix $\mathbf{W_{out}}$ eine Laufzeit $\mathcal{O}(\gamma^2 \beta + \gamma^{2.376} + \beta \gamma N_y) = \mathcal{O}(\gamma^{2.376})$  für $N_u < N$.
+Insgesamt ergibt sich der Aufwand des Trainingsvorgangs somit inklusive der Berechnung der Zustandsgleichung zu $\mathcal{O}(N^2 + N^{2.376}) = \mathcal{O}(N^{2.376})$\\
+
+Der Vorhersagevorgang besteht jeweils aus Berechnungen der Zustandsgleichung und der  Berechnung der Ausgabe $\vec{y} = \mathbf{W_{out}} \vec{x}$. Hierbei ergibt sich analog die Laufzeitkomplexität zu $\mathcal{O}(N^2)$\\

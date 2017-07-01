@@ -7,26 +7,21 @@ Die Ergebnisse für die optimalen Hyperparameter sind in Tabelle \ref{tab:exp_cr
 \begin{table}[h]
 	\centering
 
-	\begin{tabular}{|c|c|c|}
-		\multicolumn{1}{c|}{} & Barkley & Mitchell-Schaeffer \\ 
-		\hline \hline 
+	\begin{tabular}{ccc}
+		\hline		
+		\multicolumn{1}{c}{} & Barkley & Mitchell-Schaeffer \\ 
+		\hline 
 		\rule[-1ex]{0pt}{2.5ex} $\sigma$ & $1$ & $7$ \\ 
-		\hline 
 		\rule[-1ex]{0pt}{2.5ex} $\Delta \sigma$ & $1$ & $1$ \\ 
-		\hline 
 		\rule[-1ex]{0pt}{2.5ex} $\delta$ & $3$ & $3$ \\ 
-		\hline 
 		\rule[-1ex]{0pt}{2.5ex} k & $5$ & $5$ \\ 
-		\hline 
 		\rule[-1ex]{0pt}{2.5ex} Laufzeit [s] & $40$ & $5252$ \\ 
-		\hline 
 		\rule[-1ex]{0pt}{2.5ex} \textbf{MSE} & \textbf{0.00098} & \textbf{0.01891} \\ 
-		\hline 
 		\rule[-1ex]{0pt}{2.5ex} \textbf{NRMSE} & \textbf{0.1317} & \textbf{0.8795} \\ 
 		\hline 
 	\end{tabular} 
 
-	\caption{Gefundene Hyperparameter der nächsten Nachbar Vorhersage für das \textit{Mitchell-Schaeffer}- und das \textit{Barkley}-Modell, welche zu den geringsten Fehlern führen.}
+	\caption{Ermittelte Hyperparameter der nächsten Nachbar Vorhersage für das \textit{Mitchell-Schaeffer}- und das \textit{Barkley}-Modell, welche zu den geringsten Fehlern führen.}
 \label{tab:exp_cross_nn_results}
 \end{table} 
 
@@ -81,25 +76,20 @@ Bei der Verwendung radialer Basisfunktionen stellt zudem die Breite $\sigma_{RBF
 \begin{table}[h]
 	\centering
 
-	\begin{tabular}{|c|c|c|}
-		\multicolumn{1}{c|}{} & Barkley & Mitchell-Schaeffer \\ 
-		\hline \hline 
+	\begin{tabular}{ccc}
+		\hline 			
+		\multicolumn{1}{c}{} & Barkley & Mitchell-Schaeffer \\ 
+		\hline 
 		\rule[-1ex]{0pt}{2.5ex} $\sigma$ & $1$ & $7$ \\ 
-		\hline 
 		\rule[-1ex]{0pt}{2.5ex} $\Delta \sigma$ & $1$ & $1$ \\ 
-		\hline 
 		\rule[-1ex]{0pt}{2.5ex} $\delta$ & $3$ & $3$ \\ 
-		\hline 
 		\rule[-1ex]{0pt}{2.5ex} $\sigma_{RBF}$ & $0.5$ & $5$ \\ 
-		\hline 
 		\rule[-1ex]{0pt}{2.5ex} Laufzeit [s] & $1430$ & $1434$ \\ 
-		\hline 
 		\rule[-1ex]{0pt}{2.5ex} \textbf{MSE} & \textbf{0.01046} & \textbf{0.00948} \\ 
-		\hline 
 		\rule[-1ex]{0pt}{2.5ex} \textbf{NRMSE} & \textbf{0.1023} & \textbf{0.6228} \\ 
 		\hline 
 	\end{tabular} 
-	\caption{Gefundene Hyperparameter der radialen Basisfunktionen für das \textit{Mitchell-Schaeffer}- und das \textit{Barkley}-Modell, welche zu den geringsten Fehlern führen.}
+	\caption{Ermittelte Hyperparameter der radialen Basisfunktionen für das \textit{Mitchell-Schaeffer}- und das \textit{Barkley}-Modell, welche zu den geringsten Fehlern führen.}
 	\label{tab:exp_cross_rbf_results}
 \end{table} 
 
@@ -153,33 +143,24 @@ Abschließend ist dieses Problem nun mit den \textit{ESN}s gelöst worden. Dazu 
 \begin{table}[h]
 	\centering
 	\captionsetup{width=0.9\linewidth}
-	\begin{tabular}{|c|c|c|}
-		\multicolumn{1}{c|}{} &  Barkley & Mitchell-Schaeffer \\ 
-		\hline \hline 
+	\begin{tabular}{ccc}
+		\hline		
+		\multicolumn{1}{c}{} &  Barkley & Mitchell-Schaeffer \\ 
+		\hline 
 		\rule[-1ex]{0pt}{2.5ex} $\sigma$ & $3$ & $3$ \\ 
-		\hline 
 		\rule[-1ex]{0pt}{2.5ex} $\Delta \sigma$ & $1$ & $1$ \\ 
-		\hline 
 		\rule[-1ex]{0pt}{3.5ex} $N$ & $400$ & $400$ \\ 
-		\hline 
 		\rule[-1ex]{0pt}{3.5ex} $\rho(|\mathbf{W}|)$ & $0.95$ & $0.95$\\ 
-		\hline 
 		\rule[-1ex]{0pt}{3.5ex} $\alpha$ & $0.05$ & $0.05$ \\ 
-		\hline 
 		\rule[-1ex]{0pt}{3.5ex} $\epsilon$ & $0.1$ & $0.1$ \\ 
-		\hline 
 		\rule[-1ex]{0pt}{3.5ex} $\nu_{max}$ & $\num{1e-4}$ & $\num{1e-4}$\\ 
-		\hline 
 		\rule[-1ex]{0pt}{3.5ex} $\lambda$ & $\num{5e-6}$ & $\num{5e-6}$\\ 
-		\hline 
 		\rule[-1ex]{0pt}{2.5ex} Laufzeit [s] & $3710$ & $3733$ \\ 
-		\hline 
 		\rule[-1ex]{0pt}{2.5ex} \textbf{MSE} & \textbf{$\num{8.7e-7}$} & \textbf{0.00075} \\ 
-		\hline
 		\rule[-1ex]{0pt}{2.5ex} \textbf{NRMSE} & \textbf{0.0039} & \textbf{0.1859} \\ 
 		\hline 
 	\end{tabular} 
-	\caption{Gefundene Hyperparameter des \textsc{ESN} für das \textit{Mitchell-Schaeffer}- und das \textit{Barkley}-Modell, welche zu den geringsten Fehlern führen.}
+	\caption{Ermittelte Hyperparameter des \textsc{ESN} für das \textit{Mitchell-Schaeffer}- und das \textit{Barkley}-Modell, welche zu den geringsten Fehlern führen.}
 	\label{tab:exp_cross_esn_results}
 \end{table}
 
@@ -205,18 +186,16 @@ Abschließend kann nun ein Vergleich der drei verwendeten Methoden hinsichtlich 
 \begin{table}[h]
 	\centering
 	\captionsetup{width=0.9\linewidth}
-	\begin{tabular}{|c|c|c|c|c|c|c|c|}
-		\multicolumn{1}{c|}{} & \multicolumn{3}{c|}{Barkley} & \multicolumn{3}{c|}{Mitchell-Schaeffer}		\\
-		\cline{2-7}
-		\multicolumn{1}{c|}{} & NN & RBF & ESN & NN & RBF & ESN \\
+	\begin{tabular}{cccccccc}
+		\hline		
+		\multicolumn{1}{c}{} & \multicolumn{3}{c}{Barkley} & \multicolumn{3}{c}{Mitchell-Schaeffer}		\\
+		%\cline{2-7}
+		\multicolumn{1}{c}{} & NN & RBF & ESN & NN & RBF & ESN \\
 		
-		\hline
 		\hline
 		
 		Laufzeit [s] 	& \textbf{40} 		& 1430		& 3710		& 5252		& \textbf{1434} 		& 3733 \\
-		\hline
 		MSE 			& 0.00098	& 0.01046	& \textbf{\num{8.7e-7}} 	& 0.01891	& 0.00948 	& \textbf{0.00075} \\
-		\hline
 		NRMSE 			& 0.1317	& 0.1023	& \textbf{\num{0.0039}} 	& 0.8795	& 0.6228 	& \textbf{0.1859} \\
 		\hline 
 	\end{tabular} 

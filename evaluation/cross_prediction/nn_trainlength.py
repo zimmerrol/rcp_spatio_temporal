@@ -27,7 +27,13 @@ def plot(filename):
 
     slope, intercept, _, _, _ = stats.linregress(df[0], timeInSeconds)
 
-    ax.plot(df[0], df[0]*slope+intercept, label="Lineare Regression")
+    from scipy.optimize import curve_fit
+
+    log_fit_function = lambda x, a, b : a+b*x*np.log(x)
+
+    popt, pcov = curve_fit(log_fit_function, df[0], df[2])
+    ax.plot(df[0], log_fit_function(df[0], *popt), label="Logarithmischer Fit")
+    #ax.plot(df[0], df[0]*slope+intercept, label="Logarithmischer Fit")
 
     ax.set_xlabel("$N_{Training}$")
     ax.set_ylabel("Zeitdauer [s]")

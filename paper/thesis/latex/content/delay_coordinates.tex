@@ -1,7 +1,7 @@
-\section{Delay Reconstruction}
+\subsection{Delay Reconstruction}
 \label{sc:delay_reconstruction}
 Die \textit{Delay Reconstructions} (Verzögerung-Konstruktionen) können benutzt werden um Zeitreihen zu analysieren und den Phasenraum des ursprünglichen Systems zu rekonstruieren.
-Hierbei wird ein Signal $s(t)$ an diskreten Zeitpunkten betrachtet, sodass sich das diskrete Signal $s_n = s(n\Delta t)$ ergibt. Eine \textit{Delay Reconstruction} erzeugt hier raus ein Signal, in welchem die Informationen $\delta$ vorheriger Zeitpunkte mit dem Abstand $\tau$ enthalten sind. Somit wird eine höhere dimensionale Zeitreihe $\vec{z}_n \in \mathbf{R}^{\delta}$ durch
+Hierbei wird ein Signal $s(t)$ an diskreten Zeitpunkten betrachtet, sodass sich das diskrete Signal $s_n = s(n\Delta t)$ ergibt. Eine \textit{Delay Reconstruction} erzeugt hieraus ein Signal, in welchem die Informationen $\delta$ vorheriger Zeitpunkte mit dem Abstand $\tau$ enthalten sind. Somit wird eine höhere dimensionale Zeitreihe $\vec{z}_n \in \mathbf{R}^{\delta}$ durch
 \begin{align}
 	\vec{z}_n = \left(s_{n-(\delta-1)\tau}, s_{n-(\delta-2)\tau}, \ldots ,s_n \right)
 \end{align} 
@@ -10,4 +10,4 @@ konstruiert. Bei einer ausreichend hohen Wahl der Rekonstruktionsimension $m$ is
 AUC(\tau) = \sum_l^{N-\tau} (s_l-\bar{s})(s_{l+\tau}-\bar{s})
 \end{align}   
 zu ermitteln. Dies lässt sich dadurch motivieren, dass durch das hinzunehmen des Signals der Zeitreihe die um diesen Wert von $\tau$ verschoben ist, am meisten neue Information hinzugefügt wird, da die Selbstähnlichkeit des Signals am geringsten ist \citep[30\,ff.]{kantz2004nonlinear}.
-Die so konstruierte höherdimensionale Zeitreihe beinhaltet somit also nicht nur Informationen über den aktuellen Zustand des Systems, sondern auch über die unmittelbare Vergangenheit. Dadurch können diese rekonstruierten Datenpunkte auch genutzt werden um das Verhalten dynamischer Systeme vorherzusagen. 
+Die so konstruierte höherdimensionale Zeitreihe beinhaltet somit also nicht nur Informationen über den aktuellen Zustand des Systems, sondern auch über die unmittelbare Vergangenheit. Dadurch können diese rekonstruierten Datenpunkte auch genutzt werden um das Verhalten dynamischer Systeme vorherzusagen. Hierfür werden im Folgenden zwei Methoden eingeführt.
