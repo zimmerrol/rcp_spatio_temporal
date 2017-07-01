@@ -11,7 +11,7 @@ def demo_chaotic():
     Ny = 500
     deltaT = 0.1#0.001
     deltaX = 1.0#0.1#0.25
-    D = 1.71#1.171
+    D = 1.171#1.171
 
     #Erzeugt sowohl mit "pb", "epi", "tnpp" als Wert für parameters eine anhaltende Dynamik, die allerdings kaum chaotisch ist.
     #Mit "thomas" als parameters zerfällt die erregung schnell
@@ -19,6 +19,7 @@ def demo_chaotic():
 
 sim = demo_chaotic()
 sim.initialize_double_spiral()#(42, deltaX=0.1)
+sim.initialize_spiral()
 
 frame = 0
 def update_new(data):
