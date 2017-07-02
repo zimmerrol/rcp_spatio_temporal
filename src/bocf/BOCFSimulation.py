@@ -174,6 +174,36 @@ class BOCFSimulation:
             self._tau_winfinity = 0.07
             self._w_inf_star = 0.94
 
+        def paper_init_virtheart():
+            self._u_o = 0
+            self._u_u = 1.58
+            self._theta_v = 0.3
+            self._theta_w = 0.015
+            self._theta_v_minus = 0.015
+            self._theta_o = 0.006
+            self._tau_v1_minus = 60
+            self._tau_v2_minus = 60
+            self._tau_v_plus = 1.4506
+            self._tau_w1_minus = 170
+            self._tau_w2_minus = 120
+            self._k_w_minus = 65
+            self._u_w_minus = 0.03
+            self._tau_w_plus = 280
+            self._tau_fi = 0.2
+            self._tau_o1 = 6
+            self._tau_o2 = 6
+            self._tau_so1 = 43
+            self._tau_so2 = 0.2
+            self._k_so = 2
+            self._u_so = 0.65
+            self._tau_s1 = 2.7342
+            self._tau_s2 = 3
+            self._k_s = 2.0994
+            self._u_s = 0.9087
+            self._tau_si = 3.8723
+            self._tau_winfinity = 0.07
+            self._w_inf_star = 0.94
+
 
         if parameters == "thomas":
             thomas_init()
@@ -183,6 +213,10 @@ class BOCFSimulation:
             paper_init_pb()
         elif parameters == "tnpp":
             paper_init_tnnp()
+        elif parameters == "virtheart":
+            paper_init_virtheart()
+        else:
+            raise ValueError("no parameter set found!")
 
         #initial values which are immediately discarded
         self._tau_v_minus = None
@@ -192,6 +226,21 @@ class BOCFSimulation:
         self._tau_o = None
         self._v_infinity = None
         self._w_infinity = None
+
+    def initialize_spiral_virtheart(self):
+        #implements http://www.thevirtualheart.org/webgl/DS_SIAM/4v_minimal_model.html
+
+        self._u = np.zeros((self._Ny, self._Nx))
+        self._v = np.zeros((self._Ny, self._Nx))
+        self._w = np.zeros((self._Ny, self._Nx))
+        self._s = np.zeros((self._Ny, self._Nx))
+
+        for i in range(self._Ny):
+            for j in range(self._Nx//2, self._Nx):
+                t  = (i-self._Ny//2)*0.1
+                t2 = (i-self._Ny//2+20)*0.05
+                self._u[i, j] = 1.5*np.exp(-t*t)
+                self._v[i, j] = 1.0 - 0.9*np.exp(-t2*t2)
 
     """
         Erzeugt zufällige "Flecken" als Startdynamik
