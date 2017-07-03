@@ -169,7 +169,37 @@
 
 
 \chapter{Mathematische Ausführungen}
+\section{Beweisskizze: Stabilitätskriterium}
+\label{sc:apx_math_stability_proof}
+Im Folgenden wird eine Beweisskizze für das Stabilitätskriterium
+\begin{align*}
+|1-\alpha(1-\sigma_{max}(\mathbf{W}))| < 1
+\end{align*}
+nach \cite{jaeger2010} vorgeführt. Hierfür wird die Distanz der \textit{l2-Norm} $||\cdot||$ zwischen den Zustandsfolgen $(\vec{s}(n))_n$ und $(\vec{s'}(n))_n$ für das Eingangssignal $\vec{u}$ betrachtet. Es wird zudem die Zustandsgleichung \ref{eq:esn_stateeq} und die Abkürzung $\vec{v} = [b_{in}; \vec{u}(n)]$ verwendet. 
+
+\begin{align*}
+&~||\vec{s}(n+1))- \vec{s}\,'(n+1)|| \\
+&= ||(1 - \alpha) \cdot \vec{s}(n)  + \alpha \cdot f_{in}\left( \mathbf{W_{in}} \vec{v} + \mathbf{W} \vec{s}(n) \right) - (1 - \alpha) \cdot \vec{s}\,'(n)  - \alpha \cdot f_{in}\left( \mathbf{W_{in}} \vec{v} + \mathbf{W} \vec{s}\,'(n) \right)|| \\
+&= || (1-\alpha)\cdot(\vec{s}(n)-\vec{s}\,'(n)) + \alpha \cdot f_{in}\left( \mathbf{W_{in}} \vec{v} + \mathbf{W} \vec{s}(n) \right) - \alpha \cdot f_{in}\left( \mathbf{W_{in}} \vec{v} + \mathbf{W} \vec{s}\,'(n) \right) ||\\
+&\underset{\mathrm{(a)}}{\leq} (1-\alpha)\cdot|| \vec{s}(n)-\vec{s}\,'(n)|| + \alpha \cdot ||f_{in}\left( \mathbf{W_{in}} \vec{v} + \mathbf{W} \vec{s}(n) \right) - f_{in}\left( \mathbf{W_{in}} \vec{v} + \mathbf{W} \vec{s'}(n) \right) ||\\
+&\underset{\mathrm{(b)}}{\leq} (1-\alpha)\cdot|| \vec{s}(n)-\vec{s}\,'(n)|| + \alpha \cdot ||\mathbf{W_{in}} \vec{v} + \mathbf{W} \vec{s}(n)- \mathbf{W_{in}} \vec{v} + \mathbf{W} \vec{s}\,'(n) ||\\
+&= (1-\alpha)\cdot|| \vec{s}(n)-\vec{s}\,'(n)|| + \alpha \cdot ||\mathbf{W} \left(\vec{s}(n)- \vec{s}\,'(n) \right)||\\
+&\underset{\mathrm{(c)}}{\leq} (1-\alpha)\cdot ||\vec{s}(n)-\vec{s'}(n)|| + \alpha \cdot \sigma_{max}\left(\mathbf{W}\right)||\vec{s}(n)- \vec{s}\,'(n) ||\\
+&= \left(1-\alpha+\alpha\sigma_{max} \left(\mathbf{W} \right) \right) \cdot ||\vec{s}(n)-\vec{s}\,'(n)|| \\
+&= \left(1-\alpha(1+\sigma_{max} \left(\mathbf{W} \right)) \right) \cdot ||\vec{s}(n)-\vec{s}\,'(n)|| \\
+&:= \lambda ||\vec{s}(n)-\vec{s'}(n)||
+\end{align*}
+
+Dabei ist in Schritt $\mathrm{(a)}$ die Dreiecksungleichung verwendet worden. Da $f_{in}$ eine \textit{sigmoid}-förmige Funktion ist, gilt zudem $f'_{in}(x) < 1 \forall x$; dies wird in Schritt $\mathrm{(b)}$ ausgenutzt. Zudem wird in Schritt $\mathrm{(c)}$ die Beziehung
+\begin{align*}
+||\mathbf{A} \vec{x}|| \leq \sigma_{max}\left(\mathbf{A} \right) ||\vec{x}||
+\end{align*}
+zwischen dem maximalen Sprektralwert $\sigma_{max}$ der Matrix $\mathbf{A}$ und der \textit{l2-Norm} ausgenutzt.\\
+
+Gilt nun $\lambda < 1$, so nähern sich die beiden Zustandsfolgen immer näher aneinander an, bis sie schließlich gegeneinander konvergieren. Das bedeutet, dass es eine Nullfolge $(\delta(n))_n$ gibt, für die $||\vec{s}(n) - \vec{s}\,'(n)|| < \delta(n)$; somit liegt die \textit{ESP} vor. Dies bedeutet, dass der beliebig gewählte Anfangszustand des \textsc{ESN}s $\vec{s}(0)$ beziehungsweise $\vec{s}\,'(0)$ nach einer ausreichenden Zeit keinen Einfluss mehr auf die Dynamik des Systems nimmt.
+
 \section{Laufzeitanalyse}
+\label{sc:apx_runtime_complexity}
 Im Folgenden soll die theoretische Laufzeitkomplexität $T$ des Trainings und Vorhersagevorgangs eines \textsc{ESN}s unter Veränderung von $N$ betrachtet und hergeleitet werden.
 Zuerst werden die Abkürzungen
 \begin{align*}
@@ -187,4 +217,6 @@ T\left(\mathbf{Y_{target}}\mathbf{X}^T \right) = \mathcal{O}(N_y \beta \gamma).
 Somit ergibt sich für das Bestimmten der Auslesematrix $\mathbf{W_{out}}$ eine Laufzeit $\mathcal{O}(\gamma^2 \beta + \gamma^{2.376} + \beta \gamma N_y) = \mathcal{O}(\gamma^{2.376})$  für $N_u < N$.
 Insgesamt ergibt sich der Aufwand des Trainingsvorgangs somit inklusive der Berechnung der Zustandsgleichung zu $\mathcal{O}(N^2 + N^{2.376}) = \mathcal{O}(N^{2.376})$\\
 
-Der Vorhersagevorgang besteht jeweils aus Berechnungen der Zustandsgleichung und der  Berechnung der Ausgabe $\vec{y} = \mathbf{W_{out}} \vec{x}$. Hierbei ergibt sich analog die Laufzeitkomplexität zu $\mathcal{O}(N^2)$\\
+Der Vorhersagevorgang besteht jeweils aus Berechnungen der Zustandsgleichung und der  Berechnung der Ausgabe $\vec{y} = \mathbf{W_{out}} \vec{x}$. Hierbei ergibt sich analog die Laufzeitkomplexität zu $\mathcal{O}(N^2)$.\\
+
+Bei dieser Betrachtung sind noch nicht die auftretenden Laufzeiten durch das Initialisieren der Matrizen im Speicher und das Berechnen des Spektralradius zur Reskalierung von $\mathbf{W}$ berücksichtigt. 

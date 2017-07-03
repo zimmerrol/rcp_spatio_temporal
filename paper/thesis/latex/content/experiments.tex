@@ -3,7 +3,7 @@
 
 Die zuvor in Kapitel \ref{ch:theory} eingeführten Methoden werden nun durch drei verschiedene Szenarien ausprobiert und verglichen. Hierbei liegt der Fokus auf der Verwendung und Erprobung der \textsc{ESN}s. Da die klassischen Methoden der \textit{nächsten Nachbarn} (\textsc{NN}) und der \textit{radialen Basisfunktionen} (\textsc{RBF}) bereits seit längerer Zeit bekannt sind und populäre Lösung solcher Problemfälle darstellen, dienen sie als Bezugsgröße.\\
 
-Jedes der drei Szenarien wird sowohl auf ein \textit{Barkley}-System als auch auf ein System nach dem \textit{Mitchell-Schaeffer}-Modell angewendet. Diese Systeme bestehen aus $150$ Gitterpunkten und nutzen die zuvor beschriebenen Parameter. Für ihre Startverteilung werden die Felder der beiden Systemvariablen in $100$ Quadrate unterteilt, und diese mit Zufallswerten zwischen $0$ und $1$ initialisiert. Anschließend werden die Systeme über $2000$ Zeitschritte ($\widehat{=} 400.0$ Zeiteinheiten) simuliert um ein transientes Verhalten abzuwarten. Durch das weitere Simulieren der Systeme wird der wirkliche Datensatz generiert, der benutzt wird. Dieser wird in einen Trainingsdatensatz, einen Evaluationsdatensatz und einen Testdatensatz aufgeteilt. Der erste wird für das Trainieren der Modelle und Ansätze verwendet, der zweite für das Auswählen der optimalen Hyperparameter und der dritte für die finale Bewertung der Leistung eines Ansatzes. Es wird für das \textit{Barkley}- eine Samplingzeit von $0.1$ und für das \textit{Mitchell-Schaeffer}-Modell von $1.0$ Zeiteinheiten benutzt.\\
+Jedes der drei Szenarien wird sowohl auf ein \textit{Barkley}-System als auch auf ein System nach dem \textit{Mitchell-Schaeffer}-Modell angewendet. Diese Systeme bestehen aus $150$ Gitterpunkten und nutzen die zuvor beschriebenen Parameter. Für ihre Startverteilung werden die Felder der beiden Systemvariablen in $100$ Quadrate unterteilt, und diese mit Zufallswerten zwischen $0$ und $1$ initialisiert. Anschließend werden die Systeme über $20000$ Zeitschritte ($\widehat{=} 200.0$ Zeiteinheiten) simuliert um ein transientes Verhalten abzuwarten. Durch das weitere Simulieren der Systeme wird der wirkliche Datensatz generiert, der benutzt wird. Dieser wird in einen Trainingsdatensatz, einen Evaluationsdatensatz und einen Testdatensatz aufgeteilt. Der erste wird für das Trainieren der Modelle und Ansätze verwendet, der zweite für das Auswählen der optimalen Hyperparameter und der dritte für die finale Bewertung der Leistung eines Ansatzes. Es wird für das \textit{Barkley}- eine Samplingzeit von $0.1$ und für das \textit{Mitchell-Schaeffer}-Modell von $1.0$ Zeiteinheiten benutzt.\\
  
 Die erste Aufgabe besteht darin aus der Kenntnis einer der beiden Systemvariablen die andere Unbekannte zu ermitteln. Dabei wird die Spannungsvariable als Quelle genutzt. Dies ist in den zuvor eingeführten Modellen jeweils die Größe, welche den Diffusionsterm beinhaltet; also die $u$-Variable im \textit{Barkley}-Modell und die $v$-Variable im \textit{Mitchell-Schaeffer}-Modell.\\
 Im zweiten Szenario werden die Techniken verwendet um aus Messdaten einer simulierten Fernfeldmessung der Spannungsvariable  diese wiederherzustellen. Diese Fernfeldmessung wird durch eine gaußsche Unschärfe simuliert.\\
@@ -37,10 +37,12 @@ Durch dieses Vorgehen kann für jeden Gitterpunkt ein ${\left \lceil{\frac{\sigm
 
 \begin{table}[h]
 \centering
-\begin{tabular}{c||c|c|c|c|c|c|c|}
-$\sigma$ & 1 & 3 & \multicolumn{2}{c|}{5} & \multicolumn{3}{c|}{7} \\
+\begin{tabular}{cc|c|c|c|c|c|c}
+\hline
+$\sigma$ & 1 & 3 & \multicolumn{2}{c|}{5} & \multicolumn{3}{c}{7} \\
 \hline
 $\Delta \sigma$ & 1 & 1 & 1 & 2 & 1 & 2 & 3 \\
+\hline
 \end{tabular} 
 \caption{In den ersten beiden Aufgaben verwendete Parameter $\sigma$ und $\Delta \sigma$ für die \textit{Messsondentechnik}.}
 \label{tab:probe_sigma_values}
@@ -78,8 +80,8 @@ Zur Erprobung verschiedener Hyperparameter innerhalb der verschiedenen Ansätze 
 \textit{Echo State Networks} besitzen viele verschiedene Hyperparameter, welche die Qualität der Vorhersage beeinflussen können. Dazu zählen nach \ref{sc:esn} die Reservoirgröße $N$, der Spektralradius $\rho$, die Verlustrate $\alpha$, die Amplitude der zufälligen Störung $\nu$, die Stärke der Regularisierung $\lambda$ und der Anteil der vorhandenen internen Verbindungen $\epsilon$. Da es zum aktuellen Zeitpunkt noch keinen zufriendenstellenden mathematischen Algorithmus für das das selbstständige optimale Einstellen eines \textsc{ESN}s gibt, müssen die Parameter manuell ermittelt werden. Hierfür wird in dieser Arbeit eine \textsc{GridSearch} benutzt. Bei diesem Verfahren wird der Hyperparameterraum in festgelegten Schritten abgetastet und die Leistung des somit entstehenden Netzwerke evaluiert und somit die besten Parameter ermittelt. Durch die hohe Anzahl der einstellbaren Hyperparameter und die nicht zu vernachlässigende Rechenzeit für das Trainieren und Evaluieren eines Netzwerkes, ist es nicht sinnvoll diese Suche für alle Komponenten des hochdimensionalen Zielvektors gleichzeitig durchzuführen. Stattdessen wird zuerst unter der Annahme, dass die Dynamik sich lokal an allen Punkten ähnlich verhält, ein Punkt in der Mitte des Feldes ausgewählt, und nur versucht diesen einen einzelnen Punkt vorherzusagen. Diese Aufgabe kann deutlich schneller berechnet werden, sodass nun die optimalen Hyperparameter mit einer \textsc{GridSearch} gesucht werden können. Im Anschluss können die Hyperparameter des  zuvor ermittelten \textsc{ESN} für die Vorhersage aller Punkte genutzt werden. Abschließend wird noch einmal Versucht das gefundene Reservoir manuell zu verbessern, indem die Parameter $N$ und $\lambda$ noch einmal variiert werden.\\
 Es ist zu erwarten, dass die hierbei gefundenen Hyperparameter eine akzeptable Leistung für die jeweiligen Probleme erzielen können. Da allerdings bei dem zuvor beschriebenen Verfahren bei weitem nicht alle sinnvollen Hyperparameter getestet werden können, besteht die Möglichkeit, dass es noch besser geeignete Reservoirs mit anderen Hyperparametern gibt, welche eine noch höhere Leistung erzielen können.\\
 
-Statt für jeden Punkt einzeln eine Vorhersage zu treffen, ist es bei einem Reservoir-Ansatz auch vorstellbar alle Punkte gleichzeitig vorherzusagen und dabei innerhalb des Reservoirs die räumliche Struktur der Dynamik stärker abzubilden. Hierfür wäre ein sehr großes Reservoir, welches etwa so viele Einheiten besitzt, wie es Gitterpunkte gibt, vorstellbar. Da nach Anhang XXX die Laufzeit des \textsc{ESN} allerdings mit $\mathcal{O}(N^{2.376})$ anwächst
-\improvement{REMOVE THIS REGION. THIS IS BULLSHIT!}
+Statt für jeden Punkt einzeln eine Vorhersage zu treffen, ist es bei einem Reservoir-Ansatz auch vorstellbar alle Punkte gleichzeitig vorherzusagen und dabei innerhalb des Reservoirs die räumliche Struktur der Dynamik stärker abzubilden. Hierfür wäre ein sehr großes Reservoir, welches etwa so viele Einheiten besitzt, wie es Gitterpunkte gibt, vorstellbar. Da nach Anhang \ref{sc:apx_runtime_complexity} die Laufzeit des \textsc{ESN} allerdings mit mindestens $\mathcal{O}(N^{2.376})$ anwächst, würde die Laufzeit mit $(N_{Gitter}^2)^{2.376}$ anwachsen. Dahingegen wächst die Laufzeit mit dem zuvor vorgestellten Ansatz mit $(N_{Gitter})^2 \cdot N^{2.376}$, wobei $N$ die Anzahl der internen Einheiten ist. Es ist zu erkennen, dass für hinreichend große Gittergrößen die Laufzeit des großen Ansatzes stärker anwächst als das obige Vorgehen. Zudem lässt sich das zuvor vorgestellte Verfahren auch besser Parallelisieren, da die Vorhersage jedes einzelnen Punktes unabhängig von der Vorhersage der übrigen Punkte ist.   
+\improvement{Add plot to show the developement of the curves?}
 
 \FloatBarrier
 \subsection{Klassische Methoden}
@@ -87,10 +89,9 @@ Die klassischen Methoden sind nicht von alleine aus in der Lage zeitlich ausgepr
 
 \begin{table}[h]
 \centering
-\begin{tabular}{|c|c|}
+\begin{tabular}{cc}
+\hline
 $\tau_{Barkley}$ & $\tau_{Mitchell-Schaeffer}$ \\ 
-\hline 
-\hline 
 0.64 Zeiteinheiten & 2.38 Zeiteinheiten\\ 
 \hline 
 \end{tabular} 
