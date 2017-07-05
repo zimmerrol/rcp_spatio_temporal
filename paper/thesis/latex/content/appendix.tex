@@ -5,71 +5,56 @@
 \begin{table}[h]
 	\centering
 
-
 	\resizebox{\columnwidth}{!}{%
-		\begin{tabular}{|c|c|c|c|c|c|c|c|}
-			\multicolumn{1}{c|}{} & \multicolumn{7}{c|}{Barkley}\\ 
-			\hline \hline 
+		\begin{tabular}{cccccccc}
+			\hline 
+			\multicolumn{1}{c}{} & \multicolumn{7}{c}{Barkley}\\ 
+			\hline
 			\rule[-1ex]{0pt}{2.5ex} $a$ & 4 & 8 & 16 & 32 & 64 & 128 & 148\\ 
-			\hline 
-			\rule[-1ex]{0pt}{2.5ex} $b$ & 1 & 1 & 1 & 1 & 1 & 1 & 1 \\ 
-			\hline 
-			\rule[-1ex]{0pt}{3.5ex} $N$ & 400 & 400 & 50 & 200 & 400 & 200 & 50\\ 
-			\hline 
-			\rule[-1ex]{0pt}{3.5ex} $\rho(|\mathbf{W}|)$ & 0.8 & 0.5 & 0.5 & 1.5 & 1.5 & 3.0 & 0.8\\ 
-			\hline 
-			\rule[-1ex]{0pt}{3.5ex} $\alpha$ & 0.70 & 0.50 & 0.20 & 0.05 & 0.05 & 0.20 & 0.05 \\ 
-			\hline 
-			\rule[-1ex]{0pt}{3.5ex} $\epsilon$ & 0.2 & 0.2 & 0.1 & 0.2 & 0.2 & 0.2 & 0.1 \\ 
-			\hline 
-			\rule[-1ex]{0pt}{3.5ex} $\nu_{max}$ & $\num{1e-5}$ & $\num{1e-5}$ & $\num{1e-5}$ & $\num{1e-4}$ & $\num{1e-5}$ & $\num{1e-5}$ &  $\num{1e-5}$\\ 
-			\hline 
-			\rule[-1ex]{0pt}{3.5ex} $\lambda$ & $\num{5e-4}$ & $\num{5e-1}$ & $\num{5e-1}$ & $\num{5e+3}$ & $\num{5e+4}$ & $\num{5e+3}$ & $\num{5e-6}$\\ 		
-			\hline 
+			\rule[-1ex]{0pt}{2.5ex} $b$ & 2 & 2 & 2 & 2 & 1 & 2 & 1 \\ 
+			\rule[-1ex]{0pt}{3.5ex} $N$ & 400 & 400 & 400 & 200 & 400 & 200 & 50\\ 
+			\rule[-1ex]{0pt}{3.5ex} $\rho(|\mathbf{W}|)$ & 0.5 & 0.1 & 1.1 & 1.5 & 1.1 & 1.1 & 1.5\\ 
+			\rule[-1ex]{0pt}{3.5ex} $\alpha$ & 0.95 & 0.95 & 0.20 & 0.05 & 0.05 & 0.20 & 0.05 \\ 
+			\rule[-1ex]{0pt}{3.5ex} $\epsilon$ & 0.2 & 0.2 & 0.1 & 0.1 & 0.2 & 0.2 & 0.2 \\ 
+			\rule[-1ex]{0pt}{3.5ex} $\nu_{max}$ & $\num{1e-4}$ & $\num{1e-4}$ & $\num{1e-5}$ & $\num{1e-4}$ & $\num{1e-5}$ & $\num{1e-4}$ &  $\num{1e-5}$\\ 
+			\rule[-1ex]{0pt}{3.5ex} $\lambda$ & $\num{5e-4}$ & $\num{5e-4}$ & $\num{5e-0}$ & $\num{5e+2}$ & $\num{5e+4}$ & $\num{5e+3}$ & $\num{5e-0}$\\ 	
+			\rule[-1ex]{0pt}{3.5ex} $\eta$ & 20 & 5 & 5 & 100 & 100 & 20 & 10\\		
+			\\
 			\rule[-1ex]{0pt}{2.5ex} Laufzeit [s] & 5 & 15 & 60 & 170 & 1922 & 3320 & 2970\\
-			\hline 
 			\rule[-1ex]{0pt}{2.5ex} \textbf{MSE} & \textbf{0.00005} & \textbf{0.00111} & \textbf{0.01447} & \textbf{0.09301} & \textbf{0.13093} & \textbf{0.15106} & \textbf{0.18380}\\ 
-			\hline 
 			\rule[-1ex]{0pt}{2.5ex} \textbf{NRMSE} & \textbf{0.0121} & \textbf{0.0801} & \textbf{0.3386} & \textbf{0.7398} & \textbf{0.9438} & \textbf{1.0098} & \textbf{1.1049} \\ 
 			\hline 
 		\end{tabular} 
-	}
-	
-	\vspace{0.75cm}
+		}
+		\caption{Vollständige Auflistung der gefundenen Hyperparameter der \textsc{ESN}s für das \textit{Barkley}-Modell für verschiedene Größen $a$ des vorherzusagenden Bereichs, welche zu den geringsten Fehlern führen. Zudem sind die benötigte Laufzeit und die erreichten Fehler angeführt. Die Größe $b$ ist ebenfalls optimiert worden.}
+\label{tab:apx_inner_cross_esn_results_barkley}
+\end{table}
 
-	\centering
-	
+\begin{table}[t]
 	\resizebox{\columnwidth}{!}{%
-		\begin{tabular}{|c|c|c|c|c|c|c|c|}
-			\multicolumn{1}{c|}{} & \multicolumn{7}{c|}{Mitchell-Schaeffer}\\ 
-			\hline \hline 
+		\begin{tabular}{cccccccc}
+		 	\hline 
+			\multicolumn{1}{c}{} & \multicolumn{7}{c}{Mitchell-Schaeffer}\\ 
+			\hline
 			\rule[-1ex]{0pt}{2.5ex} $a$ & 4 & 8 & 16 & 32 & 64 & 128 & 148\\ 
-			\hline 
-			\rule[-1ex]{0pt}{2.5ex} $b$ & 1 & 1 & 1 & 1 & 1 & 1 & 1 \\ 
-			\hline 
-			\rule[-1ex]{0pt}{3.5ex} $N$ & 400 & 50 & 200 & 50 & 400 & 200 & 200\\ 
-			\hline 
-			\rule[-1ex]{0pt}{3.5ex} $\rho(|\mathbf{W}|)$ & 1.5 & 3.0 & 3.0 & 0.8 & 3.0 & 3.0 & 3.0\\ 
-			\hline 
-			\rule[-1ex]{0pt}{3.5ex} $\alpha$ & 0.95 & 0.50 & 0.05 & 0.95 & 0.20 & 0.05 & 0.05 \\ 
-			\hline 
-			\rule[-1ex]{0pt}{3.5ex} $\epsilon$ & 0.1 & 0.1 & 0.2 & 0.1 & 0.1 & 0.1 & 0.2 \\ 
-			\hline 
-			\rule[-1ex]{0pt}{3.5ex} $\nu_{max}$ & $\num{1e-4}$ & $\num{1e-5}$ & $\num{1e-5}$ & $\num{1e-5}$ & $\num{1e-4}$ & $\num{1e-5}$ &  $\num{1e-5}$\\ 
-			\hline 
-			\rule[-1ex]{0pt}{3.5ex} $\lambda$ & $\num{5e-0}$ & $\num{5e-2}$ & $\num{5e-1}$ & $\num{5e+3}$ & $\num{5e+3}$ & $\num{5e+4}$ & $\num{5e+4}$\\ 		
-			\hline 
+			\rule[-1ex]{0pt}{2.5ex} $b$ & 1 & 3 & 2 & 2 & 1 & 2 & 1 \\ 
+			\rule[-1ex]{0pt}{3.5ex} $N$ & 400 & 200 & 50 & 50 & 50 & 200 & 50\\ 
+			\rule[-1ex]{0pt}{3.5ex} $\rho(|\mathbf{W}|)$ & 1.5 & 0.1 & 1.5 & 1.1 & 3.0 & 1.1 & 1.5\\ 
+			\rule[-1ex]{0pt}{3.5ex} $\alpha$ & 0.95 & 0.95 & 0.50 & 0.20 & 0.50 & 0.20 & 0.70 \\ 
+			\rule[-1ex]{0pt}{3.5ex} $\epsilon$ & 0.1 & 0.2 & 0.1 & 0.1 & 0.1 & 0.2 & 0.2 \\ 
+			\rule[-1ex]{0pt}{3.5ex} $\nu_{max}$ & $\num{1e-4}$ & $\num{1e-4}$ & $\num{1e-4}$ & $\num{1e-4}$ & $\num{1e-5}$ & $\num{1e-4}$ &  $\num{1e-5}$\\ 
+			\rule[-1ex]{0pt}{3.5ex} $\lambda$ & $\num{5e-0}$ & $\num{5e-1}$ & $\num{5e-0}$ & $\num{5e+3}$ & $\num{5e+3}$ & $\num{5e+4}$ & $\num{5e+4}$\\ 
+			\rule[-1ex]{0pt}{3.5ex} $\eta$ & 20 & 50 & 15 & 5 & 100 & 10 & 15\\	
+			\\ 			
 			\rule[-1ex]{0pt}{2.5ex} Laufzeit [s] & 3 & 9 & 27 & 121 & 548 & 3322 & 3021\\
-			\hline 
 			\rule[-1ex]{0pt}{2.5ex} \textbf{MSE} & \textbf{0.00023} & \textbf{0.00177} & \textbf{0.02969} & \textbf{0.05061} & \textbf{0.06330} & \textbf{0.06842} & \textbf{0.06761}\\ 
-			\hline 
 			\rule[-1ex]{0pt}{2.5ex} \textbf{NRMSE} & \textbf{0.0661} & \textbf{0.1704} & \textbf{0.6703} & \textbf{0.8861} & \textbf{0.9775} & \textbf{1.0166} & \textbf{1.0049} \\ 
 			\hline 
 		\end{tabular} 
 	}
 
-	\caption{Vollständige Auflistung der gefundenen Hyperparameter der \textsc{ESN}s für das \textit{Barkley}-Modell (oben) und das \textit{Mitchell-Schaeffer}-Modell (unten) für verschiedene Größen $a$ des vorherzusagenden Bereichs, welche zu den geringsten Fehlern führen. Zudem sind die benötigte Laufzeit und die erreichten Fehler angeführt.}
-\label{tab:apx_inner_cross_esn_results}
+	\caption{Vollständige Auflistung der gefundenen Hyperparameter der \textsc{ESN}s für das \textit{Mitchell-Schaeffer}-Modell (unten) für verschiedene Größen $a$ des vorherzusagenden Bereichs, welche zu den geringsten Fehlern führen. Zudem sind die benötigte Laufzeit und die erreichten Fehler angeführt. Die Größe $b$ ist ebenfalls optimiert worden.}
+\label{tab:apx_inner_cross_esn_results_ms}
 \end{table}
 
 
@@ -137,6 +122,41 @@
 
 \begin{figure}[h]
 	\centering
+	\begin{subfigure}{.95\textwidth}
+		\centering
+		\hspace*{0.18cm}
+		\includegraphics[width=4.8in]{figures/results/cross_prediction/nn_trainlength_vh_time.pdf}
+		\caption{Abhängigkeit der Laufzeit.}
+	\end{subfigure}
+	\\
+	\begin{subfigure}{.95\textwidth}
+		\centering
+		\includegraphics[width=4.8in]{figures/results/cross_prediction/nn_trainlength_vh_mse.pdf}
+		\caption{Abhängigkeit des \textit{MSE}s.}
+	\end{subfigure}
+	\caption{Darstellung der Abhängigkeit des benötigten Laufzeit (oben) und des MSE (unten) von der verwendeten Anzahl an Trainingsdaten $N_{Training}$ (unten) für das \textit{Mitchell-Schaeffer}-Modell bei der Verwendung einer nächsten Nachbar Vorhersage.}
+	\label{fig:apx_exp_cross_nn_trainlength_mse_time_ms}
+\end{figure}
+
+
+\begin{figure}[h]
+	\centering
+	\begin{subfigure}{\textwidth}
+		\centering
+		\includegraphics[width=4.8in]{figures/results/cross_prediction/rbf_placements_vh_time.pdf}
+		\caption{Abhängigkeit der Laufzeit von $l$.}
+	\end{subfigure}
+	\begin{subfigure}{\textwidth}
+		\centering
+		\includegraphics[width=4.8in]{figures/results/cross_prediction/rbf_placements_vh_mse.pdf}
+  		\caption{Abhängigkeit des \textit{MSE}s von $l$.}
+	\end{subfigure}
+	\caption{Darstellung der Abhängigkeit des benötigten Laufzeit (oben) und des \textit{MSE}s (unten) von der Anzahl der Basisfunktionen $l$ für das \textit{Mitchell-Schaeffer}-Modell bei der Verwendung radialer Basisfunktionen.}
+	\label{fig:apx_exp_cross_rbf_placements_time_mse_ms}
+\end{figure}
+
+\begin{figure}[h]
+	\centering
 	\begin{subfigure}{.5\textwidth}
 		\centering
 		\includegraphics[height=2.5in]{figures/results/inner_cross_prediction/mitchell_v_inner_original.pdf}
@@ -165,7 +185,12 @@
 	\label{fig:apx_inner_cross_mitchell_result}
 \end{figure} 
 
-\end{appendices}
+\begin{figure}[h]
+	\centering
+	\includegraphics[height=4.2in]{figures/results/inner_cross_prediction/mitchell_error_size_comparison.pdf}
+	\caption{Graphische Darstellung des Fehlerwertes MSE für die drei verschiedenen Ansätze in Abhängigkeit von der Größe $a$ des vorherzusagenden Bereichs für das \textit{Mitchell-Schaeffer}-Modell.}
+	\label{fig:apx_inner_prediction_error_size_comparison_ms}
+\end{figure} 
 
 
 \chapter{Mathematische Ausführungen}
@@ -220,3 +245,28 @@ Insgesamt ergibt sich der Aufwand des Trainingsvorgangs somit inklusive der Bere
 Der Vorhersagevorgang besteht jeweils aus Berechnungen der Zustandsgleichung und der  Berechnung der Ausgabe $\vec{y} = \mathbf{W_{out}} \vec{x}$. Hierbei ergibt sich analog die Laufzeitkomplexität zu $\mathcal{O}(N^2)$.\\
 
 Bei dieser Betrachtung sind noch nicht die auftretenden Laufzeiten durch das Initialisieren der Matrizen im Speicher und das Berechnen des Spektralradius zur Reskalierung von $\mathbf{W}$ berücksichtigt. 
+
+\chapter{Programmüberblick}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.9\textwidth]{figures/illustrations/esn_flow_chart.pdf}
+  	\caption{Ablauf bei Verwendung eines \textsc{ESN}s. Dabei dabei relevanten Funktionen des Quellcodes sind kursiv geschrieben. In Leserichtung wird zuerst das \textsc{ESN} mit seinen Matrizen $\mathbf{W}$ und $\mathbf{W_{in}}$ generiert. Anschließend wird es trainiert (siehe Abbildung \ref{fig:apx_esn_training_flowchart}), um danach eine Vorhersage durchzuführen.}
+  	  \label{fig:apx_esn_flowchart}
+\end{figure}%
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.9\textwidth]{figures/illustrations/esn_training_flow_chart.pdf}
+  	\caption{Ablaufes des Trainingsvorgangs des \textsc{ESN}s. Zuerst wird die Zeitreihe der Trainingsdaten in zwei Zeitreihen unterteilt. Der erste Teil wird benutzt um das \textit{transiente} Verhalten des Reservoirs abzuwarten, wohingegen der Rest benutzt wird, um die Auslesematrix $\mathbf{W_{out}}$ zu bestimmen.}
+  	\label{fig:apx_esn_training_flowchart}
+\end{figure}%
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.9\textwidth]{figures/illustrations/general_predicition_flow_chart.pdf}
+  	\caption{Allgemeines Vorgehen zum Bestimmen der Vorhersage in einem zweidimensionalen System. Für jeden Bildpunkt wird eine einzelne Zeitreihe betrachtet, welche in Trainings- und Testdaten unterteilt wird. Mit den Trainingsdaten wird nun das ausgewählte Modell (\textsc{NN}-Ansatz, \textsc{RBF}-Ansatz oder \textsc{ESN}) trainiert. Anschließend liefert das Modell mit der Quellvariable der Testdaten eine Vorhersage, welche mit den Zielvariable verglichen wird. Daraus kann der \textit{MSE} bestimmt werden. Durch das Durchführen dieser Prozedur für alle Bildpunkt ergibt sich schlussendlich eine Vorhersage des räumlich ausgedehnten Systems.}
+  	  \label{fig:apx_general_prediction_flowchart}
+\end{figure}%
+
+\end{appendices}

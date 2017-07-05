@@ -1,10 +1,11 @@
+\clearpage
 \section{Kreuz-Prädiktion innere Dynamiken}
 \label{sec:exp_inner_prediction}
 Bei Messungen der elektrischen Erregung des Herzens können nach aktuellen Stand meistens nur die Erregungen auf der Herzoberfläche gemessen werden. Die Ausbreitungen im Inneren des räumlich ausgedehnten Herzens bleiben somit verborgen. Zudem ist anzunehmen, dass die Gesamtdynamik nicht nur durch die Oberfläche, sondern auch durch die Erregung im Inneren bestimmt und charakterisiert wird. Somit wird die Frage aufgeworfen, ob die innere Erregung des Herzens nur durch die Kenntnis der Oberflächendynamik vorhergesagt werden kann. In diesem Abschnitt soll versucht werden, diese Fragestellung erneut mit den \textsc{ESN}s und den klassischen Methoden zu untersuchen. Dabei wird diese Frage statt an einem dreidimensionalen Systems an den zuvor bereits benutzten zweidimensionalen Modellen untersucht.\\
 
 \begin{figure}[h]
 	\centering
-	\includegraphics[width=.4\linewidth]{figures/illustrations/inner_prediction.pdf}
+	\includegraphics[width=.6\linewidth]{figures/illustrations/inner_prediction.pdf}
 	\caption{Darstellung des Aufbaus. Das gesamte $N \times N$ große Feld der Spannungsvariable ist in weiß, wohingegen der vorherzusagende Bereich der Größe $a \times a$ in hellgrau dargestellt ist. Drumherum liegt der dunkelgraue Rahmen der Größe $b \times b$ dessen Pixel für die Vorhersage des Inneren genutzt werden.}
 	\label{fig:exp_inner_prediction}
 \end{figure}
@@ -43,11 +44,11 @@ Die optimalen gefundenen Hyperparameter und die damit erreichten Ergebnisse sind
 		\hline 
 		\rule[-1ex]{0pt}{2.5ex} $a$ & 4 & 8 & 16 & 32 & 64\\ 
 		\rule[-1ex]{0pt}{2.5ex} $b$ & 1 & 1 & 1  & 1  & 1 \\ 
-		\rule[-1ex]{0pt}{2.5ex} $\delta$ & 4 & 4 & 4 & 3 & 3 \\ 
-		\rule[-1ex]{0pt}{2.5ex} k & 5 & 5 & 5 & 5 & 5 \\ 
+		\rule[-1ex]{0pt}{2.5ex} $\delta$ & 3 & 3 & 4 & 3 & 3 \\ 
+		\rule[-1ex]{0pt}{2.5ex} k & 5 & 5 & 5 & 4 & 5 \\ 
 		\rule[-1ex]{0pt}{2.5ex} Laufzeit [s] & $\approx 1$ & 8 & 287 & 1809 & 14754\\ 
-		\rule[-1ex]{0pt}{2.5ex} \textbf{MSE} & \textbf{0.00231} & \textbf{0.00891} & \textbf{0.07097} & \textbf{0.18961} & \textbf{0.24599}\\ 
-		\rule[-1ex]{0pt}{2.5ex} \textbf{NRMSE} & \textbf{0.0155} & \textbf{0.0596} & \textbf{0.4779} & \textbf{1.3032} & \textbf{1.7009} \\ 
+		\rule[-1ex]{0pt}{2.5ex} \textbf{MSE} & \textbf{0.00368} & \textbf{0.01572} & \textbf{0.09410} & \textbf{0.20458} & \textbf{0.26571}\\ 
+		\rule[-1ex]{0pt}{2.5ex} \textbf{NRMSE} & \textbf{0.3517} & \textbf{0.3914} & \textbf{0.7726} & \textbf{1.1640} & \textbf{1.2963} \\ 
 		\hline 
 	\end{tabular} 
 	
@@ -64,8 +65,8 @@ Die optimalen gefundenen Hyperparameter und die damit erreichten Ergebnisse sind
 		\rule[-1ex]{0pt}{2.5ex} $\delta$ & 3 & 3 & 3 & 4 & 4 \\ 
 		\rule[-1ex]{0pt}{2.5ex} k & 5 & 5 & 5 & 5 & 5 \\ 
 		\rule[-1ex]{0pt}{2.5ex} Laufzeit [s] & $\approx 1$ & 17 & 194 & 2482 & 20272\\ 
-		\rule[-1ex]{0pt}{2.5ex} \textbf{MSE} & \textbf{0.14221} & \textbf{0.02465} & \textbf{0.06460} & \textbf{0.08744} & \textbf{0.09283} \\ 
-		\rule[-1ex]{0pt}{2.5ex} \textbf{NRMSE} & \textbf{0.2663} & \textbf{0.4052} & \textbf{0.9779} & \textbf{1.3564} & \textbf{1.4012} \\ 
+		\rule[-1ex]{0pt}{2.5ex} \textbf{MSE} & \textbf{0.00463} & \textbf{0.02182} & \textbf{0.08295} & \textbf{0.10699} & \textbf{0.12297} \\ 
+		\rule[-1ex]{0pt}{2.5ex} \textbf{NRMSE} & \textbf{0.5160} & \textbf{0.6365} & \textbf{0.9888} & \textbf{1.1646} & \textbf{1.1837} \\ 
 		\hline 
 	\end{tabular} 
 
@@ -87,11 +88,11 @@ Analog zu den vorherigen Ausführungen sind die radialen Basisfunktionen ebenfal
 		\hline
 		\rule[-1ex]{0pt}{2.5ex} $a$ & 4 & 8 & 16 & 32 & 64\\ 
 		\rule[-1ex]{0pt}{2.5ex} $b$ & 1 & 1 & 1  & 1  & 1 \\ 
-		\rule[-1ex]{0pt}{2.5ex} $\delta$ & 4 & 4 & 4 & 3 & 3 \\ 
+		\rule[-1ex]{0pt}{2.5ex} $\delta$ & 3 & 3 & 4 & 4 & 3 \\ 
 		\rule[-1ex]{0pt}{2.5ex} $\sigma_{RBF}$ & 9 & 5 & 9 & 9 & 7\\ 
-		\rule[-1ex]{0pt}{2.5ex} Laufzeit [s] & $\approx 2$ & 7 & 41 & 279 & 1845\\ 
-		\rule[-1ex]{0pt}{2.5ex} \textbf{MSE} & \textbf{0.00051} & \textbf{0.00450} & \textbf{0.04009} & \textbf{0.08783} & \textbf{0.13615}\\ 
-		\rule[-1ex]{0pt}{2.5ex} \textbf{NRMSE} & \textbf{0.0586} & \textbf{0.1735} & \textbf{0.5196} & \textbf{0.7769} & \textbf{0.9703} \\ 
+		\rule[-1ex]{0pt}{2.5ex} Laufzeit [s] & $\approx 1$ & 8 & 45 & 260 & 1839\\ 
+		\rule[-1ex]{0pt}{2.5ex} \textbf{MSE} & \textbf{0.00051} & \textbf{0.00450} & \textbf{0.04009} & \textbf{0.08783} & \textbf{0.13903}\\ 
+		\rule[-1ex]{0pt}{2.5ex} \textbf{NRMSE} & \textbf{0.0601} & \textbf{0.1909} & \textbf{0.4885} & \textbf{0.8816} & \textbf{0.9805} \\ 
 		\hline 
 	\end{tabular} 
 	
@@ -109,7 +110,7 @@ Analog zu den vorherigen Ausführungen sind die radialen Basisfunktionen ebenfal
 		\rule[-1ex]{0pt}{2.5ex} $\sigma_{RBF}$ & 9 & 9 & 9 & 5 & 7 \\ 
 		\rule[-1ex]{0pt}{2.5ex} Laufzeit [s] & $\approx 1$ & 7 & 43 & 237 & 1756\\
 		\rule[-1ex]{0pt}{2.5ex} \textbf{MSE} & \textbf{0.00064} & \textbf{0.00497} & \textbf{0.02220} & \textbf{0.04745} & \textbf{0.05588} \\ 
-		\rule[-1ex]{0pt}{2.5ex} \textbf{NRMSE} & \textbf{0.1094} & \textbf{0.2857} & \textbf{0.5797} & \textbf{0.8580} & \textbf{0.9184} \\ 
+		\rule[-1ex]{0pt}{2.5ex} \textbf{NRMSE} & \textbf{0.0925} & \textbf{0.2842} & \textbf{0.7178} & \textbf{0.9530} & \textbf{1.0094} \\ 
 		\hline 
 	\end{tabular} 
 
@@ -126,7 +127,7 @@ Im Gegensatz zu den anderen beiden Methoden wächst die benötigte Rechenzeit be
 Zudem ergibt sich bei dieser Aufgabe ein weiteres Problem, welches eine Modifikation erfordert: In den vorherigen Aufgaben ist die Dimension des Eingangssignals in das \textsc{ESN} $N_u < 50$ gewesen. Nun wächst die Dimension des Eingangssignals allerdings sehr stark mit $N_u = 4b(b+a)$ an. Dies würde bei der Konstruktion der Eingangsmatrix $\mathbf{W_{in}}$ nach Abschnitt \ref{sec:esn_structure} dazu führen, dass die inneren Einheiten des Reservoirs zu viele Eingangssignale erhalten und somit unter Umständen schnell eine Sättigung des $tanh(\cdot)$ in der zeitlichen Entwicklungsgleichung \ref{eq:esn_stateeq} ergibt. Um dies zu lösen ist ein neuer Hyperparameter $\eta$ eingeführt worden, der die Anzahl von Eingangssignalen pro innerer Einheit beschränkt. Dadurch wird die Matrix $\mathbf{W_{in}}$ dünn besetzt. Dies wird zudem dadurch motiviert, dass viele Einträge des Eingangssignals aus Bildpunkten mit einem geringen Abstand zueinander stammen, wodurch redundante Informationen eingespeist werden würden. Durch eine dünn besetzte Matrix $\mathbf{W_{in}}$ kann dieser Effekt reduziert werden. Des Weiteren wird versucht eine reichhaltigere innere Dynamik durch diesen Schritt analog zu der Begründung der Dünnbesetztheit der Matrix $\mathbf{W}$ zu erzeugen.\\
 
 Bei der Untersuchung ist zusätzlich ersichtlich geworden, dass der untersuchte Bereich der Regularisierung $\lambda \in [\num{5e-2},\num{5e-6}]$ zu gering ist, da der optimale Wert stets am linken Rand des Intervalls gefunden worden ist. Deswegen ist zusätzlich einmal eine Suche auf dem größeren Parameterbereich $\lambda \in [\num{5e-4},\num{5e+4}]$ durchgeführt worden.
-In Tabelle \ref{tab:exp_inner_cross_esn_results} sind die Fehler und benötigten Laufzeiten für die besten Reservoirs für die beiden Modelle aufgelistet. Es kann erneut der Trend beobachtet werden, dass der Fehler mit steigendem $a$ ebenso zunimmt, und für kleine Werte für $a$ der Fehler im \textit{Mitchell-Schaffer}-Modell größer ist als im \textit{Barkley-Modell}.
+In Tabelle \ref{tab:exp_inner_cross_esn_results} sind die Fehler und benötigten Laufzeiten für die besten Reservoirs für die beiden Modelle aufgelistet. Die ermittelten Hyperparameter sind in den Tabellen \ref{tab:apx_inner_cross_esn_results_barkley} und \ref{tab:apx_inner_cross_esn_results_ms} aufgelistet. Es kann erneut der Trend beobachtet werden, dass der Fehler mit steigendem $a$ ebenso zunimmt, und für kleine Werte für $a$ der Fehler im \textit{Mitchell-Schaffer}-Modell größer ist als im \textit{Barkley-Modell}.
 
 \begin{table}[h]
 	\centering
@@ -137,7 +138,7 @@ In Tabelle \ref{tab:exp_inner_cross_esn_results} sind die Fehler und benötigten
 			\multicolumn{1}{c}{} & \multicolumn{7}{c}{Barkley}\\ 
 			\hline 
 			\rule[-1ex]{0pt}{2.5ex} $a$ & 4 & 8 & 16 & 32 & 64 & 128 & 148\\ 
-			\rule[-1ex]{0pt}{2.5ex} $b$ & 1 & 1 & 1 & 1 & 1 & 1 & 1 \\ 
+			\rule[-1ex]{0pt}{2.5ex} $b$ & 2 & 2 & 2 & 2 & 1 & 2 & 1 \\ 
 			\rule[-1ex]{0pt}{2.5ex} Laufzeit [s] & 5 & 15 & 60 & 170 & 1922 & 3320 & 2970\\
 			\rule[-1ex]{0pt}{2.5ex} \textbf{MSE} & \textbf{0.00005} & \textbf{0.00111} & \textbf{0.01447} & \textbf{0.09301} & \textbf{0.13093} & \textbf{0.15106} & \textbf{0.18380}\\ 
 			\rule[-1ex]{0pt}{2.5ex} \textbf{NRMSE} & \textbf{0.0121} & \textbf{0.0801} & \textbf{0.3386} & \textbf{0.7398} & \textbf{0.9438} & \textbf{1.0098} & \textbf{1.1049} \\ 
@@ -155,7 +156,7 @@ In Tabelle \ref{tab:exp_inner_cross_esn_results} sind die Fehler und benötigten
 			\multicolumn{1}{c}{} & \multicolumn{7}{c}{Mitchell-Schaeffer}\\ 
 			\hline
 			\rule[-1ex]{0pt}{2.5ex} $a$ & 4 & 8 & 16 & 32 & 64 & 128 & 148\\ 
-			\rule[-1ex]{0pt}{2.5ex} $b$ & 1 & 1 & 1 & 1 & 1 & 1 & 1 \\ 
+			\rule[-1ex]{0pt}{2.5ex} $b$ & 1 & 3 & 2 & 2 & 1 & 2 & 1 \\ 
 			\rule[-1ex]{0pt}{2.5ex} Laufzeit [s] & 3 & 9 & 27 & 121 & 548 & 3322 & 3021\\
 			\rule[-1ex]{0pt}{2.5ex} \textbf{MSE} & \textbf{0.00023} & \textbf{0.00177} & \textbf{0.02969} & \textbf{0.05061} & \textbf{0.06330} & \textbf{0.06842} & \textbf{0.06761}\\ 
 			\rule[-1ex]{0pt}{2.5ex} \textbf{NRMSE} & \textbf{0.0661} & \textbf{0.1704} & \textbf{0.6703} & \textbf{0.8861} & \textbf{0.9775} & \textbf{1.0166} & \textbf{1.0049} \\ 
@@ -163,7 +164,7 @@ In Tabelle \ref{tab:exp_inner_cross_esn_results} sind die Fehler und benötigten
 		\end{tabular} 
 	}
 
-	\caption{Ermittelte Hyperparameter der \textsc{ESN}s und Werte für $b$ für das \textit{Barkley}-Modell (oben) und das \textit{Mitchell-Schaeffer}-Modell (unten) für verschiedene Größen $a$ des vorherzusagenden Bereichs, welche zu den geringsten Fehlern führen.}
+	\caption{Auflistung der Fehlerwerte MSE und NRMSE zusammen mit der Laufzeit für das jeweils beste \textsc{ESN}, welches zu den geringsten Fehlern führt, für das \textit{Barkley}-Modell (oben) und das \textit{Mitchell-Schaeffer}-Modell (unten) für verschiedene Größen $a$ des vorherzusagenden Bereichs. Dabei ist der Wert für $b$ ebenfalls optimiert worden.}
 \label{tab:exp_inner_cross_esn_results}
 \end{table}
 
@@ -199,7 +200,9 @@ Zudem ist in Abbildung \ref{fig:exp_inner_cross_barkley_esn_error_dependency_com
 \end{figure} 
 
 \subsection{Vergleich}
-Für einen Vergleich der drei Methoden bietet es sich an die Ergebnisse für die größten Wert für $a$ durchzuführen, der mit allen drei Ansätzen betrachtet worden ist. Dies entspricht dem Wert $a=64$. Eine Übersicht der verschiedenen Ergebnisse ist in Tabelle \ref{tab:exp_inner_cross_comparison_results} zu finden.
+Zuerst kann bemerkt werden, dass für den \textsc{NN}- und den \textsc{RBF}-Ansatz der optimale Wert für die Randdicke $b=1$ lautet, wohingegen bei den \textsc{ESN}s Werte mit $b > 1$ bevorzugt werden. Dieser Unterschied lässt sich dadurch erklären, dass das Eingangssignal für das \textsc{ESN} nicht vollständig genutzt worden ist, sondern durch die Verwendung der dünnbesetzten Eingangsmatrix $\mathbf{W_{in}}$ nur einzelne zufällig ausgewählte Punkte genutzt worden sind. Somit können in diesem Fall durch einen breiteren Rand Eingangssignale aus einer größeren Menge an unterschiedlichen Signalen gewählt werden.
+\improvement{Make this more clear.}
+Für einen genaueren Vergleich der drei Methoden bietet es sich an die Ergebnisse für die größten Wert für $a$ durchzuführen, der mit allen drei Ansätzen betrachtet worden ist. Dies entspricht dem Wert $a=64$. Eine Übersicht der verschiedenen Ergebnisse ist in Tabelle \ref{tab:exp_inner_cross_comparison_results} zu finden.
 
 \begin{table}[h]
 	\centering
@@ -212,16 +215,23 @@ Für einen Vergleich der drei Methoden bietet es sich an die Ergebnisse für die
 		
 		\hline
 		
-		Laufzeit [s] 	& 20272 	& 1756		& \textbf{1089}		& 14754		&  	1845	& \textbf{1206} \\
-		MSE 			& 0.09284	& 0.05588	& 	\textbf{0.05389} 		& 0.24599	& 0.13615 	& \textbf{0.12975}	 \\
-		NRMSE 			& 1.1837	& 0.9184	& \textbf{0.9019} 			& 1.3042	& 0.9703 	& \textbf{0.9472} \\
+		Laufzeit [s] 	& 14754		&  	1845	& \textbf{1206}		&	20272 	& 1756		& \textbf{1089}		 \\
+		MSE 			& 0.24599	& 0.13615 	& \textbf{0.12882}	&	0.09283	& 0.05588	& 	\textbf{0.05464}  \\
+		NRMSE 			& 1.2963	& 0.9805 	& \textbf{0.9438}	&	1.1837	& 1.0094	& \textbf{0.9081} 	 \\
 		\hline 
 	\end{tabular} 
 	\caption{Vergleich der benötigten Laufzeit und der erreichten Fehlers der drei Ansätze für das \textit{Mitchell-Schaeffer}- und das \textit{Barkley}-Modell, welche zu den geringsten Fehlern führen, für $a=64$.}
 	\label{tab:exp_inner_cross_comparison_results}
 \end{table}
 
-Es zeigt sich erneut, dass die Vorhersagen der klassischen Methoden einen höheren Fehler haben. Während der \textsc{NN}-Ansatz bei beiden Modellen schlechtere Ergebnisse als die Vorhersage mittels des Mittelwertes liefert, sind die radialen Basisfunktionen und die \textsc{ESN}s leicht besser als diese. Dabei erreichen die \textsc{ESN}s und radialen Basisfunktionen in etwa die gleiche Genauigkeit. Diese reicht allerdings auch nicht aus, um dies Methoden tatsächlich sinnvoll verwenden zu können. 
+\begin{figure}[H]
+	\centering
+	\includegraphics[height=4.2in]{figures/results/inner_cross_prediction/barkley_error_size_comparison.pdf}
+	\caption{Graphische Darstellung des Fehlerwertes MSE für die drei verschiedenen Ansätze in Abhängigkeit von der Größe $a$ des vorherzusagenden Bereichs für das \textit{Barkley}-Modell.}
+	\label{fig:inner_prediction_error_size_comparison_barkley}
+\end{figure}
+ 
+Zudem ist ein grafischer Vergleich der Fehlerwerte MSE durchgeführt worden, welcher in Abbildung \ref{fig:inner_prediction_error_size_comparison_barkley} für das \textit{Barkley}-Modell zu finden ist. Eine analoge Darstellung für das \textit{Mitchell-Schaeffer}-Modell ist in Abbildung \ref{fig:apx_inner_prediction_error_size_comparison_ms} aufgetragen. Es zeigt sich erneut, dass die Vorhersagen der klassischen Methoden einen höheren Fehler haben. Während der \textsc{NN}-Ansatz bei beiden Modellen schlechtere Ergebnisse als die Vorhersage mittels des Mittelwertes liefert, sind die radialen Basisfunktionen und die \textsc{ESN}s leicht besser als diese. Dabei erreichen die \textsc{ESN}s und radialen Basisfunktionen in etwa die gleiche Genauigkeit. Da der NRMSE für beide Methoden nahe an $1.0$ liegt ist die Vorhersage kaum besser, als die Vorhersage mittels des Mittelwertes. Die Vorhersagequalität reicht bei keiner der drei Methoden aus, um sie tatsächlich sinnvoll verwenden zu können. 
 
 Des Weiteren wächst der Fehlers mit steigender Größe des vorherzusagenden Bereiches auch bei allen drei Ansätze an. Es ist somit zu vermuten, dass dies nicht nur eine reine Beschränkung der einzelnen Methoden ist, sondern dass es womöglich eine Eigenschaft der betrachteten Modelle ist. 
 \improvement{Add comparison images}

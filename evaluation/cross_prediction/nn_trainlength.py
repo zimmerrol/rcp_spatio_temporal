@@ -29,10 +29,11 @@ def plot(filename):
 
     from scipy.optimize import curve_fit
 
-    log_fit_function = lambda x, a, b : a+b*x*np.log(x)
+    log_fit_function = lambda x, a, b: a+b*x*np.log(x)
 
-    popt, pcov = curve_fit(log_fit_function, df[0], df[2])
-    ax.plot(df[0], log_fit_function(df[0], *popt), label="Logarithmischer Fit")
+    popt, _ = curve_fit(log_fit_function, df[0], timeInSeconds)
+    print(popt)
+    ax.plot(df[0], log_fit_function(df[0], *popt), label="Linearer Fit")
     #ax.plot(df[0], df[0]*slope+intercept, label="Logarithmischer Fit")
 
     ax.set_xlabel("$N_{Training}$")

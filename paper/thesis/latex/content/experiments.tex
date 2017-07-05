@@ -3,16 +3,16 @@
 
 Die zuvor in Kapitel \ref{ch:theory} eingeführten Methoden werden nun durch drei verschiedene Szenarien ausprobiert und verglichen. Hierbei liegt der Fokus auf der Verwendung und Erprobung der \textsc{ESN}s. Da die klassischen Methoden der \textit{nächsten Nachbarn} (\textsc{NN}) und der \textit{radialen Basisfunktionen} (\textsc{RBF}) bereits seit längerer Zeit bekannt sind und populäre Lösung solcher Problemfälle darstellen, dienen sie als Bezugsgröße.\\
 
-Jedes der drei Szenarien wird sowohl auf ein \textit{Barkley}-System als auch auf ein System nach dem \textit{Mitchell-Schaeffer}-Modell angewendet. Diese Systeme bestehen aus $150$ Gitterpunkten und nutzen die zuvor beschriebenen Parameter. Für ihre Startverteilung werden die Felder der beiden Systemvariablen in $100$ Quadrate unterteilt, und diese mit Zufallswerten zwischen $0$ und $1$ initialisiert. Anschließend werden die Systeme über $20000$ Zeitschritte ($\widehat{=} 200.0$ Zeiteinheiten) simuliert um ein transientes Verhalten abzuwarten. Durch das weitere Simulieren der Systeme wird der wirkliche Datensatz generiert, der benutzt wird. Dieser wird in einen Trainingsdatensatz, einen Evaluationsdatensatz und einen Testdatensatz aufgeteilt. Der erste wird für das Trainieren der Modelle und Ansätze verwendet, der zweite für das Auswählen der optimalen Hyperparameter und der dritte für die finale Bewertung der Leistung eines Ansatzes. Es wird für das \textit{Barkley}- eine Samplingzeit von $0.1$ und für das \textit{Mitchell-Schaeffer}-Modell von $1.0$ Zeiteinheiten benutzt.\\
+Jedes der drei Szenarien wird sowohl auf ein \textit{Barkley}-System als auch auf ein System nach dem \textit{Mitchell-Schaeffer}-Modell angewendet. Diese Systeme bestehen aus $150$ Gitterpunkten und nutzen die zuvor beschriebenen Parameter. Für ihre Startverteilung werden die Felder der beiden Systemvariablen in $10 \times 10 = 100$ gleichgroße Quadrate mit einer Seitenlänge von $15$ Gitterpunkten unterteilt. Innerhalb dieser Quadrate werden die Variablen homogen mit einem Zufallswert zwischen $0$ und $1$ initialisiert. Anschließend werden die Systeme über $20000$ Zeitschritte ($\widehat{=} 200.0$ Zeiteinheiten) simuliert um ein transientes Verhalten abzuwarten. Durch das weitere Simulieren der Systeme wird der wirkliche Datensatz generiert, der benutzt wird. Dieser wird in einen Trainingsdatensatz, einen Evaluationsdatensatz und einen Testdatensatz aufgeteilt. Der erste wird für das Trainieren der Modelle und Ansätze verwendet, der zweite für das Auswählen der optimalen Hyperparameter und der dritte für die finale Bewertung der Leistung eines Ansatzes. Es wird für das \textit{Barkley}- eine Samplingzeit von $0.1$ und für das \textit{Mitchell-Schaeffer}-Modell von $1.0$ Zeiteinheiten benutzt.\\
  
-Die erste Aufgabe besteht darin aus der Kenntnis einer der beiden Systemvariablen die andere Unbekannte zu ermitteln. Dabei wird die Spannungsvariable als Quelle genutzt. Dies ist in den zuvor eingeführten Modellen jeweils die Größe, welche den Diffusionsterm beinhaltet; also die $u$-Variable im \textit{Barkley}-Modell und die $v$-Variable im \textit{Mitchell-Schaeffer}-Modell.\\
+Die erste Aufgabe besteht darin aus der Kenntnis einer der beiden Systemvariablen die andere Unbekannte zu ermitteln (Kreuz-Prädiktion). Dabei wird die Spannungsvariable als Quelle genutzt. Dies ist in den zuvor eingeführten Modellen jeweils die Größe, welche den Diffusionsterm beinhaltet; also die $u$-Variable im \textit{Barkley}-Modell und die $v$-Variable im \textit{Mitchell-Schaeffer}-Modell.\\
 Im zweiten Szenario werden die Techniken verwendet um aus Messdaten einer simulierten Fernfeldmessung der Spannungsvariable  diese wiederherzustellen. Diese Fernfeldmessung wird durch eine gaußsche Unschärfe simuliert.\\
 Abschließend wird die Spannungsvariable der inneren Punkte eines Quadrates nur durch die Kenntnis der Randwerte des Systems vorhergesagt.\\
 
 \unsure{Add subchapter?}
 \section{Allgemeines Vorgehen}
 \label{sc:experiments_general}
-Das Ziel aller drei Aufgaben besteht jeweils darin ein zweidimensionales Feld vorherzusagen. Eine naheliegende Möglichkeit dies zu schaffen besteht darin wirklich den gesamten Inhalt des $150 \times 150$ Einheiten großen Feldes auf einmal vorherzusagen. Da dabei die Ausgabe der Vorhersage aus einem $22500$-dimensionalen Vektor besteht werden sehr viele Trainingsdaten benötigt, um genügend Informationen über eine solch hochdimensionale Ausgabe zu erhalten. Um dieses Problem zu umgehen wird stattdessen ein Verfahren benutzt, bei dem jeder Punkt einzeln vorhergesagt wird. Dieses Aufteilen einer großen Vorhersage in viele kleinere bietet zudem eine Verbesserung der Ressourcennutzung, bei der zugleich der Bedarf an Arbeitsspeicher und auch die Rechenzeit sinkt (Details siehe \ref{exp_general_esn}).\\
+Das Ziel aller drei Aufgaben besteht jeweils darin ein zweidimensionales Feld vorherzusagen. Eine naheliegende Möglichkeit dies zu schaffen besteht darin wirklich den gesamten Inhalt des $150 \times 150$ Einheiten großen Feldes auf einmal vorherzusagen. Da dabei die Ausgabe der Vorhersage aus einem $22500$-dimensionalen Vektor besteht werden sehr viele Trainingsdaten benötigt, um genügend Informationen über eine solch hochdimensionale Ausgabe zu erhalten. Um dieses Problem zu umgehen wird stattdessen ein Verfahren benutzt, bei dem jeder Punkt einzeln vorhergesagt wird. Dieses Aufteilen einer großen Vorhersage in viele kleinere bietet zudem eine Verbesserung der Ressourcennutzung, bei der zugleich der Bedarf an Arbeitsspeicher und auch die Rechenzeit sinkt (Details siehe \ref{exp_general_esn}). Eine schematische Darstellung ist in Abbildung \ref{fig:apx_general_prediction_flowchart} zu finden.\\
 
 \begin{figure}[h]
 \centering
@@ -51,9 +51,9 @@ $\Delta \sigma$ & 1 & 1 & 1 & 2 & 1 & 2 & 3 \\
 Der Trainingsvorgang wird jeweils über $N_{Training}=15000$ Zeitschritte durchgeführt und der anschließende Evaluationsdurchgang auf $N_{Evaluation} = 2000$ Zeitschritte. Der finale Testvorgang ist ebenfalls $N_{Testing}=2000$ Schritte lang.
 Zur Bewertung der Leistung einer Vorhersage werden die beiden Fehlergrößen MSE und NRMSE eingeführt. Im Allgemeinen ist der MSE (\textit{Mean Squared Error}) durch
 \begin{align}
-MSE(y) = \sum_i^m \sum_t^{N_{Testing}} \left(y(t)_i - \hat{y}(t)_i \right)^2
+MSE(y) = \frac{1}{m \cdot N_{Testing}} \sum_i^m \sum_t^{N_{Testing}} \left(y(t)_i - \hat{y}(t)_i \right)^2
 \end{align}
-definiert und charakterisiert die Genauigkeit einer Vorhersage $\hat{y}$ im Vergleich zu dem tatsächlichen Wert $y \in \mathbb{R}^m$ über den Zeitraum $N_{Testing}$. Der NRMSE normiert diesen Fehler noch auf eine Vorhersage, bei der der Mittelwert $\langle y \rangle$ über die Trainingsphase als vorhergesagten Wert genutzt wird. Er ist als
+definiert und charakterisiert die Genauigkeit einer Vorhersage $\hat{y}$ im Vergleich zu dem tatsächlichen Wert $y \in \mathbb{R}^m$ über den Zeitraum $N_{Testing}$. Der NRMSE (\textit{Normalized Root Mean Squared Error}) normiert diesen Fehler noch auf eine Vorhersage, bei der der Mittelwert $\langle y \rangle$ über die Trainingsphase als vorhergesagten Wert genutzt wird. Er ist als
 \begin{align}
 NRMSE(y) = \sqrt{\frac{MSE(y)}{MSE\left(\langle y \rangle\right)}}
 \end{align}
@@ -64,13 +64,13 @@ Unter der Kenntnis, dass in den Modellen nur Werte zwischen $0$ und $1$ angenomm
 \begin{align}
 x = \begin{cases}
 	0,& \text{wenn } x \leq 0\\
-	x,& \text{wenn } x \geq 0 \land \leq 1\\
+	x,& \text{wenn } 0 \geq x \geq1\\
     1,& \text{wenn } x \geq 1
 \end{cases}
 \end{align}
 abgeschnitten, wobei $x$ für eine der beiden Variablen in dem jeweiligen Modell steht.\\
 
-Zur Erprobung verschiedener Hyperparameter innerhalb der verschiedenen Ansätze ist ein \textsc{Sun Grid Engine}-Cluster genutzt worden. Dabei besteht jeder Knoten aus zwei \textsc{Intel(R) Xeon(R) CPU E5-2650 v2} CPUs mit einem Takt von $2.650$ GHz und $64$ GB Arbeitsspeicher. Diese werden durch das Betriebssystem \textsc{SUSE Linux Enterprise Server 11} betrieben. Die angegebenen Laufzeiten beziehen sich jeweils auf die Ausführung auf einem dieser Knoten. 
+Zur Erprobung verschiedener Hyperparameter innerhalb der verschiedenen Ansätze ist ein \textsc{Sun Grid Engine}-Cluster genutzt worden. Dabei besteht jeder Knoten aus zwei \textsc{Intel(R) Xeon(R) CPU E5-2650 v2} CPUs mit einem Takt von $2.650$~GHz und $64$~GB Arbeitsspeicher. Diese werden durch das Betriebssystem \textsc{SUSE Linux Enterprise Server 11} betrieben. Die angegebenen Laufzeiten beziehen sich jeweils auf die Ausführung auf einem dieser Knoten. 
 \improvement{Add moreinformation about the cluster}
 
 
@@ -85,7 +85,7 @@ Statt für jeden Punkt einzeln eine Vorhersage zu treffen, ist es bei einem Rese
 
 \FloatBarrier
 \subsection{Klassische Methoden}
-Die klassischen Methoden sind nicht von alleine aus in der Lage zeitlich ausgeprägte Dynamiken vorherzusagen, da den Methoden a priori keine Informationen über die vorherigen Zustände vorliegen. Um dieses Problem zu lösen können Verzögerungs-Koordinaten mittels der in Abschnitt \ref{sc:delay_reconstruction} beschriebenen \textit{Delay Reconstruction} für die in Abschnitt \ref{sc:experiments_general} beschriebenen Vektoren aufgestellt werden. Die über die Autokorrelation ermittelte zeitliche Verzögerung $\tau$ ist für beide Systeme in Tabelle \ref{tab:delay_reconstruction_tau} dargestellt.     
+Die klassischen Methoden sind nicht von alleine in der Lage zeitlich ausgeprägte Dynamiken vorherzusagen, da den Methoden a priori keine Informationen über die vorherigen Zustände vorliegen. Um dieses Problem zu lösen können Verzögerungs-Koordinaten mittels der in Abschnitt \ref{sc:delay_reconstruction} beschriebenen \textit{Delay Reconstruction} für die in Abschnitt \ref{sc:experiments_general} beschriebenen Vektoren aufgestellt werden. Die über die Autokorrelation ermittelte zeitliche Verzögerung $\tau$ ist für beide Systeme in Tabelle \ref{tab:delay_reconstruction_tau} dargestellt.     
 
 \begin{table}[h]
 \centering
