@@ -50,6 +50,10 @@ def parse_arguments():
     else:
         direction = args.direction[0]
 
+    if direction.startswith("bocf"):
+        N = 128
+        ndata = 24999
+
     print("Prediction via: {0}".format(direction))
 parse_arguments()
 
@@ -64,8 +68,9 @@ def generate_data(N, trans, sample_rate, Ngrid):
             data = np.load("../../cache/barkley/raw/{0}_{1}.uv.dat.npy".format(N, Ngrid))
     elif direction in ["bocf_uv", "bocf_uw", "bocf_us"]:
         if not os.path.exists("../../cache/bocf/raw/{0}_{1}.uvws.dat.npy".format(N, Ngrid)):
-            data = bocfh.generate_uvws_data(N, 50000, 50, Ngrid=Ngrid)
-            np.save("../../cache/bocf/raw/{0}_{1}.uvws.dat.npy".format(N, Ngrid), data)
+            print("NO BOCF data set found. Please generate a chaotic data set manually.")
+            #data = bocfh.generate_uvws_data(N, 50000, 50, Ngrid=Ngrid)
+            #np.save("../../cache/bocf/raw/{0}_{1}.uvws.dat.npy".format(N, Ngrid), data)
         else:
             data = np.load("../../cache/bocf/raw/{0}_{1}.uvws.dat.npy".format(N, Ngrid))
     else:
