@@ -37,7 +37,7 @@ testLength = 2000
 trainLength = 15000
 
 def parse_arguments():
-    global id, predictionMode, direction
+    global id, predictionMode, direction, N, ndata
 
     id = int(os.getenv("SGE_TASK_ID", 0))
 
