@@ -52,7 +52,7 @@ def parse_arguments():
 
     if direction.startswith("bocf"):
         N = 128
-        ndata = 24999
+        ndata = 24998
 
     print("Prediction via: {0}".format(direction))
 parse_arguments()
