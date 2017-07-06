@@ -22,7 +22,7 @@ Die zeitliche Entwicklung der inneren Zustände kann, motiviert durch ein gewöh
 \begin{align}
 \vec{s}(n) = f_{in}\left( \mathbf{W_{in}} [b_{in}; \vec{u}(n)] + \mathbf{W} \vec{s}(n-1) \right).
 \end{align}
-bestimmt werden. Dabei ist $f_{in}$ eine beliebige (meistens \textit{sigmoid}-förmige) Transferfunktion, und $[\cdot\,;\,\cdot]$ das vertikale Aneinanderfügen von Vektoren beziehungsweise Matrizen bezeichnet. In dieser Arbeit wird die Tansferfunktion $f_{in} = \tanh(\cdot)$ genutzt.\\
+bestimmt werden. Dabei ist $f_{in}$ eine beliebige (meistens \textit{sigmoid}-förmige) Transferfunktion, und $[\cdot\,;\,\cdot]$ das vertikale Aneinanderfügen von Vektoren beziehungsweise Matrizen. In dieser Arbeit wird die Tansferfunktion $f_{in} = \tanh(\cdot)$ genutzt.\\
 
 Bessere Ergebnisse lassen sich durch das Abändern der Zustandsgleichung zu
 \begin{align}
@@ -39,7 +39,7 @@ Somit ergibt sich
 \end{align}
 als Zustandsgleichung. Solche Rückkopplungen werden meistens nur benutzt um autonom arbeitenden Modelle zu erzeugen. Da dies für die Anwendungen in dieser Arbeit nicht gewünscht ist, wird im Folgenden die Rückkopplungsmatrix weggelassen.\\
 
-Anhand der inneren Zustände lassen sich nun noch die sogenannten erweiterten inneren Zustände $x(n) = [b_{out}; \vec{s}(n); \vec{u}(n)] \in \mathbb{R}^{1 + N + N_u}$ definieren, wobei $b_{out}$ einen \textit{Bias} für die Ausgabe darstellt.\\
+Anhand der inneren Zustände lassen sich nun noch die sogenannten erweiterten inneren Zustände $\vec{x}(n) = [b_{out}; \vec{s}(n); \vec{u}(n)] \in \mathbb{R}^{1 + N + N_u}$ definieren, wobei $b_{out}$ einen \textit{Bias} für die Ausgabe darstellt.\\
 
 Aus diesen erweiterten inneren Zuständen kann nun die Ausgabe $\vec{y}(n)$ konstruiert werden. Dies kann entweder im Sinne einer Linearkombination durch die Ausgangsmatrix $\mathbf{W_{out}} \in \mathbb{R}^{ N_y \times (1 + N + N_u)}$ oder durch andere nicht lineare Regressionsalgorithmen wie beispielsweise einer \textsc{Support Vector Machine (SVM)} durchgeführt werden. Im Folgenden wird nur der Fall einer Linearkombination betrachtet, da sich für die anderen Methoden ein analoges Verfahren ergibt.
 In diesem Fall berechnet sich die Ausgabe mittels
@@ -82,19 +82,19 @@ Darauf basierend ist eine weitere hinreichende Bedingung
 hergeleitet worden. Wobei als Betrag der Matrix hier das elementweise Betragsnehmen gemeint ist. Diese Bedingung ist weniger einschränkend als Gleichung (\ref{eq:theory_old_requirement}) \cite{yildiz}.\\
 
 
-Weitergehend hat sich in Experimenten gezeigt, dass eine dünnbesetze Gewichtsmatrix $\mathbf{W}$ zu reicheren Dynamiken innerhalb des Reservoirs führen kann. Dabei werden in der Literatur oftmals mehr als $80\%$ der Einträge auf $0$ gesetzt \citep{jaeger2010}. Eine solche dünnbesetze Matrix bedeutet, dass nicht mehr jedes Neuron mit jedem anderen Neuron verbunden ist, sondern dass nur noch ein relativer Anteil $\epsilon$ dieser Verbindungen vorhanden ist. Da durch eine größere Anzahl an verschiedenen internen Dynamiken vielfältigere Funktionen besser approximiert werden können, kann die Vorhersagequalität durch einen Geringen $\epsilon$ Wert erhöht werden.\\
+Weitergehend hat sich in Experimenten gezeigt, dass eine dünnbesetze Gewichtsmatrix $\mathbf{W}$ zu reicheren Dynamiken innerhalb des Reservoirs führen kann. Dabei werden in der Literatur oftmals mehr als $80\%$ der Einträge auf $0$ gesetzt \citep{jaeger2010}. Eine solche dünnbesetze Matrix bedeutet, dass nicht mehr jedes Neuron mit jedem anderen Neuron verbunden ist, sondern dass nur noch ein relativer Anteil $\epsilon$ dieser Verbindungen vorhanden ist. Da durch eine größere Anzahl an verschiedenen internen Dynamiken vielfältigere Funktionen besser approximiert werden können, kann die Vorhersagequalität durch einen geringen $\epsilon$ Wert erhöht werden.\\
 
 Darauf basierend kann nun eine Methode nach \cite{yildiz} angegeben werden, um die Gewichtsmatrix $\mathbf{W}$ zu konstruieren:
 
 \singlespacing
 \begin{enumerate}
-	\item Generiere zufällige Matrix $\mathbf{W}$ mit $\mathbf{|W|} = \mathbf{W}$ bei der in jeder Zeile nur $\epsilon$ Einträge ungleich $0$ sind.
+	\item Generiere zufällige Matrix $\mathbf{W}$ mit $\mathbf{|W|} = \mathbf{W}$ bei der in jeder Zeile nur $\epsilon/N$ Einträge ungleich $0$ sind.
 	\item Skaliere $\mathbf{W}$, sodass Gleichung (\ref{eq:theory_sufficient_requirement}) erfüllt ist.
 	\item Wechsel zufällig das Vorzeichen von ungefähr der Hälfte aller Einträge.
 \end{enumerate}
 \onehalfspacing
 
-Statt dieser Vorschrift wurde zuvor oftmals $\mathbf{W}$ zufällig generiert und anschließend nur $\rho(\mathbf{W})$ statt $\rho(|\mathbf{W}|)$ skaliert, was mit unter zu instabilen Systemen geführt hat. Da allerdings auch für Systeme mit einem Spektralradius $ > 1$ die \textit{ESP} beobachtet werden kann für nicht verschwindende Eingänge $\vec{u}_n$, ist es ratsam auch effektive Spektralradien jenseits $1$ auszuprobieren.\\
+Statt dieser Vorschrift wurde zuvor oftmals $\mathbf{W}$ zufällig generiert und anschließend nur $\rho(\mathbf{W})$ statt $\rho(|\mathbf{W}|)$ skaliert, was mitunter zu instabilen Systemen geführt hat. Da allerdings auch für Systeme mit einem Spektralradius $ > 1$ die \textit{ESP} beobachtet werden kann für nicht verschwindende Eingänge $\vec{u}_n$, ist es ratsam auch effektive Spektralradien jenseits $1$ auszuprobieren.\\
 
 Zusätzlich zu diesen Eigenschaften wird die Dynamik des Reservoirs auch von dessen Größe $N$ bestimmt. Es kann gezeigt werden, dass die Gedächtnisleistung eines Reservoirs stark von dieser abhängt. Somit ist es ratsam für Aufgaben, die eine lange Gedächtnisleistung benötigen, ein großes und für Aufgaben, die nur ein Kurzzeitgedächtnis benötigten, ein kleines Reservoir zu benutzen. \citep{jeagerTut2002}. Bei einer zu kleine Wahl für $N$ kann das Reservoir nicht die volle Dynamik des eigentlichen Systems wiedergeben. Bei einer zu großen Wahl von $N$ kann das \textit{Overfitting} auftreten: Dabei generalisiert das \textsc{ESN} die tatsächliche Dynamik des Systems nicht stark genug, sodass zwar ein geringer Trainingsfehler aber ein deutlich höherer Testfehler erreicht wird \citep{jeagerTut2002}.
 
@@ -103,12 +103,12 @@ Zusätzlich zu diesen Eigenschaften wird die Dynamik des Reservoirs auch von des
 \subsection{Trainingsvorgang}
 Nachdem der Aufbau des Netzwerkes beschrieben ist, ergibt sich nun die Frage, wie der Trainingsvorgang durchgeführt wird.
 
-Hierfür wird für die Zeiten $n=0, ..., T_0$ das \textsc{ESN} mit dem Signal $\vec{u}(n)$ betrieben, wobei $T_0$ die \textit{transiente Zeit} beschreibt. Hierdurch soll das System aus seinem zufällig gewähltem Anfangszustand in einen charakteristischen Zustand übergehen. Anschließend wird das System für Zeiten $n < T + T_0$ weiter betrieben und die erweiterten Zustände $\vec{x}(n)$ als Spalten in der \textit{Zustandsmatrix} $\mathbf{X} \in \mathbb{R}^{(1 + N_u + N) \times T}$ gesammelt. Analog dazu werden die gewünschten Ausgaben $\vec{y}(n)$ nach dem Anwenden der Inversen $f^{-1}_{out}$ der Ausgabe-Transferfunktion $f_{out}$ auch als Spalten in der \textit{Ausgabematrix} $Y \in \mathbb{R}^{N_y \times T}$ gesammelt.
+Hierfür wird für die Zeiten $n=0, ..., T_0$ das \textsc{ESN} mit dem Signal $\vec{u}(n)$ betrieben, wobei $T_0$ die \textit{transiente Zeit} beschreibt. Hierdurch soll das System aus seinem zufällig gewähltem Anfangszustand in einen charakteristischen Zustand übergehen. Anschließend wird das System für Zeiten $n < T + T_0$ weiter betrieben und die erweiterten Zustände $\vec{x}(n)$ als Spalten in der \textit{Zustandsmatrix} $\mathbf{X} \in \mathbb{R}^{(1 + N_u + N) \times T}$ gesammelt. Analog dazu werden die gewünschten Ausgaben $\vec{y}(n)$ als Spalten in der \textit{Ausgabematrix} $Y \in \mathbb{R}^{N_y \times T}$ gesammelt.
 Nun wird eine Lösung der Gleichung
 \begin{align}
-\mathbf{Y} = \mathbf{W_{out}} \mathbf{X}
+\mathbf{Y} = f_{out} \left( \mathbf{W_{out}} \mathbf{X} \right) \Leftrightarrow f_{out}^{-1} \left( \mathbf{Y} \right) = \mathbf{W_{out}}\mathbf{X}
 \end{align}
-für $\mathbf{W}_{out}$ gesucht. Hierfür stehen mehrere Verfahren zur Verfügung, von denen zwei prominente erwähnt sein sollen.
+für $\mathbf{W}_{out}$ gesucht, wobei das Inverse $f^{-1}_{out}$ der Ausgabe-Transferfunktion $f_{out}$ elementweise angewendet wird. Hierfür stehen mehrere Verfahren zur Verfügung, von denen zwei prominente erwähnt sein sollen.
 Zum einen kann die Lösung durch eine \textit{Tikhonov Regularisierung} erhalten werden. Dabei wird die Kostenfunktion 
 \begin{align}
 \sum_n ||\vec{y}(n) - \mathbf{W_{out}}\vec{x}(n)||^2 + \beta \cdot \sum_i ||\vec{W}_{out, i}||^2
@@ -118,7 +118,7 @@ minimiert, welche aus der Summe der Fehlerquadrate und einem Gewichtsterm $\beta
 \label{eq:tikhonov}
 \mathbf{W}_{out} = \mathbf{Y} \mathbf{X}^T \left(\mathbf{X} \mathbf{X}^T + \beta I \right)^{-1}
 \end{align}
-ist sehr leistungsstark, sodass bei geeigneter Wahl von $\beta$ die besten Ergebnisse hinsichtlich der Genauigkeit der Vorsage erzielt werden können. Durch die Verwendung der Matrixinversion kann dieses Verfahren allerdings auch numerisch instabil werden \cite{lukoseviciusa2009}. Auf Grund der hohen Genauigkeit wird in dieser Arbeit nur dieses Lösungsverfahren verwendet. Die weiteren Lösungsansätze für das Gleichungssystem sind nur aus Gründen der Vollständigkeit angegeben.\\
+ist sehr leistungsstark, sodass bei geeigneter Wahl von $\beta$ die besten Ergebnisse hinsichtlich der Genauigkeit der Vorsage erzielt werden können. Durch die Verwendung der Matrixinversion kann dieses Verfahren allerdings auch numerisch instabil werden \cite{lukoseviciusa2009}. Trotzdem wird in dieser Arbeit auf Grund der hohen Genauigkeit nur dieses Lösungsverfahren verwendet. Die weiteren Lösungsansätze für das Gleichungssystem sind nur aus Gründen der Vollständigkeit angegeben.\\
 
 Zum anderen kann zur Lösung die \textit{Moore-Penrose-Pseudoinverse} $\mathbf{X}'$ genutzt werden, sodass für die Ausgabematrix
 \begin{align}
@@ -140,7 +140,7 @@ Zusammenfassend ergibt sich somit der folgende Funktionsablauf für die Anwendun
 	\item Einspeisen des Signals $\vec{u}(n)$ für Vorhersagen des Signales $\vec{y}(n)$ für $n > T + T_0$
 \end{enumerate}
 \onehalfspacing
-\end{minipage}
+\end{minipage}\\
 
 Dieser Ablauf ist schematisch in den Abbildungen \ref{fig:apx_esn_flowchart} und \ref{fig:apx_esn_training_flowchart} dargestellt.
 

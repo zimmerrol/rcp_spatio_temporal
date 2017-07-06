@@ -1,13 +1,13 @@
-\subsection{Delay Reconstruction}
+\subsection{Verzögerungskoordinanten}
 \label{sc:delay_reconstruction}
-Die \textit{Delay Reconstructions} (Verzögerung-Konstruktionen) können benutzt werden um Zeitreihen zu analysieren und den Phasenraum des ursprünglichen Systems zu rekonstruieren.
-Hierbei wird ein Signal $s(t)$ an diskreten Zeitpunkten betrachtet, sodass sich das diskrete Signal $s_n = s(n\Delta t)$ ergibt. Eine \textit{Delay Reconstruction} erzeugt hieraus ein Signal, in welchem die Informationen $\delta$ vorheriger Zeitpunkte mit dem Abstand $\tau$ enthalten sind. Somit wird eine höhere dimensionale Zeitreihe $\vec{z}_n \in \mathbf{R}^{\delta}$ durch
+Die \textit{Verzögerungskoordinaten} (Delay Coordinates) können benutzt werden um Zeitreihen zu analysieren und den Phasenraum des ursprünglichen Systems zu rekonstruieren.
+Hierbei wird ein Signal $s(t)$ an diskreten Zeitpunkten betrachtet, sodass sich das diskrete Signal $s_n = s(n\Delta t)$ ergibt. Eine solche Rekonstruktion erzeugt hieraus ein Signal, in welchem die Informationen $\delta$ vorheriger Zeitpunkte mit dem Abstand $\tau$ enthalten sind. Somit wird eine höhere dimensionale Zeitreihe $\vec{z}_n \in \mathbf{R}^{\delta}$ durch
 \begin{align}
 	\vec{z}_n = \left(s_{n-(\delta-1)\tau}, s_{n-(\delta-2)\tau}, \ldots ,s_n \right)
 \end{align} 
-konstruiert. Bei einer ausreichend hohen Wahl der Rekonstruktionsimension $m$ ist es hiermit möglich den Phasenraum des Attraktors zu rekonstruieren. Für die Wahl der Verzögerungszeit $\tau$ gibt es keine rigorose mathematische Definition oder Beschreibung, sondern es existieren verschiedene Ansätze zur Ermittlung des optimalen Wertes. Ein populärer Ansatz, welcher in dieser Arbeit verwendet besteht darin $\tau$ durch das Auffinden der ersten Nullstelle von der Autokorrelationsfunktion 
+konstruiert. Bei einer ausreichend hohen Wahl der Rekonstruktionsimension $m$ ist es hiermit möglich den Phasenraum des Attraktors zu rekonstruieren. Für die Wahl der Verzögerungszeit $\tau$ gibt es keine rigorose mathematische Definition oder Beschreibung, sondern es existieren verschiedene Ansätze zur Ermittlung des optimalen Wertes. Ein populärer Ansatz, welcher in dieser Arbeit verwendet wird, besteht darin $\tau$ durch das Auffinden der ersten Nullstelle der Autokorrelationsfunktion 
 \begin{align}
 AUC(\tau) = \sum_l^{N-\tau} (s_l-\bar{s})(s_{l+\tau}-\bar{s})
 \end{align}   
-zu ermitteln. Dies lässt sich dadurch motivieren, dass durch das hinzunehmen des Signals der Zeitreihe die um diesen Wert von $\tau$ verschoben ist, am meisten neue Information hinzugefügt wird, da die Selbstähnlichkeit des Signals am geringsten ist \citep[30\,ff.]{kantz2004nonlinear}.
-Die so konstruierte höherdimensionale Zeitreihe beinhaltet somit also nicht nur Informationen über den aktuellen Zustand des Systems, sondern auch über die unmittelbare Vergangenheit. Dadurch können diese rekonstruierten Datenpunkte auch genutzt werden um das Verhalten dynamischer Systeme vorherzusagen. Hierfür werden im Folgenden zwei Methoden eingeführt.
+zu ermitteln. Dies lässt sich dadurch motivieren, dass durch das Hinzunehmen von Signalen der Zeitreihe, die um diesen Wert $\tau$ verschoben sind, am meisten neue Information hinzugefügt wird, da die Selbstähnlichkeit des Signals am geringsten ist \citep[30\,ff.]{kantz2004nonlinear}.
+Die so konstruierte höherdimensionale Zeitreihe beinhaltet somit also nicht nur Informationen über den aktuellen Zustand des Systems, sondern auch über die unmittelbare Vergangenheit. Dadurch können diese rekonstruierten Datenpunkte auch genutzt werden, um das Verhalten dynamischer Systeme vorherzusagen. Hierfür werden im Folgenden zwei Methoden eingeführt.
