@@ -122,6 +122,36 @@
 
 \begin{figure}[h]
 	\centering
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[height=2.5in]{figures/results/inner_cross_prediction/mitchell_v_inner_original.pdf}
+		\setcapmargin[1cm]{0.5cm}
+		\caption{Echte Erregung des Modells}
+	\end{subfigure}%
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[height=2.5in]{figures/results/inner_cross_prediction/mitchell_v_inner_nn.pdf}
+		\setcapmargin[1cm]{0.5cm}
+  		\caption{Vorhersage des \textsc{NN}-Ansatzes}
+	\end{subfigure}
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[height=2.5in]{figures/results/inner_cross_prediction/mitchell_v_inner_rbf.pdf}
+		\setcapmargin[1cm]{0.5cm}
+  		\caption{Vorhersage des \textsc{RBF}-Ansatzes}
+	\end{subfigure}%
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[height=2.5in]{figures/results/inner_cross_prediction/mitchell_v_inner_esn.pdf}
+		\setcapmargin[1cm]{0.5cm}
+  		\caption{Vorhersage des \textsc{ESN}}
+	\end{subfigure}
+	\caption{Graphische Darstellung der $v$-Variable des \textit{Mitchell-Schaeffer}-Modells für den $1000$. Zeitschritt des Evaluationsdatensatzes. Oben links ist das tatsächliche Feld des Modells zu sehen. Danach folgenden in Leserichtung die Vorhersagen des \textsc{NN}-Ansatzes, des \textsc{RBF}-Ansatzes und des \textsc{ESN}.}
+	\label{fig:apx_inner_cross_mitchell_result}
+\end{figure} 
+
+\begin{figure}[h]
+	\centering
 	\begin{subfigure}{.95\textwidth}
 		\centering
 		\hspace*{0.18cm}
@@ -154,36 +184,6 @@
 	\caption{Darstellung der Abhängigkeit des benötigten Laufzeit (oben) und des \textit{MSE}s (unten) von der Anzahl der Basisfunktionen $l$ für das \textit{Mitchell-Schaeffer}-Modell bei der Verwendung radialer Basisfunktionen.}
 	\label{fig:apx_exp_cross_rbf_placements_time_mse_ms}
 \end{figure}
-
-\begin{figure}[h]
-	\centering
-	\begin{subfigure}{.5\textwidth}
-		\centering
-		\includegraphics[height=2.5in]{figures/results/inner_cross_prediction/mitchell_v_inner_original.pdf}
-		\setcapmargin[1cm]{0.5cm}
-		\caption{Echte Erregung des Modells}
-	\end{subfigure}%
-	\begin{subfigure}{.5\textwidth}
-		\centering
-		\includegraphics[height=2.5in]{figures/results/inner_cross_prediction/mitchell_v_inner_nn.pdf}
-		\setcapmargin[1cm]{0.5cm}
-  		\caption{Vorhersage des \textsc{NN}-Ansatzes}
-	\end{subfigure}
-	\begin{subfigure}{.5\textwidth}
-		\centering
-		\includegraphics[height=2.5in]{figures/results/inner_cross_prediction/mitchell_v_inner_rbf.pdf}
-		\setcapmargin[1cm]{0.5cm}
-  		\caption{Vorhersage des \textsc{RBF}-Ansatzes}
-	\end{subfigure}%
-	\begin{subfigure}{.5\textwidth}
-		\centering
-		\includegraphics[height=2.5in]{figures/results/inner_cross_prediction/mitchell_v_inner_esn.pdf}
-		\setcapmargin[1cm]{0.5cm}
-  		\caption{Vorhersage des \textsc{ESN}}
-	\end{subfigure}
-	\caption{Graphische Darstellung der $v$-Variable des \textit{Mitchell-Schaeffer}-Modells für den $1000$. Zeitschritt des Evaluationsdatensatzes. Oben links ist das tatsächliche Feld des Modells zu sehen. Danach folgenden in Leserichtung die Vorhersagen des \textsc{NN}-Ansatzes, des \textsc{RBF}-Ansatzes und des \textsc{ESN}.}
-	\label{fig:apx_inner_cross_mitchell_result}
-\end{figure} 
 
 \begin{figure}[h]
 	\centering
