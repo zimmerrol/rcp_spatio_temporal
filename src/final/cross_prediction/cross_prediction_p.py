@@ -27,8 +27,8 @@ def parse_arguments():
         cpmtp.prediction_mode = args.mode[0]
 
     if cpmtp.direction.startswith("bocf"):
-        cpmtp.N = 128
-        cpmtp.ndata = 24998
+        cpmtp.N = 150
+        cpmtp.ndata = 20000
 
     print("Prediction via {0}: {1}".format(cpmtp.prediction_mode, cpmtp.direction))
 

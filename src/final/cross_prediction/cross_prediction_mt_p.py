@@ -127,8 +127,8 @@ def generate_data(N, Ngrid):
     data[0] -= means_train[0]
     data[1] -= means_train[1]
 
-    shared_input_data[:] = data[0]
-    shared_output_data[:] = data[1]
+    shared_input_data[:ndata] = data[0]
+    shared_output_data[:ndata] = data[1]
 
 def prepare_predicter(y, x, training_data_in, training_data_out):
     if prediction_mode == "ESN":
