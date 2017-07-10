@@ -291,8 +291,10 @@ def mainFunction():
 
     shared_prediction = shared_prediction + means_train[1]
 
-    shared_prediction[shared_prediction < 0.0] = 0.0
-    shared_prediction[shared_prediction > 1.0] = 1.0
+
+    if not direction.startswith("bocf"):
+        shared_prediction[shared_prediction < 0.0] = 0.0
+        shared_prediction[shared_prediction > 1.0] = 1.0
 
     diff = (shared_output_data[trainLength:trainLength+predictionLength]-shared_prediction)
     mse_validation = np.mean((diff[:predictionLength-testLength])**2)
