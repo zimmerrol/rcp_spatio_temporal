@@ -28,6 +28,9 @@ if args.direction[0] not in ["vu", "uv", "hv", "vh", "bocf_uv", "bocf_uw", "bocf
 else:
     direction = args.direction[0]
 
+if direction.startswith("bocf"):
+    ndata = 20000
+
 if direction in ["uv", "vu"]:
     if not os.path.exists("../../cache/barkley/raw/{0}_{1}.uv.dat.npy".format(ndata, N)):
         data = bh.generate_uv_data(N, 50000, 5, Ngrid=N)
@@ -36,8 +39,7 @@ if direction in ["uv", "vu"]:
         data = np.load("../../cache/barkley/raw/{0}_{1}.uv.dat.npy".format(ndata, N))
 elif direction in ["bocf_uv", "bocf_uw", "bocf_us"]:
     if not os.path.exists("../../cache/bocf/raw/{0}_{1}.uvws.dat.npy".format(ndata, N)):
-        data = bocfh.generate_uvws_data(N, 50000, 50, Ngrid=N)
-        np.save("../../cache/bocf/raw/{0}_{1}.uvws.dat.npy".format(ndata, N), data)
+        print("NO BOCF data set found. Please generate a chaotic data set manually.")
     else:
         data = np.load("../../cache/bocf/raw/{0}_{1}.uvws.dat.npy".format(ndata, N))
 else:
