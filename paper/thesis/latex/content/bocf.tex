@@ -1,0 +1,39 @@
+\subsection{Bueno-Orovio-Cherry-Fenton-Modell}
+Ebenso wie die beiden vorherigen Modelle ist das \textit{Bueno-Orovio-Cherry-Fenton}-Modell (\textit{BOCF}-Modell) ebenso ein System aus gekoppelten partiellen Differentialgleichungen. Es ist ein sogenanntes \textit{minimales Modell} zur Beschreibung der Aktionspotentiale auf der Membran von Herzzellen. Dies bedeutet, dass nicht jeder einzelne Ionenstrom modelliert wird, sondern diese in 3 verschiedene Gruppen unterteilt und diese dann zusammen modelliert werden: Dabei werden sie in \textit{schnell hineinströmende}, \textit{langsam hineinströmende} und \textit{ausströmende} Ionen unterteilt. Dieses Vorgehen reduziert die Anzahl der benötigten Variablen des Systems sehr stark: Während andere Modelle auf Ionenebene zur Beschreibung der Aktionspotentiale viele Variablen besitzen, wie beispielsweise das \textit{Tuscher-Noble-Noble-Panfilov}-Modell (\textit{TNPP}-Modell) mit $17$ Variablen, benötigt das \textit{BOCF}-Modell nur $4$ Variablen - Dies senkt den benötigten Rechenaufwand. Gleichzeitig beinhaltet es $28$ Konstanten, welche die Form der Dynamik charakterisieren. Dadurch ist zum einen eine Anpassung an verschiedene experimentelle Messergebnisse möglich, zum anderen können allerdings auch die Ergebnisse andere bestehende Modelle reproduziert werden. Hierdurch kommt die Bezeichung des \textit{minimalen Modells} zustande \citep{Bueno-Orovio2008}.\\
+
+Die Dynamik wird durch die Gleichungen 
+\begin{align}
+\begin{aligned}
+\frac{\partial u}{\partial t} &= D \nabla^2 u + - (J_{si} + J_{fi} + J_{so})\\
+\frac{\partial v}{\partial t} &= (1-H(u-\theta_w))((v_\infty - v)/\tau_v^- - H(u-\theta_v)v/\tau_v^+ \\
+\frac{\partial w}{\partial t} &= (1-H(u-\theta_w))((v_\infty - w)/\tau_v^- - H(u-\theta_w)v/\tau_w^+ \\
+\frac{\partial s}{\partial t} &= ((1 + \tanh(k_s(u-u_s)))/2 - s)/\tau_s
+\end{aligned}
+\end{align}
+beschrieben. Die drei Ströme $J_{si}$, $J_{fi}$ und $J_{so}$ folgen den Gleichungen
+\begin{align}
+\begin{aligned}
+J_{si} &= -H(u-\theta_w)ws/\tau_{si} \\
+J_{fi} &= -vH(u-\theta_v)(u-\theta_v)(u_u - u)/\tau_{fi} \\
+J_{so} &= (u-u_o)(1-H(u-\theta_w))/\tau_o + H(u-\theta_w)/\tau_{so}.
+\end{aligned}
+\end{align}
+
+Dabei steht $H(x)$ für die \textit{Heaviside-Distribution}. Zusätzlich werden sieben spannungsabhängige Konstanten
+\begin{align}
+\begin{aligned}
+\tau_v^-   &= (1-H(u-\theta_v^-))\tau_{v1}^- + H(u-\theta_v^-)\tau_{v2}^- \\
+\tau_w^-   &= tau_{w1}^- + (\tau_{w2}^- - \tau_{w1}^-)(1+\tanh(k_w^-(u-t_w^-)))/2 \\
+\tau_{so}^- &= tau_{so1}^- + (\tau_{so2}^- - \tau_{so1}^-)(1+\tanh(k_{so}^-(u-t_{so})))/2 \\
+\tau_s^-    &= (1-H(u-\theta_w))\tau_{s1} + H(u-\theta_w)\tau_{s2} \\ 
+\tau_o^-    &= (1-H(u-\theta_o))\tau_{o1} + H(u-\theta_o)\tau_{o2} \\\\
+v_\infty &= \begin{cases}
+	1,& \text{wenn } u \leq \theta_v^-\\
+    0,& \text{wenn } u \geq \theta_v^-
+\end{cases} \\
+w_\infty &= (1-H(u-\theta_o))(1-u/\tau_{w\infty}) + H(u-\theta_o)w_\infty^*
+\end{aligned}
+\end{align}
+eingeführt. In diesem Modell beschreibt die Variable $u(t)$ die Membranspannung. Des Weiteren wird das Modell durch $28$ Konstanten. In dieser Arbeit wird der Satz von Konstanten genutzt, welcher das \textit{Tuscher-Noble-Noble-Panfilov}-Modell reproduziert. Die Konstanten sind in \ref{tab:apx_bocf_tnpp_constants} zu finden. Sie sind ausgewählt worden, weil mit ihnen eine chaotische Dynamik beobachteten werden kann \citep{Bueno-Orovio2008}.\\
+
+Die Differentialgleichungen sind erneut, wie zuvor auch im \textit{Barkley}- und im \textit{Mitchell-Schaeffer}-Modell diskretisiert und die gleichen Randbedingungen wie zuvor genutzt worden. Im Folgenden werden die Integrationskonstanten $\Delta x = 1.0, \Delta t = 0.1$ und die Diffusionskonstante $D = \num{2e-1}$ genutzt. Die raumzeitliche Dynamik des Systems ist in Form der $u$-Variable ebenfalls im Anhang in Abbildung \ref{fig:apx_bocf_evolution} dargestellt.\\

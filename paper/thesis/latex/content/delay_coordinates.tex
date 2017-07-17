@@ -1,11 +1,11 @@
 \subsection{Verzögerungskoordinanten}
 \label{sc:delay_reconstruction}
 Die \textit{Verzögerungskoordinaten} (Delay Coordinates) können benutzt werden um Zeitreihen zu analysieren und den Phasenraum des ursprünglichen Systems zu rekonstruieren.
-Hierbei wird ein Signal $s(t)$ an diskreten Zeitpunkten betrachtet, sodass sich das diskrete Signal $s_n = s(n\Delta t)$ ergibt. Eine solche Rekonstruktion erzeugt hieraus ein Signal, in welchem die Informationen $\delta$ vorheriger Zeitpunkte mit dem Abstand $\tau$ enthalten sind. Somit wird eine höhere dimensionale Zeitreihe $\vec{z}_n \in \mathbf{R}^{\delta}$ durch
+Hierbei wird ein Signal $s(t)$ an diskreten Zeitpunkten betrachtet, sodass sich das diskrete Signal $s_n = s(n\Delta t)$ ergibt. Eine solche Rekonstruktion erzeugt hieraus ein Signal, in welchem die Informationen $\delta$ vorheriger Zeitpunkte mit dem Abstand $\tau$ enthalten sind. Somit wird eine höherdimensionale Zeitreihe $\vec{z}_n \in \mathbf{R}^{\delta}$ durch
 \begin{align}
 	\vec{z}_n = \left(s_{n-(\delta-1)\tau}, s_{n-(\delta-2)\tau}, \ldots ,s_n \right)
 \end{align} 
-konstruiert. Bei einer ausreichend hohen Wahl der Rekonstruktionsimension $m$ ist es hiermit möglich den Phasenraum des Attraktors zu rekonstruieren. Für die Wahl der Verzögerungszeit $\tau$ gibt es keine rigorose mathematische Definition oder Beschreibung, sondern es existieren verschiedene Ansätze zur Ermittlung des optimalen Wertes. Ein populärer Ansatz, welcher in dieser Arbeit verwendet wird, besteht darin $\tau$ durch das Auffinden der ersten Nullstelle der Autokorrelationsfunktion 
+konstruiert \citep[35\,ff.]{kantz2004nonlinear}. Bei einer ausreichend hohen Wahl der Rekonstruktionsdimension $m$ ist es hiermit möglich den Phasenraum des Attraktors zu rekonstruieren. Für die Wahl der Verzögerungszeit $\tau$ gibt es keine rigorose mathematische Definition oder Beschreibung, sondern es existieren verschiedene Ansätze zur Ermittlung des optimalen Wertes. Ein populärer Ansatz, welcher in dieser Arbeit verwendet wird, besteht darin, $\tau$ durch das Auffinden der ersten Nullstelle der Autokorrelationsfunktion 
 \begin{align}
 AUC(\tau) = \sum_l^{N-\tau} (s_l-\bar{s})(s_{l+\tau}-\bar{s})
 \end{align}   
