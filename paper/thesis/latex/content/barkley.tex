@@ -1,5 +1,5 @@
 \subsection{Barkley-Modell}
-Das \textit{Barkley}-Modell, welches 1990 von Dwight Barkley vorgestellt wurde, ist ein System aus gekoppelten Reaktionsdiffusionsgleichungen. Dies sind partielle Differentialgleichungen (\textit{PDE}) zweiter Ordnung welche einen Diffusionsterm besitzen. Das \textit{Barkley}-Modell beschreibt ein erregbares und oszillierendes Medium. Das Modell besteht aus zwei Variablen $u(t)$, $v(t)$ die den  \textit{PDEs}
+Das \textit{Barkley}-Modell, welches 1990 von Dwight Barkley vorgestellt wurde, ist ein System aus gekoppelten Reaktionsdiffusionsgleichungen. Dies sind partielle Differentialgleichungen (\textit{PDE}) zweiter Ordnung, welche einen Diffusionsterm besitzen. Das \textit{Barkley}-Modell beschreibt ein erregbares und oszillierendes Medium. Das Modell besteht aus zwei Variablen $u(t)$, $v(t)$ die den  \textit{PDEs}
 \begin{equation}
 \begin{gathered}
 \frac{\partial u}{\partial t} = D \cdot \nabla^2 u + \frac{1}{\epsilon} (1-u) \left(u-\frac{v+b}{a}\right)\\
@@ -13,11 +13,11 @@ a &= 0.8,\\ b &= 0.01,\\ \epsilon &= 0.02
 \end{align*}
 festgelegt.\\
 Zudem wird das Modell in dieser Arbeit in zwei Dimensionen betrachtet, sodass $u(t, x,y)$ und $v(t, x,y)$ skalare zeitabhängige Felder sind.\\
-Zur Simulation des Systems werden zunächst die \textit{PDE}s zeitlich mit einem Zeitschritt $\Delta t$ und örtlich mit einer Gitterkonstante $\Delta x$ diskretisiert. Zur Beschreibung des Diffusionstermes wird eine Fünf-Punkte Methode
+Die \textit{PDE}s werden zunächst zur Simulation des Systems zeitlich mit einem Zeitschritt $\Delta t$ und örtlich mit einer Gitterkonstante $\Delta x$ diskretisiert. Zur Beschreibung des Diffusionstermes wird eine Fünf-Punkte Methode
 \begin{align}
 \nabla^2 u(t)_{i,j} \simeq \frac{u(t)_{i-1, j} + u(t)_{i+1,j} + u(t)_{i,j-1} + u(t)_{i,j+1} - 4 u(t)_{i,j}}{\Delta x^2} \eqdef \Sigma(t)_{i,j}
 \end{align} 
-nach \citep{Barkley:2008} verwendet. Dabei stehen die tiefergestellten Indizes für den diskretisierten Ort der \textit{x-y-Ebene}.
+nach \citep{Barkley:2008} verwendet. Die tiefergestellten Indizes stehen für den diskretisierten Ort der \textit{x-y-Ebene}.
 Für kleine Zeitschritte $\Delta t$ ist ein \textit{explizites Eulerverfahren}
 \begin{equation}
 \begin{gathered}
@@ -33,4 +33,4 @@ mit
 \frac{\partial v}{\partial t}_{i,j} = u(t)_{i,j}^3-v(t)_{i,j}
 \end{gathered}
 \end{equation}
-ausreichend genau. Dabei werden \textit{Neumann}-Randbedingungen genutzt, sodass die senkrechte Komponente der räumlichen Ableitung an den Rändern des Feldes verschwindet. Im Folgenden wird zudem, in Analogie zu \citep{berg2011synchronization}, die Diffusionskonstante auf $D = 1/25$, die Gitterkonstante auf $\Delta x = 0.1$ und die Zeitkonstante auf $\Delta t = 0.01$ gesetzt. Die raumzeitliche Dynamik des Systems ist in Form der $u$-Variable im Anhang in Abbildung \ref{fig:apx_barkley_evolution} dargestellt.
+ausreichend genau. Hierbei werden \textit{Neumann}-Randbedingungen genutzt, sodass die senkrechte Komponente der räumlichen Ableitung an den Rändern des Feldes verschwindet. Im Folgenden wird zudem, in Analogie zu \citep{berg2011synchronization}, die Diffusionskonstante auf $D = 1/25$, die Gitterkonstante auf $\Delta x = 0.1$ und die Zeitkonstante auf $\Delta t = 0.01$ gesetzt. Die raumzeitliche Dynamik des Systems ist in Form der $u$-Variable im Anhang in Abbildung \ref{fig:apx_barkley_evolution} dargestellt.

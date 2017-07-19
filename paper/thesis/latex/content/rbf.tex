@@ -1,5 +1,5 @@
 \subsection{Radiale Basisfunktionen}
-Eine weitere Methode um einen funktionalen Zusammenhang $F : X \rightarrow Y$ zu finden, welcher Daten der Menge $X \in \mathbb{R}^n$ auf Elemente aus $Y \in \mathbb{R}^m$ eindeutig abbildet, bieten die \textit{radialen Basisfunktionen} (im Folgenden als \textsc{RBF} abgekürzt) an. Auch hierfür werden Daten benötigt, anhand derer der Zusammenhang erlernt werden kann. Diese Trainingsdaten sollen im Folgenden aus $N$ Datensätzen bestehen.\\
+Eine weitere Methode um einen funktionalen Zusammenhang $F : X \rightarrow Y$ zu finden, welcher Daten der Menge $X \in \mathbb{R}^n$ auf Elemente aus $Y \in \mathbb{R}^m$ eindeutig abbildet, bieten die \textit{radialen Basisfunktionen} (im Folgenden als \textsc{RBF} abgekürzt) an. Auch dafür werden Daten benötigt, anhand derer der Zusammenhang erlernt werden kann. Diese Trainingsdaten sollen im Folgenden aus $N$ Datensätzen bestehen.\\
 
 Bei diesem Ansatz wird die gesuchte Funktion $F$ als Linearkombination aus vielen radialen Funktionen approximiert. Dafür werden $l$ Elemente $\{\vec{x}_i\}, i=1,...,l$ aus den Trainingsdaten ausgewählt und diese als so genannte \textit{Zentren} $\{\vec{z}_i\}$ genutzt. Hiermit lassen sich die Funktionen als $\phi_i(\vec{x}) = \phi(||\vec{x}-\vec{z}_i||), i=1,\ldots ,l$ darstellen \citep{lowe2multi}. Eine mögliche Wahl der Basisfunktionen sind zum Beispiel Gaußfunktionen
 \begin{align*}
@@ -11,7 +11,7 @@ Die Linearkombination führt zu dem Ansatz
 \label{eq:rbf_lincomb}
 \vec{y} = F(\vec{x}) = \sum^l_{i=1} \vec{\omega}_i \phi(||\vec{x} - \vec{z}_i||).
 \end{align}
-Die $\vec{\omega}_i \in \mathbb{R}^m$ stehen hierbei für die \textit{Gewichtsvektoren} der einzelnen Basisfunktionen $\phi_i$ im Rahmen der Linearkombination.\\
+Die $\vec{\omega}_i \in \mathbb{R}^m$ stehen hier für die \textit{Gewichtsvektoren} der einzelnen Basisfunktionen $\phi_i$ im Rahmen der Linearkombination.\\
 
 Das Ziel besteht jetzt darin die Gewichtsvektoren $\omega_i$ approximativ zu bestimmen. Dafür werden zunächst drei Matrizen definiert, durch die das Problem ausgedrückt werden kann.\\
 Die Matrix $\mathbf{Y} \in \mathbb{R}^{N \times m}$ repräsentiert die Funktionswerte der Abbildung und beinhaltet als Zeilen die $N$ verschiedenen Funktionswerte $\vec{y}_i$ der Trainingsdaten
@@ -42,12 +42,12 @@ A_{N1} & \ldots  & A_{Nm} \\
 \end{pmatrix},
 \end{align}
 wobei die einzelnen Elemente als $A_{ij} \defeq \phi(|| \vec{x}_i - \vec{y}_j ||)$ definiert sind.\\
-Damit lässt sich das Problem durch
+Das Problem lässt sich somit durch
 \begin{align}
 \mathbf{Y} = \mathbf{A} \cdot \mathbf{\Omega}
 \end{align}
 ausdrücken \citep{lowe2multi}. Da die Matrizen $\mathbf{Y}$ und $\mathbf{A}$ konstruiert sind, besteht die Aufgabe lediglich darin die Matrix $\mathbf{\Omega}$ der Gewichte zu ermitteln. Der naheliegende Ansatz, das direkte ermitteln der Inversen $\mathbf{A}^{-1}$ stellt sich dafür aus ungeeignet heraus, da das Problem meistens überkonditioniert ist und die Matrix nicht quadratisch ist, wodurch keine Inverse gefunden werden kann. Stattdessen ist es geschickter, das Problem als eine lineare Optimierungsaufgabe zu betrachten, bei der der Fehler $||\mathbf{A} \omega_i - \vec{y}_i||^2$ minimiert werden soll.\\
-Durch die Verwendung der \textit{Moore-Penrose Pseudoinversen} $\mathbf{A}'$ wird hierbei zugleich gewährleistet, dass die Lösung ausgewählt wird, die zudem auch die kleinsten Gewichte besitzt. Dies hilft den Effekt des \textit{Overfittings} zu verringern \cite{lowe2multi}. Das \textit{Overfitting} beschreibt den Effekt, dass das Vorhersage-Modell zu stark auf die Trainingsdaten angepasst ist, und das Verhalten nicht stark genug generalisiert. Dies ist an einem (deutlich) höheren Test- als Trainingsfehler zu erkennen.\\
+Durch die Verwendung der \textit{Moore-Penrose Pseudoinversen} $\mathbf{A}'$ wird zugleich gewährleistet, dass die Lösung ausgewählt wird, die zudem auch die kleinsten Gewichte besitzt. Dies hilft den Effekt des \textit{Overfittings} zu verringern \cite{lowe2multi}. Das \textit{Overfitting} beschreibt den Effekt, dass das Vorhersage-Modell zu stark auf die Trainingsdaten angepasst ist, und das Verhalten nicht stark genug generalisiert. Dies ist an einem (deutlich) höheren Test- als Trainingsfehler zu erkennen.\\
 
 Mit diesem Ansatz ergibt sich die Lösung zu
 \begin{align}

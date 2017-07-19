@@ -1,6 +1,6 @@
 \section{Echo State Network}
 \label{sc:esn}
-Um die zuvor erwähnten Probleme der \textsc{RNN} zu umgehen, wurden als mögliche Lösung die \textsc{Echo State Networks} von H. Jäger vorgeschlagen \cite{jaeger2010}. Etwa zeitgleich wurde von W. Maas das Modell der \textit{Liquid State Machines} vorgeschlagen. In diesem Modell steht der biologische Hintergrund im Fokus, doch sind die Ergebnisse denen der \textit{Echo State Networks} (\textsc{ESN}) sehr ähnlich \citep{Maass2011}. 
+Um die zuvor erwähnten Probleme der \textsc{RNN} zu umgehen, wurden als mögliche Lösung die \textsc{Echo State Networks} von H. Jäger vorgeschlagen \cite{jaeger2010}. Etwa zeitgleich wurde von W. Maas das Modell der \textit{Liquid State Machines} entwickelt. In diesem Modell steht der biologische Hintergrund im Fokus, doch sind die Ergebnisse denen der \textit{Echo State Networks} (\textsc{ESN}) sehr ähnlich \citep{Maass2011}. 
 
 \subsection{Aufbau}
 \label{sec:esn_structure}
@@ -37,11 +37,11 @@ Somit ergibt sich
 \label{eq:esn_stateeq_feedback}
 \vec{s}(n) = (1 - \alpha) \cdot \vec{s}(n-1) + \alpha \cdot f_{in}\left( \mathbf{W_{in}} [b_{in}; \vec{u}(n)] + \mathbf{W} \vec{s}(n-1) + \mathbf{W_{fb}} \vec{y}(n) \right)
 \end{align}
-als Zustandsgleichung. Solche Rückkopplungen werden meistens nur benutzt, um autonom arbeitenden Modelle zu erzeugen. Da dies für die Anwendungen in dieser Arbeit nicht gewünscht ist, wird im Folgenden die Rückkopplungsmatrix weggelassen.\\
+als Zustandsgleichung. Solche Rückkopplungen werden meist nur benutzt, um autonom arbeitende Modelle zu erzeugen. Da dies für die Anwendungen in dieser Arbeit nicht gewünscht ist, wird im Folgenden die Rückkopplungsmatrix weggelassen.\\
 
 Anhand der inneren Zustände lassen sich nun noch die sogenannten erweiterten inneren Zustände $\vec{x}(n) = [b_{out}; \vec{s}(n); \vec{u}(n)] \in \mathbb{R}^{1 + N + N_u}$ definieren, wobei $b_{out}$ einen \textit{Bias} für die Ausgabe darstellt.\\
 
-Aus diesen erweiterten inneren Zuständen kann nun die Ausgabe $\vec{y}(n)$ konstruiert werden. Dies kann entweder im Sinne einer Linearkombination durch die Ausgangsmatrix $\mathbf{W_{out}} \in \mathbb{R}^{ N_y \times (1 + N + N_u)}$ oder durch andere nicht lineare Regressionsalgorithmen wie beispielsweise einer \textsc{Support Vector Machine (SVM)} durchgeführt werden. Im Folgenden wird nur der Fall einer Linearkombination betrachtet, da sich für die anderen Methoden ein analoges Verfahren ergibt.
+Aus diesen erweiterten inneren Zuständen kann nun die Ausgabe $\vec{y}(n)$ konstruiert werden. Dies kann entweder im Sinne einer Linearkombination durch die Ausgangsmatrix $\mathbf{W_{out}} \in \mathbb{R}^{ N_y \times (1 + N + N_u)}$ oder durch andere nicht lineare Regressionsalgorithmen, wie beispielsweise einer \textsc{Support Vector Machine (SVM)}, durchgeführt werden. Im Folgenden wird nur der Fall einer Linearkombination betrachtet, da sich für die anderen Methoden ein analoges Verfahren ergibt.
 In diesem Fall berechnet sich die Ausgabe mittels
 \begin{align}
 \vec{y}(n) = f_{out} \left( \mathbf{W_{out}} \vec{x}(n) \right) = f_{out} \left(\mathbf{W_{out}} [b_{out}; \vec{s}(n); \vec{u}(n)] \right),
@@ -61,7 +61,7 @@ Sei $E : S \times U \rightarrow S$ ein \textsc{ESN} für den Zustandsraum $S$ un
 \begin{definition}[Echo State Eigenschaft (ESP)]
 Ein \textsc{ESN} $E : S \times U \rightarrow S$ besitzt die \textit{Echo State Eigenschaft} genau dann wenn eine Nullfolge $(\delta(n))_{n \geq 0}$ existiert, sodass für alle Paare von Zustandsfolgen $(\vec{s}(n))_n, (\vec{s}\,'(n))_n$, die kompatibel mit der Eingangsfolge $(\vec{u}(n))_n$ sind, gilt, dass $\forall n \geq 0 : ||\vec{s}(n) - \vec{s}\,'(n)|| < \delta_n$
 \end{definition} 
-Das Vorliegen der \textit{ESP} bedeutet anschaulich, dass nachdem das Netzwerk lange genug betrieben worden ist, der Zustand nicht mehr von dem beliebig gewähltem Anfangszustand abhängt. Stattdessen wird ein für das Signal und Netzwerk charakteristischer Zustand angenommen. Diese Eigenschaft ist notwendig, damit das \textsc{ESN} Vorhersagen treffen kann \cite{jeagerTut2002}.\\
+Das Vorliegen der \textit{ESP} bedeutet anschaulich, dass nachdem das Netzwerk lange genug betrieben worden ist, der Zustand nicht mehr von dem beliebig gewählten Anfangszustand abhängt. Stattdessen wird ein für das Signal und Netzwerk charakteristischer Zustand angenommen. Diese Eigenschaft ist notwendig, damit das \textsc{ESN} Vorhersagen treffen kann \cite{jeagerTut2002}.\\
 
 Nun stellt sich die Frage, wann ein Netzwerk diese Eigenschaft besitzt. Da die Gewichtsmatrix $\mathbf{W}$ die internen Verbindungen beschreibt und somit einen sehr starken Einfluss auf die Dynamik hat, ist anzunehmen, dass die Eigenschaft hauptsächlich durch die Gewichtsmatrix $\mathbf{W}$ bestimmt wird.\\
 
@@ -79,12 +79,12 @@ Darauf basierend ist eine weitere hinreichende Bedingung
 \label{eq:theory_sufficient_requirement}
 \rho(\alpha |\mathbf{W}|+(1-\alpha) \mathbf{I}) < 1
 \end{align}
-hergeleitet worden. Wobei als Betrag der Matrix hier das elementweise Betragsnehmen gemeint ist. Diese Bedingung ist weniger einschränkend als Gleichung (\ref{eq:theory_old_requirement}) \cite{yildiz}.\\
+hergeleitet worden. Wobei als Betrag der Matrix hier das elementweise Betragsnehmen gemeint ist. Diese Bedingung ist weniger einschränkend als die Gleichung (\ref{eq:theory_old_requirement}) \cite{yildiz}.\\
 
 
 Weitergehend hat sich in Experimenten gezeigt, dass eine dünnbesetze Gewichtsmatrix $\mathbf{W}$ zu reicheren Dynamiken innerhalb des Reservoirs führen kann. Dabei werden in der Literatur oftmals mehr als $80\%$ der Einträge auf $0$ gesetzt \citep{jaeger2010}. Eine solche dünnbesetze Matrix bedeutet, dass nicht mehr jedes Neuron mit jedem anderen Neuron verbunden ist, sondern dass nur noch ein relativer Anteil $\epsilon$ dieser Verbindungen vorhanden ist. Da durch eine größere Anzahl an verschiedenen internen Dynamiken vielfältigere Funktionen besser approximiert werden können, kann die Vorhersagequalität durch einen geringen $\epsilon$ Wert erhöht werden.\\
 
-Darauf basierend kann nun eine Methode nach \cite{yildiz} angegeben werden, um die Gewichtsmatrix $\mathbf{W}$ zu konstruieren:
+Auf diesen Erkenntnissen basierend kann nun eine Methode nach \cite{yildiz} angegeben werden, um die Gewichtsmatrix $\mathbf{W}$ zu konstruieren:
 
 \singlespacing
 \begin{enumerate}
@@ -94,9 +94,9 @@ Darauf basierend kann nun eine Methode nach \cite{yildiz} angegeben werden, um d
 \end{enumerate}
 \onehalfspacing
 
-Statt dieser Vorschrift wurde zuvor oftmals $\mathbf{W}$ zufällig generiert und anschließend nur $\rho(\mathbf{W})$ statt $\rho(|\mathbf{W}|)$ skaliert, was mitunter zu instabilen Systemen geführt hat. Da allerdings auch für Systeme mit einem Spektralradius $ > 1$ die \textit{ESP} für nicht verschwindende Eingänge $\vec{u}_n$ beobachtet werden kann, ist es ratsam auch effektive Spektralradien jenseits von $1$ auszuprobieren.\\
+Statt dieser Vorschrift wurde zuvor oftmals $\mathbf{W}$ zufällig generiert und anschließend nur $\rho(\mathbf{W})$ statt $\rho(|\mathbf{W}|)$ skaliert, was mitunter zu instabilen Systemen geführt hat. Da allerdings die \textit{ESP} auch für Systeme mit einem Spektralradius $ > 1$ für nicht verschwindende Eingänge $\vec{u}_n$ beobachtet werden kann, ist es ratsam auch effektive Spektralradien jenseits von $1$ auszuprobieren.\\
 
-Zusätzlich zu diesen Eigenschaften wird die Dynamik des Reservoirs auch von dessen Größe $N$ bestimmt. Es kann gezeigt werden, dass die Gedächtnisleistung eines Reservoirs stark von dieser abhängt. Somit ist es ratsam für Aufgaben, die eine lange Gedächtnisleistung benötigen, ein großes und für Aufgaben, die nur ein Kurzzeitgedächtnis benötigten, ein kleines Reservoir zu benutzen \citep{jeagerTut2002}. Bei einer zu kleine Wahl für $N$ kann das Reservoir nicht die volle Dynamik des eigentlichen Systems wiedergeben. Bei einer zu großen Wahl von $N$ kann das \textit{Overfitting} auftreten: Dabei generalisiert das \textsc{ESN} die tatsächliche Dynamik des Systems nicht stark genug, sodass zwar ein geringer Trainingsfehler aber ein deutlich höherer Testfehler erreicht wird \citep{jeagerTut2002}.
+Zusätzlich zu diesen Eigenschaften wird die Dynamik des Reservoirs auch von dessen Größe $N$ bestimmt. Es kann gezeigt werden, dass die Gedächtnisleistung eines Reservoirs stark von dieser abhängt. Somit ist es ratsam für Aufgaben, die eine lange Gedächtnisleistung benötigen, ein großes und für Aufgaben, die nur ein Kurzzeitgedächtnis benötigten, ein kleines Reservoir zu benutzen \citep{jeagerTut2002}. Bei einer zu kleinen Wahl für $N$ kann das Reservoir nicht die volle Dynamik des eigentlichen Systems wiedergeben. Bei einer zu großen Wahl von $N$ kann das \textit{Overfitting} auftreten: Dabei generalisiert das \textsc{ESN} die tatsächliche Dynamik des Systems nicht stark genug, sodass zwar ein geringer Trainingsfehler aber ein deutlich höherer Testfehler erreicht wird \citep{jeagerTut2002}.
 
 \improvement{Write something about runtime complexity?} 
 
@@ -108,7 +108,7 @@ Nun wird eine Lösung der Gleichung
 \begin{align}
 \mathbf{Y} = f_{out} \left( \mathbf{W_{out}} \mathbf{X} \right) \Leftrightarrow f_{out}^{-1} \left( \mathbf{Y} \right) = \mathbf{W_{out}}\mathbf{X}
 \end{align}
-für $\mathbf{W}_{out}$ gesucht, wobei das Inverse $f^{-1}_{out}$ der Ausgabe-Transferfunktion $f_{out}$ elementweise angewendet wird. Hierfür stehen mehrere Verfahren zur Verfügung, von denen zwei prominente erwähnt sein sollen.
+für $\mathbf{W}_{out}$ gesucht, wobei das Inverse $f^{-1}_{out}$ der Ausgabe-Transferfunktion $f_{out}$ elementweise angewendet wird. Hierfür stehen mehrere Verfahren zur Verfügung, von denen zwei prominente folgend erwähnt werden.\\
 Zum einen kann die Lösung durch eine \textit{Tikhonov-Regularisierung} erhalten werden. Dabei wird die Kostenfunktion 
 \begin{align}
 \sum_n ||\vec{y}(n) - \mathbf{W_{out}}\vec{x}(n)||^2 + \beta \cdot \sum_i ||\vec{W}_{out, i}||^2
@@ -125,9 +125,9 @@ Zum anderen kann zur Lösung die \textit{Moore-Penrose-Pseudoinverse} $\mathbf{X
 \label{eq:pseudo_inverse}
 \mathbf{W_{out}} = \mathbf{Y} \mathbf{X}'
 \end{align}
-folgt. Dieses Verfahren ist zwar sehr rechenaufwendig aber dafür numerisch stabil \cite{lukoseviciusa2009, jaeger2012}. Nichts desto trotz, kann allerdings auf Grund des Fehlens einer Regularisierung leicht der Effekt des \textit{Overfittings} auftreten, wodurch die Qualität der Vorhersage sinkt. Auf Grund dessen wird es in dieser Arbeit nicht verwendet.\\
+folgt. Dieses Verfahren ist zwar sehr rechenaufwendig aber dafür numerisch stabil \cite{lukoseviciusa2009, jaeger2012}. Nichts desto trotz, kann jedoch auf Grund des Fehlens einer Regularisierung leicht der Effekt des \textit{Overfittings} auftreten, wodurch die Qualität der Vorhersage sinkt. Auf Grund dessen wird es in dieser Arbeit nicht verwendet.\\
 
-Um das \textit{Overfitting} bei der Verwendung der Psuedoinversen zu reduzieren, kann in der Zustandsgleichung (\ref{eq:esn_stateeq}) beziehungsweise (\ref{eq:esn_stateeq_feedback}) eine leichte normalverteilte Störung $\vec{\nu}(n)$ addiert werden. Falls die \textit{Tikhonov Regularisierung} zur Lösung verwendet wird, erhöht die Verwendung der zufälligen Störung die Stabilität der Vorhersage des Systems. Dieser Ansatz beruht auf Empirie, da eine mathematische Begründung hierfür noch nicht vollständig gelungen ist \citep{jaeger2010, lukoseviciusa2009}. Anschaulich lässt sich das Vorgehen dadurch motivieren, dass hierdurch künstliche Datenpunkte in der Nähe der vorhandenen Trainingsdaten emuliert werden und somit eine größere Vielfalt an Daten während der Trainingsphase beobachtet wird.\\
+Um das \textit{Overfitting} bei der Verwendung der Psuedoinversen zu reduzieren, kann in der Zustandsgleichung (\ref{eq:esn_stateeq}) (beziehungsweise (\ref{eq:esn_stateeq_feedback})) eine leichte normalverteilte Störung $\vec{\nu}(n)$ addiert werden. Wenn die \textit{Tikhonov Regularisierung} zur Lösung verwendet wird, erhöht die Verwendung der zufälligen Störung die Stabilität der Vorhersage des Systems. Dieser Ansatz beruht auf Empirie, da eine mathematische Begründung hierfür noch nicht vollständig gelungen ist \citep{jaeger2010, lukoseviciusa2009}. Anschaulich lässt sich das Vorgehen dadurch motivieren, dass hierdurch künstliche Datenpunkte in der Nähe der vorhandenen Trainingsdaten emuliert werden und somit eine größere Vielfalt an Daten während der Trainingsphase beobachtet wird.\\
 
 \hspace{-0.5cm}
 \begin{minipage}{\textwidth}

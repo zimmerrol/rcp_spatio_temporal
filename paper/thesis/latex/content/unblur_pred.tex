@@ -1,7 +1,7 @@
 \clearpage
 \section{Vorhersage der Dynamik durch das Fernfeld}
 \label{sec:exp_unblur}
-Bei der Durchführung von in vitro Experimenten mit Herzen gibt es verschiedene Möglichkeiten, die Messung der elektrischen Erregung auf der Herzoberfläche durchzuführen. Zum einen können Elektroden zur Messung benutzt werden, zum anderen allerdings auch Fluoreszenzmessungen durchgeführt werden. Bei der Verwendung von Elektroden wird effektiv nicht das unmittelbare elektrische Feld auf der Herzoberfläche sondern ein Fernfeld dessen gemessen. Es stellt sich nun die Frage, ob aus der Kenntnis dieses Fernfeldes die korrekte Erregung auf der Oberfläche bestimmt werden kann. Eine experimentelle Untersuchung dieser Fragestellung wird im Folgenden durchgeführt. Hierfür müssen zuerst diese Fernfeldaufnahmen für das \textit{Barkley}- und für das \textit{Mitchell-Schaeffer}-Modell erzeugt werden. Dabei wird das Fernfeld nicht korrekt simuliert, sondern durch eine gaußsche Unschärfe nachgebildet. Dazu wird auf das gesamte Feld der Spannungsvariable beider Modelle eine solche Unschärfe mit einer Breite $\sigma_{Blur} = 8.0$ mittels einer Faltung angewendet. Eine exemplarische Darstellung des emulierten Fernfeldes und des tatsächlichen Feldes ist in Abbildungen \ref{fig:exp_unblur_barkley} und \ref{fig:exp_unblur_mitchell_schaeffer} zu finden.
+Bei der Durchführung von in vitro Experimenten mit Herzen gibt es verschiedene Möglichkeiten, die Messung der elektrischen Erregung auf der Herzoberfläche durchzuführen. Zum einen können Elektroden zur Messung benutzt werden, zum anderen können auch Fluoreszenzmessungen durchgeführt werden. Bei der Verwendung von Elektroden wird effektiv nicht das unmittelbare elektrische Feld auf der Herzoberfläche sondern ein Fernfeld dessen gemessen. Es stellt sich nun die Frage, ob aus der Kenntnis dieses Fernfeldes die korrekte Erregung auf der Oberfläche bestimmt werden kann. Eine experimentelle Untersuchung dieser Fragestellung wird im Folgenden durchgeführt. Hierfür müssen zuerst diese Fernfeldaufnahmen für das \textit{Barkley}- und für das \textit{Mitchell-Schaeffer}-Modell erzeugt werden. Das Fernfeld wird dabei nicht korrekt simuliert, sondern durch eine gaußsche Unschärfe nachgebildet. Im Folge dessen wird auf das gesamte Feld der Spannungsvariable beider Modelle eine solche Unschärfe mit einer Breite $\sigma_{Blur} = 8.0$ mittels einer Faltung angewendet. Eine exemplarische Darstellung des emulierten Fernfeldes und des tatsächlichen Feldes ist in Abbildungen \ref{fig:exp_unblur_barkley} und \ref{fig:exp_unblur_mitchell_schaeffer} zu finden.
 
 \begin{figure}[h]
 	\centering
@@ -45,7 +45,7 @@ Bei der Durchführung von in vitro Experimenten mit Herzen gibt es verschiedene 
 
 \FloatBarrier
 \subsection{Nächste Nachbar Vorhersage}
-Zuerst wird diese Aufgabe erneut mit dem \textsc{NN}-Ansatz betrachtet. Die besten gefundenen Hyperparameter dafür sind in Tabelle \ref{tab:exp_unblur_nn_results} aufgelistet. Bemerkenswert ist erneut die geringe Laufzeit dieses Ansatzes. Dies wird durch die verhältnismäßig geringe Dimensionalität des Eingabevektors begünstigt. Allerdings sind die Fehlerwerte sehr hoch, sodass die Vorhersage kaum besser ist als eine Schätzung mit dem Mittelwert als Vorhersage, wie an dem NRMSE $\approx 1.0$ zu erkennen ist.
+Zuerst wird diese Aufgabe erneut mit dem \textsc{NN}-Ansatz betrachtet. Die besten gefundenen Hyperparameter dafür sind in Tabelle \ref{tab:exp_unblur_nn_results} aufgelistet. Bemerkenswert ist erneut die geringe Laufzeit dieses Ansatzes. Dies wird durch die verhältnismäßig geringe Dimensionalität des Eingabevektors begünstigt. Allerdings sind die Fehlerwerte sehr hoch, sodass die Vorhersage nur geringfügig besser ist als eine Schätzung mit dem Mittelwert als Vorhersage, wie an dem NRMSE $\approx 1.0$ ersichtlich ist.
 
 \begin{table}[h]
 	\centering
@@ -71,7 +71,7 @@ Zuerst wird diese Aufgabe erneut mit dem \textsc{NN}-Ansatz betrachtet. Die best
 
 \FloatBarrier
 \subsection{Radiale Basisfunktionen}
-Als Nächstes sind nun die radialen Basisfunktionen ebenfalls auf das Problem angewendet worden. Die dabei gefundenen Hyperparameter sind in Tabelle \ref{tab:exp_unblur_rbf_results} präsentiert. Dabei sind die optimalen Werte für $\sigma$ und $\Delta \sigma$ nicht mit denen des \textsc{NN}-Ansatzes identisch.
+Im Folgenden sind nun die radialen Basisfunktionen ebenfalls auf das Problem angewendet worden. Die dabei gefundenen Hyperparameter sind in Tabelle \ref{tab:exp_unblur_rbf_results} präsentiert. Die optimalen Werte für $\sigma$ und $\Delta \sigma$ sind nicht mit denen des \textsc{NN}-Ansatzes identisch.
 
 \begin{table}[h]
 	\centering
@@ -96,7 +96,7 @@ Als Nächstes sind nun die radialen Basisfunktionen ebenfalls auf das Problem an
 
 \FloatBarrier
 \subsection{Echo State Network}
-Nachdem die klassischen Methoden bereits auf dieses Problem angewendet worden sind, kann das Problem mittels der \textsc{ESN}s erneut betrachtet werden. Hierfür sind die verwendeten Hyperparameter erneut nach Abschnitt \ref{sec:exp_general_esn} gesucht worden. Die Ergebnisse sind in Tabelle \ref{tab:exp_unblur_esn_results} zu finden. Auffällig ist hierbei, dass die optimale Größe $N$ des Reservoirs für beide Modelle unter der maximal betrachteten Größe $N \leq 400$ liegt. Dies kann ein Anzeichen dafür sein, dass für das Bewältigen der Aufgabe kein ausgeprägtes Langzeitgedächtnis vorhanden sein muss, da diese nach Abschnitt \ref{sc:esn} mit der Größe $N$ des Reservoirs skaliert. 
+Nachdem die klassischen Methoden bereits auf dieses Problem angewendet worden sind, kann es mittels der \textsc{ESN}s erneut betrachtet werden. Hierfür sind die verwendeten Hyperparameter erneut nach Abschnitt \ref{sec:exp_general_esn} gesucht worden. Die Ergebnisse sind in Tabelle \ref{tab:exp_unblur_esn_results} zu finden. Auffällig ist hierbei, dass die optimale Größe $N$ des Reservoirs für beide Modelle unter der maximal betrachteten Größe $N \leq 400$ liegt. Dies kann ein Anzeichen dafür sein, dass für das Bewältigen der Aufgabe kein ausgeprägtes Langzeitgedächtnis vorhanden sein muss, da diese nach Abschnitt \ref{sc:esn} mit der Größe $N$ des Reservoirs skaliert. 
 \improvement{Add more details on:long time memory vs N dependency in theory.}
 
 \begin{table}[h]
@@ -125,8 +125,8 @@ Nachdem die klassischen Methoden bereits auf dieses Problem angewendet worden si
 
 \FloatBarrier
 \subsection{Vergleich}
-Zusammenfassend können nun die Ergebnisse der drei Ansätze erneut verglichen werden. Eine vergleichende Übersicht ist in Tabelle \ref{tab:exp_unblur_comparison_results} zu finden. Dort ist erneut zu bemerken, dass die \textsc{ESN}s die geringsten Fehlerwerte erzeugen, doch der \textsc{NN}-Ansatz deutlich schneller berechnet werden kann.\\
-Zusätzlich zu der Tabelle ist noch ein exemplarischer grafischer Vergleich der Resultate der drei Ansätze mit dem Ziel in Abbildung \ref{fig:exp_unblur_barkley_result} dargestellt. Dort fällt auf, dass die Vorhersage des \textsc{NN}-Ansatzes sogar die Struktur der Dynamik kaum korrekt auflöst. Im Vergleich dazu ist die Vorhersage des \textsc{RBF}-Ansatzes und des \textsc{ESN} deutlich feiner und beinhaltet die Makrostruktur der Dynamik. Des Weiteren ist zu bemerken, dass diese mit dem \textsc{ESN} etwas feiner aufgelöst worden ist, als mit \textsc{RBF}-Ansatz. Zwar stimmen hier auch nicht die feinen Details der Dynamik mit dem Original überein, doch ist eine starke Verbesserung im Vergleich zu dem nachgebildeten Fernfeld zu bemerken. Unter Umständen wäre es für zukünftige Arbeiten bei dieser Aufgabe angebracht, eine andere Fehlermetrik als die mittlere quadratische Abweichung zu benutzen, welche die Ähnlichkeit zwischen den Strukturen der Felder stärker berücksichtigt. 
+Zusammenfassend können nun die Ergebnisse der drei Ansätze abermals verglichen werden. Eine vergleichende Übersicht darüber ist in Tabelle \ref{tab:exp_unblur_comparison_results} zu finden. AUch dazu lässt sich erneut sagen, dass die \textsc{ESN}s die geringsten Fehlerwerte erzeugen, doch der \textsc{NN}-Ansatz deutlich schneller berechnet werden kann.\\
+Zusätzlich zu der Tabelle ist noch ein exemplarischer grafischer Vergleich der Resultate der drei Ansätze mit der Zielvariable in Abbildung \ref{fig:exp_unblur_barkley_result} dargestellt. Dort fällt auf, dass die Vorhersage des \textsc{NN}-Ansatzes sogar die Struktur der Dynamik kaum korrekt auflöst. Im Vergleich dazu ist die Vorhersage des \textsc{RBF}-Ansatzes und des \textsc{ESN} deutlich feiner und beinhaltet die Makrostruktur der Dynamik. Des Weiteren ist zu bemerken, dass diese mit dem \textsc{ESN} etwas feiner aufgelöst worden ist, als mit \textsc{RBF}-Ansatz. Zwar stimmen hier auch nicht die feinen Details der Dynamik mit dem Original überein, jedoch ist eine starke Verbesserung im Vergleich zu dem nachgebildeten Fernfeld zu bemerken. Unter Umständen wäre es für zukünftige Arbeiten bei dieser Aufgabe angebracht, eine andere Fehlermetrik als die mittlere quadratische Abweichung zu benutzen, welche die Ähnlichkeit zwischen den Strukturen der Felder stärker berücksichtigt. 
 
 \begin{figure}[h]
 	\centering
@@ -178,7 +178,7 @@ Zusätzlich zu der Tabelle ist noch ein exemplarischer grafischer Vergleich der 
 		NRMSE 			& 0.8308		& 0.5170	& \textbf{0.4048} 	& 0.9737		& 0.7052 	& \textbf{0.6234} \\
 		\hline 
 	\end{tabular} 
-	\caption{Vergleich der benötigten Laufzeit und des erreichten Fehlers der drei Ansätze für das \textit{Mitchell-Schaeffer}- und das \textit{Barkley}-Modell, welche zu den geringsten Fehlern führen.}
+	\caption{Vergleich der benötigten Laufzeit und des erreichten Fehlers der drei Ansätze für das \textit{Mitchell-Schaeffer}- und das \textit{Barkley}-Modell, die zu den geringsten Fehlern führen.}
 	\label{tab:exp_unblur_comparison_results}
 \end{table}
 

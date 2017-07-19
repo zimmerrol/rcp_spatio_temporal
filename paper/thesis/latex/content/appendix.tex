@@ -264,17 +264,17 @@ nach \cite{jaeger2010} vorgeführt. Hierfür wird die Distanz der \textit{$l^2$-
 &:= \lambda ||\vec{s}(n)-\vec{s'}(n)||
 \end{align*}
 
-Dabei ist in Schritt $\mathrm{(a)}$ die Dreiecksungleichung verwendet worden. Da $f_{in}$ eine \textit{sigmoid}-förmige Funktion ist, gilt zudem $f'_{in}(x) < 1 \forall x$; dies wird in Schritt $\mathrm{(b)}$ ausgenutzt. Zudem wird in Schritt $\mathrm{(c)}$ die Beziehung
+Dabei ist in Schritt $\mathrm{(a)}$ die Dreiecksungleichung verwendet worden. Da $f_{in}$ eine \textit{sigmoid}-förmige Funktion ist, gilt zudem $f'_{in}(x) < 1,\, \forall x$; dies wird in Schritt $\mathrm{(b)}$ benutzt. Zudem wird in Schritt $\mathrm{(c)}$ die Beziehung
 \begin{align*}
 ||\mathbf{A} \vec{x}|| \leq \sigma_{max}\left(\mathbf{A} \right) ||\vec{x}||
 \end{align*}
 zwischen dem maximalen Sprektralwert $\sigma_{max}$ der Matrix $\mathbf{A}$ und der \textit{$l^2$-Norm} ausgenutzt.\\
 
-Gilt nun $\lambda < 1$, so nähern sich die beiden Zustandsfolgen immer näher aneinander an, bis sie schließlich gegeneinander konvergieren. Das bedeutet, dass es eine Nullfolge $(\delta(n))_n$ gibt, für die $||\vec{s}(n) - \vec{s}\,'(n)|| < \delta(n)$; somit liegt die \textit{ESP} vor. Dies bedeutet, dass der beliebig gewählte Anfangszustand des \textsc{ESN}s $\vec{s}(0)$ beziehungsweise $\vec{s}\,'(0)$ nach einer ausreichenden Zeit keinen Einfluss mehr auf die Dynamik des Systems nimmt.
+Gilt nun $\lambda < 1$, so nähern sich die beiden Zustandsfolgen immer weiter aneinander an, bis sie schließlich gegeneinander konvergieren. Das bedeutet, dass es eine Nullfolge $(\delta(n))_n$ gibt, für die $||\vec{s}(n) - \vec{s}\,'(n)|| < \delta(n)$ gilt; somit liegt die \textit{ESP} vor. Folglich nimmt der beliebig gewählte Anfangszustand des \textsc{ESN}s $\vec{s}(0)$ (beziehungsweise $\vec{s}\,'(0)$) nach einer ausreichenden Zeit keinen Einfluss mehr auf die Dynamik des Systems.
 
 \section{Laufzeitanalyse}
 \label{sc:apx_runtime_complexity}
-Im Folgenden soll die theoretische Laufzeitkomplexität $T$ des Trainings und Vorhersagevorgangs eines \textsc{ESN}s unter Veränderung von $N$ betrachtet und hergeleitet werden.
+Im Folgenden wird die theoretische Laufzeitkomplexität $T$ des Trainings und Vorhersagevorgangs eines \textsc{ESN}s unter Veränderung von $N$ betrachtet und hergeleitet.
 Zuerst werden die Abkürzungen
 \begin{align*}
 \beta = T-T_{0} \qquad\qquad\qquad \gamma = 1+N_u+N
@@ -289,11 +289,11 @@ T\left((\mathbf{X}\mathbf{X}^T+\beta \mathbf{I})^{-1} \right) = \mathcal{O}(\gam
 T\left(\mathbf{Y_{target}}\mathbf{X}^T \right) = \mathcal{O}(N_y \beta \gamma).
 \end{align*}
 Somit ergibt sich für das Bestimmen der Auslesematrix $\mathbf{W_{out}}$ eine Laufzeit $\mathcal{O}(\gamma^2 \beta + \gamma^{3} + \beta \gamma N_y) = \mathcal{O}(\gamma^{3})$  für $N_u < N$.
-Insgesamt ergibt sich der Aufwand des Trainingsvorgangs somit inklusive der Berechnung der Zustandsgleichung zu $\mathcal{O}(N^2 + N^{3}) = \mathcal{O}(N^{3})$\\
+Insgesamt beträgt der Aufwand des Trainingsvorgangs somit inklusive der Berechnung der Zustandsgleichung zu $\mathcal{O}(N^2 + N^{3}) = \mathcal{O}(N^{3})$\\
 
 Der Vorhersagevorgang besteht jeweils aus Berechnungen der Zustandsgleichung und der  Berechnung der Ausgabe $\vec{y} = \mathbf{W_{out}} \vec{x}$. Hierbei ergibt sich analog die Laufzeitkomplexität zu $\mathcal{O}(N^2)$.\\
 
-Bei dieser Betrachtung sind noch nicht die auftretenden Laufzeiten durch das Initialisieren der Matrizen im Speicher und das Berechnen des Spektralradius zur Reskalierung von $\mathbf{W}$ berücksichtigt. 
+Die auftretenden Laufzeiten durch das Initialisieren der Matrizen im Speicher und das Berechnen des Spektralradius zur Reskalierung von $\mathbf{W}$ sind bei dieser Betrachtung noch nicht berücksichtigt.
 
 \chapter{Programmüberblick}
 
@@ -307,7 +307,7 @@ Bei dieser Betrachtung sind noch nicht die auftretenden Laufzeiten durch das Ini
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=0.9\textwidth]{figures/illustrations/esn_training_flow_chart.pdf}
-  	\caption{Ablauf des Trainingsvorgangs des \textsc{ESN}s. Zuerst wird die Zeitreihe der Trainingsdaten in zwei Zeitreihen unterteilt. Der erste Teil wird benutzt um das \textit{transiente} Verhalten des Reservoirs abzuwarten, wohingegen der Rest benutzt wird, um die Auslesematrix $\mathbf{W_{out}}$ zu bestimmen.}
+  	\caption{Ablauf des Trainingsvorgangs des \textsc{ESN}s. Zuerst wird die Zeitreihe der Trainingsdaten in zwei Zeitreihen unterteilt. Der erste Teil der Zeitreihe wird benutzt, um das \textit{transiente} Verhalten des Reservoirs abzuwarten, wohingegen der Rest benutzt wird, um die Auslesematrix $\mathbf{W_{out}}$ zu bestimmen.}
   	\label{fig:apx_esn_training_flowchart}
 \end{figure}%
 
