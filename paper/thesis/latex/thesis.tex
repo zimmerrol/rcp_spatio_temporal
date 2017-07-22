@@ -40,10 +40,10 @@
 \usepackage[pdftex,dvipsnames]{xcolor}  % Coloured text etc.
 % 
 \usepackage[colorinlistoftodos,prependcaption,textsize=tiny]{todonotes}
-\newcommandx{\unsure}[2][1=]{\todo[linecolor=red,backgroundcolor=red!25,bordercolor=red,#1]{#2}}
-\newcommandx{\change}[2][1=]{\todo[linecolor=blue,backgroundcolor=blue!25,bordercolor=blue,#1]{#2}}
-\newcommandx{\info}[2][1=]{\todo[linecolor=OliveGreen,backgroundcolor=OliveGreen!25,bordercolor=OliveGreen,#1]{#2}}
-\newcommandx{\improvement}[2][1=]{\todo[linecolor=Plum,backgroundcolor=Plum!25,bordercolor=Plum,#1]{#2}}
+\newcommandx{\unsure}[2][1=]{} %{\todo[linecolor=red,backgroundcolor=red!25,bordercolor=red,#1]{#2}}
+\newcommandx{\change}[2][1=]{} %{\todo[linecolor=blue,backgroundcolor=blue!25,bordercolor=blue,#1]{#2}}
+\newcommandx{\info}[2][1=]{} %{\todo[linecolor=OliveGreen,backgroundcolor=OliveGreen!25,bordercolor=OliveGreen,#1]{#2}}
+\newcommandx{\improvement}[2][1=]{} %\todo[linecolor=Plum,backgroundcolor=Plum!25,bordercolor=Plum,#1]{#2}}
 
 
 \usepackage[toc,page]{appendix}
@@ -106,6 +106,8 @@
             bookmarksopen=true,     % aufgeklappte Bookmarks
             bookmarksnumbered=true  % Kapitelnummerierung in bookmarks
             ]{hyperref}
+
+\setlength{\parindent}{0cm}
 
 %% Weiter benoetigte Pakete: datenumber
 %% Falls dieses Paket nicht in der Installation vorhanden ist,
@@ -180,6 +182,6 @@
 %% benutzten Mittel
 \Declaration
 
-\listoftodos[Notes]
+%\listoftodos[Notes]
 
 \end{document}

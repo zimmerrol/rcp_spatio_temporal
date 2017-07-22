@@ -34,8 +34,8 @@ Die meisten, auf zellulärer Ebene aufgestellten, Gleichungen haben eine hohe Ko
 Analog zu der Betrachtung des \textit{Barkley}-Modells sind für die numerische Betrachtung die beiden \textit{PDE}s erneut in einem expliziten Verfahren mittels
 \begin{equation}
 \begin{gathered}
-\frac{\partial v}{\partial t}_{i,j} = D \cdot \Sigma(t)_{i,j} + \frac{h(t)_{i,j} v(t)_{i,j}^2(1-v(t)_{i,j})}{\tau_{in}} - \frac{v(t)_{i,j}}{\tau_{out}}\\
-\frac{\partial h}{\partial t}_{i,j} = \begin{cases}
+\frac{\partial v_{i,j}{\partial t}} = D \cdot \Sigma(t)_{i,j} + \frac{h(t)_{i,j} v(t)_{i,j}^2(1-v(t)_{i,j})}{\tau_{in}} - \frac{v(t)_{i,j}}{\tau_{out}}\\
+\frac{\partial h_{i,j}}{\partial t} = \begin{cases}
 	\frac{1-h(t)_{i,j}}{\tau_{open}},& \text{wenn } v(t)_{i,j} \leq v_{gate}\\
     \frac{-h(t)_{i,j}}{\tau_{close}},& \text{wenn } v(t)_{i,j} \geq v_{gate}
 \end{cases}

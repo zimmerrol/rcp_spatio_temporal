@@ -45,7 +45,7 @@ Bei der Durchführung von in vitro Experimenten mit Herzen gibt es verschiedene 
 
 \FloatBarrier
 \subsection{Nächste Nachbar Vorhersage}
-Zuerst wird diese Aufgabe erneut mit dem \textsc{NN}-Ansatz betrachtet. Die besten gefundenen Hyperparameter dafür sind in Tabelle \ref{tab:exp_unblur_nn_results} aufgelistet. Bemerkenswert ist erneut die geringe Laufzeit dieses Ansatzes. Dies wird durch die verhältnismäßig geringe Dimensionalität des Eingabevektors begünstigt. Allerdings sind die Fehlerwerte sehr hoch, sodass die Vorhersage nur geringfügig besser ist als eine Schätzung mit dem Mittelwert als Vorhersage, wie an dem NRMSE $\approx 1.0$ ersichtlich ist.
+Zuerst wird diese Aufgabe erneut mit dem \textsc{NN}-Ansatz betrachtet. Die besten gefundenen Hyperparameter dafür sind in Tabelle \ref{tab:exp_unblur_nn_results} aufgelistet. Bemerkenswert ist erneut die geringe Gesamtlaufzeit dieses Ansatzes. Dies wird durch die verhältnismäßig geringe Dimensionalität des Eingabevektors begünstigt. Allerdings sind die Fehlerwerte sehr hoch, sodass die Vorhersage nur geringfügig besser ist als eine Schätzung mit dem Mittelwert als Vorhersage, wie an dem NRMSE $\approx 1.0$ ersichtlich ist.
 
 \begin{table}[h]
 	\centering
@@ -125,7 +125,7 @@ Nachdem die klassischen Methoden bereits auf dieses Problem angewendet worden si
 
 \FloatBarrier
 \subsection{Vergleich}
-Zusammenfassend können nun die Ergebnisse der drei Ansätze abermals verglichen werden. Eine vergleichende Übersicht darüber ist in Tabelle \ref{tab:exp_unblur_comparison_results} zu finden. AUch dazu lässt sich erneut sagen, dass die \textsc{ESN}s die geringsten Fehlerwerte erzeugen, doch der \textsc{NN}-Ansatz deutlich schneller berechnet werden kann.\\
+Zusammenfassend können nun die Ergebnisse der drei Ansätze abermals verglichen werden. Eine vergleichende Übersicht darüber ist in Tabelle \ref{tab:exp_unblur_comparison_results} zu finden. Auch dazu lässt sich erneut sagen, dass die \textsc{ESN}s die geringsten Fehlerwerte erzeugen, doch der \textsc{NN}-Ansatz deutlich schneller berechnet werden kann, sofern sowohl die Laufzeit der Trainings- als auch der Vorhersagephase berücksichtigt werden.\\
 Zusätzlich zu der Tabelle ist noch ein exemplarischer grafischer Vergleich der Resultate der drei Ansätze mit der Zielvariable in Abbildung \ref{fig:exp_unblur_barkley_result} dargestellt. Dort fällt auf, dass die Vorhersage des \textsc{NN}-Ansatzes sogar die Struktur der Dynamik kaum korrekt auflöst. Im Vergleich dazu ist die Vorhersage des \textsc{RBF}-Ansatzes und des \textsc{ESN} deutlich feiner und beinhaltet die Makrostruktur der Dynamik. Des Weiteren ist zu bemerken, dass diese mit dem \textsc{ESN} etwas feiner aufgelöst worden ist, als mit \textsc{RBF}-Ansatz. Zwar stimmen hier auch nicht die feinen Details der Dynamik mit dem Original überein, jedoch ist eine starke Verbesserung im Vergleich zu dem nachgebildeten Fernfeld zu bemerken. Unter Umständen wäre es für zukünftige Arbeiten bei dieser Aufgabe angebracht, eine andere Fehlermetrik als die mittlere quadratische Abweichung zu benutzen, welche die Ähnlichkeit zwischen den Strukturen der Felder stärker berücksichtigt. 
 
 \begin{figure}[h]

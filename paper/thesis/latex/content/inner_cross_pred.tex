@@ -32,7 +32,7 @@ Für die letzte Aufgabe ist zuerst der \textsc{NN}-Ansatz getestet worden. Es is
 \begin{align*}
 (a+2b)^2-a^2 = 4b^2+4ab
 \end{align*}
-skaliert. Da zudem die Rechenzeit für diesen Ansatz nach \ref{sc:theory_nn} für wachsende Dimensionen sehr stark zunimmt, kann diese Aufgabe für große Abmessungen des vorherzusagendenen Bereiches nicht mehr in einer angebrachten Zeit berechnet werden.
+skaliert. Diese Dimensionalität wird mit der Dimension der Verzögerungskoordinaten noch vervielfacht, wie bereits in Kapitel \ref{sec:experiments_general_classical} beschrieben. Da zudem die Rechenzeit für diesen Ansatz nach \ref{sc:theory_nn} für wachsende Dimensionen sehr stark zunimmt, kann diese Aufgabe für große Abmessungen des vorherzusagendenen Bereiches nicht mehr in einer angebrachten Zeit berechnet werden.
 Die optimalen gefundenen Hyperparameter und die damit erreichten Ergebnisse sind in Tabelle \ref{tab:exp_inner_cross_nn_results} aufgelistet.
 
 \begin{table}[h]
@@ -120,7 +120,6 @@ Analog zu den vorherigen Ausführungen sind die radialen Basisfunktionen ebenfal
 
 Es ist anzumerken, dass der NRMSE für beide Modelle und alle betrachteten Größen $a$ kleiner als $1.0$ bleibt. Nichtsdestotrotz steigt er ebenfalls mit wachsendem $a$ an, wie auch schon bei den nächsten Nachbarn. Für die größten beiden $a$-Werte ist in beiden Modellen der Fehler allerdings schon so groß, dass die Vorhersage kaum nützliche Informationen liefert.
 
-\FloatBarrier
 \subsection{Echo State Network}
 Im Gegensatz zu den anderen beiden Methoden wächst die benötigte Rechenzeit bei der Verwendung der \textsc{ESN}s nicht so schnell an. Folglich können hiermit auch deutlich größere innere Felder betrachtet werden. Zur Optimierung des Ansatzes ist erneut das in Abschnitt \ref{sec:exp_general_esn} beschriebene Verfahren durchgeführt worden. Es ist allerdings so modifiziert worden, dass bei der groben Hyperparameterbestimmung des \textsc{ESN} vier Punkte, statt wie zuvor ein Punkt, des inneren Quadrates betrachtet worden sind.\\
 
@@ -170,18 +169,7 @@ In Tabelle \ref{tab:exp_inner_cross_esn_results} sind die Fehler und benötigten
 
 Es ist anzunehmen, dass für die Vorhersage eines Punktes der weit von den bekannten Randwerten entfernt liegt, nicht nur sein vorheriger Wert und die aktuellen Randwerte benötigt werden. Vielmehr werden die vergangenen Randwerte einen starken Einfluss nehmen. Dies kann anhand eines Beispiels schnell deutlich gemacht werden: Würde eine ebene Welle durch das Feld propagieren, so können weit entfernte Punkte erst deutlich nachdem die Welle durch die Ränder hindurch gelaufen ist, hiervon beeinflusst werden. Somit benötigt das System eine ausgeprägte Gedächtnisleistung. Bei den \textsc{ESN}s skaliert nach \ref{sc:esn} die Gedächtnisleistung mit der Größe $N$ des Netzwerkes. Es wäre also anzunehmen, dass möglichst große Reservoirs eine optimale Leistung erzielen können. Dies kann experimentell nicht bestätigt werden. So erzielen zwar teilweise die größtmöglichen Reservoirs ($N=400$) die besten Ergebnisse, doch gibt es auch Werte für $a$, bei denen kleinere Reservoirs ($N=50$) besser arbeiten.\\
 
-\begin{figure}[h]
-	\centering
-	\includegraphics[height=2.5in]{figures/results/inner_cross_prediction/inner_errors.pdf}
-	\setcapmargin[1cm]{0.5cm}
-	\caption{Graphische Darstellung der Abhängigkeit des MSE für die Vorhersage der $u$-Variable des \textit{Barkley}-Modells vom Abstand zum Rand. In Blau ist die Abhängigkeit für das \textsc{ESN}s mit starker und in Orange für das mit schwacher Regularisierung dargestellt.}
-	\label{fig:exp_inner_cross_barkley_esn_error_dependency_comparison}
-\end{figure} 
-
-Um den Einfluss der Regularisierung hervorzuheben, sind in Abbildung \ref{fig:exp_inner_cross_barkley_esn_comparison} die Vorhersagen des optimalen Reservoir mit der hohen Regularisierung ($\lambda=\num{5e4}$) und eines zuvor ermittelten Reservoirs mit einer geringeren Regularisierung ($\lambda=0.05$) exemplarisch für das \textit{Barkley}-Modell dargestellt. Im Falle der starken Regularisierung ist die Vorhersage stark verschwommen und so wird beinahe der Mittelwert der Erregung anstelle der feineren Strukturen vorhergesagt. Dagegen wird bei der geringeren Regularisierung eine feinere Struktur bestimmt. \improvement{Add details?}
-Zudem ist in Abbildung \ref{fig:exp_inner_cross_barkley_esn_error_dependency_comparison} die Abhängigkeit des mittleren quadratischen Fehlers für jene beiden Reservoirs dargestellt. Dabei ist zu erkennen, dass für geringe Abstände die Vorhersage mit der kleinen Regularisierung deutlich kleinere Fehler verursacht, wohingegen ab einem Abstand von fünf Gitterpunkten eine stärkere Regularisierung geringere Fehler erzeugt. Des Weiteren scheint der Fehler dabei schnell gegen eine obere Schranke zu konvergieren. Dies lässt sich damit vereinbaren, dass dieses Reservoir hauptsächlich noch den Mittelwert der Dynamik vorhersagt.
-
-\begin{figure}[h]
+\begin{figure}[H]
 	\centering
 	\begin{subfigure}{.5\textwidth}
 		\centering
@@ -199,6 +187,22 @@ Zudem ist in Abbildung \ref{fig:exp_inner_cross_barkley_esn_error_dependency_com
 	\label{fig:exp_inner_cross_barkley_esn_comparison}
 \end{figure} 
 
+
+
+Um den Einfluss der Regularisierung hervorzuheben, sind in Abbildung \ref{fig:exp_inner_cross_barkley_esn_comparison} die Vorhersagen des optimalen Reservoirs mit der hohen Regularisierung ($\lambda=\num{5e4}$) und eines zuvor ermittelten Reservoirs mit einer geringeren Regularisierung ($\lambda=0.05$) exemplarisch für das \textit{Barkley}-Modell dargestellt.
+Im Falle der starken Regularisierung ist die Vorhersage stark verschwommen und so wird beinahe der Mittelwert der Erregung anstelle der feineren Strukturen vorhergesagt. Dagegen wird bei der geringeren Regularisierung eine feinere Struktur bestimmt. \improvement{Add details?}
+Zudem ist in Abbildung \ref{fig:exp_inner_cross_barkley_esn_error_dependency_comparison} die Abhängigkeit des mittleren quadratischen Fehlers für jene beiden Reservoirs dargestellt. Dabei ist zu erkennen, dass für geringe Abstände die Vorhersage mit der kleinen Regularisierung deutlich kleinere Fehler verursacht, wohingegen ab einem Abstand von fünf Gitterpunkten eine stärkere Regularisierung geringere Fehler erzeugt. Des Weiteren scheint der Fehler dabei schnell gegen eine obere Schranke zu konvergieren. Dies lässt sich damit vereinbaren, dass dieses Reservoir hauptsächlich noch den Mittelwert der Dynamik vorhersagt.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[height=3.5in]{figures/results/inner_cross_prediction/inner_errors.pdf}
+	\setcapmargin[1cm]{0.5cm}
+	\caption{Graphische Darstellung der Abhängigkeit des MSE für die Vorhersage der $u$-Variable des \textit{Barkley}-Modells vom Abstand zum Rand des vorherzusagenden Gebiets. In Blau ist die Abhängigkeit für das \textsc{ESN}s mit starker und in Orange für das mit schwacher Regularisierung dargestellt.}
+	\label{fig:exp_inner_cross_barkley_esn_error_dependency_comparison}
+\end{figure} 
+
+
+\FloatBarrier
 \subsection{Vergleich}
 Zuerst kann bemerkt werden, dass für den \textsc{NN}- und den \textsc{RBF}-Ansatz der optimale Wert für die Randdicke $b=1$ lautet, wohingegen bei den \textsc{ESN}s Werte mit $b > 1$ besserer Ergebnisse liefern. Dieser Unterschied lässt sich dadurch erklären, dass das Eingangssignal für das \textsc{ESN} nicht vollständig genutzt worden ist, sondern durch die Verwendung der dünnbesetzten Eingangsmatrix $\mathbf{W_{in}}$ nur einzelne zufällig ausgewählte Punkte genutzt worden sind. Somit können in diesem Fall, durch einen breiteren Rand, Eingangssignale aus einer größeren Menge an unterschiedlichen Signalen gewählt werden.
 \improvement{Make this more clear.}
@@ -227,7 +231,7 @@ Für einen genaueren Vergleich der drei Methoden bietet es sich an die Ergebniss
 \begin{figure}[H]
 	\centering
 	\includegraphics[height=3.7in]{figures/results/inner_cross_prediction/barkley_error_size_comparison.pdf}
-	\caption{Graphische Darstellung des Fehlerwertes MSE für die drei verschiedenen Ansätze in Abhängigkeit von der Größe $a$ des vorherzusagenden Bereichs für das \textit{Barkley}-Modell.}
+	\caption{Darstellung des Fehlerwertes MSE für die drei Ansätze in Abhängigkeit von der Größe $a$ des vorherzusagenden Bereichs für das \textit{Barkley}-Modell.}
 	\label{fig:inner_prediction_error_size_comparison_barkley}
 \end{figure}
  
@@ -270,4 +274,4 @@ Des Weiteren wächst der Fehler mit steigender Größe des vorherzusagenden Bere
 	\label{fig:exp_inner_cross_barkley_result}
 \end{figure} 
 
-In Abbildung \ref{fig:exp_inner_cross_barkley_result} werden exemplarisch die aus den drei Ansätzen resultierenden Felder der Spannungsvariable $u(t)$ des \textit{Barkley}-Modells, zusammen mit dem originalen Feld, dargestellt. Eine analoge Darstellung für das \textit{Mitchell-Schaeffer}-Modell ist im Anhang als Abbildung \ref{fig:apx_inner_cross_mitchell_result} zu finden. Es fällt auf, dass sowohl die Vorhersage der \textsc{RBF} als auch die des \textsc{ESN} stark verschwommen ist und kaum Details zeigt. Im Gegensatz dazu macht der \textsc{NN}-Ansatz eine sehr scharfe Vorhersage. Dies ist dahingehend interessant, als das zum einen jeder Bildpunkt einzeln vorhersagt wird, und zum anderen immer die nächsten fünf Nachbarn genutzt werden. Daraus können zwei Konsequenzen folgen. Erstens spricht die hohe Auflösung dafür, dass die Vorhersage nahezu perfekt einem Bereich aus den Trainingsdaten entspricht. Da die Vorhersage aber (zumindest in diesem Moment) nicht gut mit dem Original übereinstimmt, bedeutet dies, dass die Verzögerungskoordinaten, die genutzt worden sind, den Bereich nicht eindeutig beschreiben. Zweitens kann daraus auch gefolgert werden, dass für diese Aufgabe die Länge der Trainingsdaten zu gering gewählt worden ist. 
+In Abbildung \ref{fig:exp_inner_cross_barkley_result} werden exemplarisch die aus den drei Ansätzen resultierenden Felder der Spannungsvariable $u(t)$ des \textit{Barkley}-Modells, zusammen mit dem originalen Feld, dargestellt. Eine analoge Darstellung für das \textit{Mitchell-Schaeffer}-Modell ist im Anhang als Abbildung \ref{fig:apx_inner_cross_mitchell_result} zu finden. Es fällt auf, dass sowohl die Vorhersage der \textsc{RBF} als auch die des \textsc{ESN} stark verschwommen ist und kaum Details zeigt. Im Gegensatz dazu macht der \textsc{NN}-Ansatz eine sehr scharfe Vorhersage. Dies ist dahingehend interessant, als das zum einen jeder Bildpunkt einzeln vorhersagt wird, und zum anderen immer die nächsten fünf Nachbarn im Zustandsraum genutzt werden. Daraus können zwei Konsequenzen folgen. Erstens spricht die hohe Auflösung dafür, dass die Vorhersage nahezu perfekt einem Bereich aus den Trainingsdaten entspricht. Da die Vorhersage aber (zumindest in diesem Moment) nicht gut mit dem Original übereinstimmt, bedeutet dies, dass die Verzögerungskoordinaten, die genutzt worden sind, den Bereich nicht eindeutig beschreiben. Zweitens kann daraus auch gefolgert werden, dass für diese Aufgabe die Länge der Trainingsdaten zu gering gewählt worden ist. 

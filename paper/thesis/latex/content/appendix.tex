@@ -105,7 +105,7 @@
 		\setcapmargin[1cm]{0.5cm}
 		\caption{Erregung für $n=150$}
 	\end{subfigure}
-	\caption{Graphische Darstellung der zeitlichen Entwicklung der $u$-Variable des \textit{Barkley}-Modells. In Leserichtung sind die Felder der $u$-Variable für die Zeitpunkte $t=0,\, 50,\, 100,\, 150$ des Evaluationsdatensatzes dargestellt.}
+	\caption{Graphische Darstellung der zeitlichen Entwicklung der $u$-Variable des \textit{Barkley}-Modells. In Leserichtung sind die Felder der $u$-Variable für die Zeitpunkte $n=0,\, 50,\, 100,\, 150$ des Evaluationsdatensatzes dargestellt.}
 	\label{fig:apx_barkley_evolution}
 \end{figure} 
 
@@ -249,7 +249,7 @@ Im Folgenden wird eine Beweisskizze für das Stabilitätskriterium
 \begin{align*}
 |1-\alpha(1-\sigma_{max}(\mathbf{W}))| < 1
 \end{align*}
-nach \cite{jaeger2010} vorgeführt. Hierfür wird die Distanz der \textit{$l^2$-Norm} $||\cdot||$ zwischen den Zustandsfolgen $(\vec{s}(n))_n$ und $(\vec{s'}(n))_n$ für das Eingangssignal $\vec{u}$ betrachtet. Es wird zudem die Zustandsgleichung \ref{eq:esn_stateeq} und die Abkürzung $\vec{v} = [b_{in}; \vec{u}(n)]$ verwendet. 
+nach \cite{jaeger2010} vorgeführt. Hierfür wird die Distanz der \textit{$l^2$-Norm} $||\cdot||$ zwischen den Zustandsfolgen $(\vec{s}(n))_n$ und $(\vec{s'}(n))_n$ für das Eingangssignal $\vec{u}$ betrachtet. Es wird zudem die Zustandsgleichung \ref{eq:esn_stateeq} und die Abkürzung $\vec{v}(n) = [b_{in}; \vec{u}(n)]$ verwendet. 
 
 \begin{align*}
 &~||\vec{s}(n+1))- \vec{s}\,'(n+1)|| \\
@@ -274,7 +274,7 @@ Gilt nun $\lambda < 1$, so nähern sich die beiden Zustandsfolgen immer weiter a
 
 \section{Laufzeitanalyse}
 \label{sc:apx_runtime_complexity}
-Im Folgenden wird die theoretische Laufzeitkomplexität $T$ des Trainings und Vorhersagevorgangs eines \textsc{ESN}s unter Veränderung von $N$ betrachtet und hergeleitet.
+Im Folgenden wird die theoretische Laufzeitkomplexität $T$ des Trainings- und Vorhersagevorgangs eines \textsc{ESN}s unter Veränderung von $N$ betrachtet und hergeleitet.
 Zuerst werden die Abkürzungen
 \begin{align*}
 \beta = T-T_{0} \qquad\qquad\qquad \gamma = 1+N_u+N

@@ -20,9 +20,9 @@ nn_v_errors  = [0.004632133, 0.021815471, 0.082946634, 0.106986577, 0.122971027,
 rbf_v_errors = [0.000457106, 0.004913831, 0.034048691, 0.058552435, 0.067503695, np.nan, np.nan ]
 esn_v_errors = [0.000233437, 0.001765347, 0.029685474, 0.050612656, 0.063301057, 0.068415167, 0.067612346, ]
 
-plt.plot(sizes, nn_u_errors, "--o", label="NN")
-plt.plot(sizes, rbf_u_errors, "--o", label="RBF")
-plt.plot(sizes, esn_u_errors, "--o", label="ESN")
+plt.semilogy(sizes, nn_u_errors, "--o", label="NN")
+plt.semilogy(sizes, rbf_u_errors, "--o", label="RBF")
+plt.semilogy(sizes, esn_u_errors, "--o", label="ESN")
 plt.xticks([4, 8, 16, 32, 64, 128, 148])
 plt.xlabel("Innere Größe $a$")
 plt.ylabel("MSE")
@@ -30,9 +30,9 @@ plt.legend()
 plt.savefig("images/barkley_error_size_comparison.pdf")
 #plt.show()
 
-plt.plot(sizes, nn_v_errors, "--o", label="NN")
-plt.plot(sizes, rbf_v_errors, "--o", label="RBF")
-plt.plot(sizes, esn_v_errors, "--o", label="ESN")
+plt.semilogy(sizes, nn_v_errors, "--o", label="NN")
+plt.semilogy(sizes, rbf_v_errors, "--o", label="RBF")
+plt.semilogy(sizes, esn_v_errors, "--o", label="ESN")
 plt.xticks([4, 8, 16, 32, 64, 128, 148])
 plt.xlabel("Innere Größe $a$")
 plt.ylabel("MSE")

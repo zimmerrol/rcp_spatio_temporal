@@ -29,8 +29,8 @@ mit
 
 \begin{equation}
 \begin{gathered}
-\frac{\partial u}{\partial t}_{i,j} = D \cdot \Sigma(t)_{i,j} + \frac{1}{\epsilon} (1-u(t)_{i,j}) \left(u(t)_{i,j}-\frac{v(t)_{i,j}+b}{a}\right)\\
-\frac{\partial v}{\partial t}_{i,j} = u(t)_{i,j}^3-v(t)_{i,j}
+\frac{\partial u_{i,j}}{\partial t} = D \cdot \Sigma(t)_{i,j} + \frac{1}{\epsilon} (1-u(t)_{i,j}) \left(u(t)_{i,j}-\frac{v(t)_{i,j}+b}{a}\right)\\
+\frac{\partial v_{i,j}}{\partial t} = u(t)_{i,j}^3-v(t)_{i,j}
 \end{gathered}
 \end{equation}
 ausreichend genau. Hierbei werden \textit{Neumann}-Randbedingungen genutzt, sodass die senkrechte Komponente der räumlichen Ableitung an den Rändern des Feldes verschwindet. Im Folgenden wird zudem, in Analogie zu \citep{berg2011synchronization}, die Diffusionskonstante auf $D = 1/25$, die Gitterkonstante auf $\Delta x = 0.1$ und die Zeitkonstante auf $\Delta t = 0.01$ gesetzt. Die raumzeitliche Dynamik des Systems ist in Form der $u$-Variable im Anhang in Abbildung \ref{fig:apx_barkley_evolution} dargestellt.
