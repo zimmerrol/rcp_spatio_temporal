@@ -208,7 +208,7 @@ Zuerst kann bemerkt werden, dass für den \textsc{NN}- und den \textsc{RBF}-Ansa
 \improvement{Make this more clear.}
 Für einen genaueren Vergleich der drei Methoden bietet es sich an die Ergebnisse für den größten $a$-Wert durchzuführen, der mit allen drei Ansätzen betrachtet worden ist. Dieser Anforderung entspricht der Wert $a=64$. Eine Übersicht der verschiedenen Ergebnisse ist in Tabelle \ref{tab:exp_inner_cross_comparison_results} zu finden.
 
-\begin{table}[h]
+\begin{table}[H]
 	\centering
 	\captionsetup{width=0.9\linewidth}
 	\begin{tabular}{cccccccc}
@@ -228,6 +228,8 @@ Für einen genaueren Vergleich der drei Methoden bietet es sich an die Ergebniss
 	\label{tab:exp_inner_cross_comparison_results}
 \end{table}
 
+Ergänzend ist ein grafischer Vergleich der Fehlerwerte MSE für alle untersuchen Abmessungen $a$ durchgeführt worden, welcher in Abbildung \ref{fig:inner_prediction_error_size_comparison_barkley} für das \textit{Barkley}-Modell zu finden ist. Eine analoge Darstellung für das \textit{Mitchell-Schaeffer}-Modell ist in Abbildung \ref{fig:apx_inner_prediction_error_size_comparison_ms} aufgetragen. Wieder zeigt sich, dass die Vorhersagen der klassischen Methoden einen höheren Fehler haben. Während der \textsc{NN}-Ansatz bei beiden Modellen schlechtere Ergebnisse als die Vorhersage mittels des Mittelwertes liefert, sind die radialen Basisfunktionen und die \textsc{ESN}s geringfügig besser als diese für $a=64$. Dabei erreichen die \textsc{ESN}s und radialen Basisfunktionen in etwa die gleiche Genauigkeit. Da der NRMSE für beide Methoden nah an $1.0$ liegt, ist die Vorhersage kaum besser als die Vorhersage mittels des Mittelwertes. Die Vorhersagequalität reicht bei keiner der drei Methoden aus, um sie tatsächlich sinnvoll verwenden zu können.
+
 \begin{figure}[H]
 	\centering
 	\includegraphics[height=3.7in]{figures/results/inner_cross_prediction/barkley_error_size_comparison.pdf}
@@ -235,12 +237,14 @@ Für einen genaueren Vergleich der drei Methoden bietet es sich an die Ergebniss
 	\label{fig:inner_prediction_error_size_comparison_barkley}
 \end{figure}
  
-Ergänzend ist ein grafischer Vergleich der Fehlerwerte MSE durchgeführt worden, welcher in Abbildung \ref{fig:inner_prediction_error_size_comparison_barkley} für das \textit{Barkley}-Modell zu finden ist. Eine analoge Darstellung für das \textit{Mitchell-Schaeffer}-Modell ist in Abbildung \ref{fig:apx_inner_prediction_error_size_comparison_ms} aufgetragen. Wieder zeigt sich, dass die Vorhersagen der klassischen Methoden einen höheren Fehler haben. Während der \textsc{NN}-Ansatz bei beiden Modellen schlechtere Ergebnisse als die Vorhersage mittels des Mittelwertes liefert, sind die radialen Basisfunktionen und die \textsc{ESN}s geringfügig besser als diese. Dabei erreichen die \textsc{ESN}s und radialen Basisfunktionen in etwa die gleiche Genauigkeit. Da der NRMSE für beide Methoden nah an $1.0$ liegt, ist die Vorhersage kaum besser als die Vorhersage mittels des Mittelwertes. Die Vorhersagequalität reicht bei keiner der drei Methoden aus, um sie tatsächlich sinnvoll verwenden zu können. 
 
-Des Weiteren wächst der Fehler mit steigender Größe des vorherzusagenden Bereiches bei allen drei Ansätzen an. Es ist somit zu vermuten, dass dies nicht nur eine reine Beschränkung der einzelnen Methoden ist, sondern dass es womöglich eine Eigenschaft der betrachteten Modelle ist. 
-\improvement{Add comparison images}
 
-\begin{figure}[h]
+Des Weiteren wächst der Fehler mit steigender Größe des vorherzusagenden Bereiches bei allen drei Ansätzen an. Es ist somit zu vermuten, dass dies nicht nur eine reine Beschränkung der einzelnen Methoden ist, sondern dass es womöglich eine Eigenschaft der betrachteten Modelle ist. \\
+\improvement{Add comparison images} 
+
+In Abbildung \ref{fig:exp_inner_cross_barkley_result} werden exemplarisch die aus den drei Ansätzen resultierenden Felder der Spannungsvariable $u(t)$ des \textit{Barkley}-Modells, zusammen mit dem originalen Feld, dargestellt. Eine analoge Darstellung für das \textit{Mitchell-Schaeffer}-Modell ist im Anhang als Abbildung \ref{fig:apx_inner_cross_mitchell_result} zu finden. Es fällt auf, dass sowohl die Vorhersage der \textsc{RBF} als auch die des \textsc{ESN} stark verschwommen ist und kaum Details zeigt. Im Gegensatz dazu macht der \textsc{NN}-Ansatz eine sehr scharfe Vorhersage. Dies ist dahingehend interessant, als das zum einen jeder Bildpunkt einzeln vorhersagt wird, und zum anderen immer die nächsten fünf Nachbarn im Zustandsraum genutzt werden. 
+
+\begin{figure}[H]
 	\centering
 	\begin{subfigure}{.5\textwidth}
 		\centering
@@ -274,4 +278,4 @@ Des Weiteren wächst der Fehler mit steigender Größe des vorherzusagenden Bere
 	\label{fig:exp_inner_cross_barkley_result}
 \end{figure} 
 
-In Abbildung \ref{fig:exp_inner_cross_barkley_result} werden exemplarisch die aus den drei Ansätzen resultierenden Felder der Spannungsvariable $u(t)$ des \textit{Barkley}-Modells, zusammen mit dem originalen Feld, dargestellt. Eine analoge Darstellung für das \textit{Mitchell-Schaeffer}-Modell ist im Anhang als Abbildung \ref{fig:apx_inner_cross_mitchell_result} zu finden. Es fällt auf, dass sowohl die Vorhersage der \textsc{RBF} als auch die des \textsc{ESN} stark verschwommen ist und kaum Details zeigt. Im Gegensatz dazu macht der \textsc{NN}-Ansatz eine sehr scharfe Vorhersage. Dies ist dahingehend interessant, als das zum einen jeder Bildpunkt einzeln vorhersagt wird, und zum anderen immer die nächsten fünf Nachbarn im Zustandsraum genutzt werden. Daraus können zwei Konsequenzen folgen. Erstens spricht die hohe Auflösung dafür, dass die Vorhersage nahezu perfekt einem Bereich aus den Trainingsdaten entspricht. Da die Vorhersage aber (zumindest in diesem Moment) nicht gut mit dem Original übereinstimmt, bedeutet dies, dass die Verzögerungskoordinaten, die genutzt worden sind, den Bereich nicht eindeutig beschreiben. Zweitens kann daraus auch gefolgert werden, dass für diese Aufgabe die Länge der Trainingsdaten zu gering gewählt worden ist. 
+Daraus können zwei Konsequenzen folgen. Erstens spricht die hohe Auflösung dafür, dass die Vorhersage nahezu perfekt einem Bereich aus den Trainingsdaten entspricht. Da die Vorhersage aber (zumindest in diesem Moment) nicht gut mit dem Original übereinstimmt, bedeutet dies, dass die Verzögerungskoordinaten, die genutzt worden sind, den Bereich nicht eindeutig beschreiben. Zweitens kann daraus auch gefolgert werden, dass für diese Aufgabe die Länge der Trainingsdaten zu gering gewählt worden ist. 

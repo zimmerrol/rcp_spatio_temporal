@@ -12,7 +12,7 @@ Diese Dynamik wird durch die Gleichungen
 \end{cases}
 \end{gathered}
 \end{equation}
-beschrieben. Dabei stehen die Parameter $\tau_{in}, \tau_{out}, \tau_{open}, \tau_{close}$ für Zeitkonstanten, welche die Form des Aktionspotentials modifizieren. Die ersten beiden Konstanten beschreiben die Geschwindigkeit, mit der die Ionen durch die Membran strömen, und die letzten beiden die Geschwindigkeit mit der sich die verantwortlichen Ionenkanäle öffnen, beziehungsweise schließen. Zusätzlich stellt die Konstante $v_{gate}$ eine Grenzspannung dar. Sowohl beim Über- als auch beim Unterschreiten dieser Grenze ändert sich der jeweilige Zustand der Ionenkanäle, indem $h(t)$ angepasst wird. Im Rahmen dieser Arbeit werden, soweit keine anderen Angaben vorhanden sind, die Parameter durch die Werte aus Tabelle \ref{tab:ms_parameters} gemäß \citep{mitchell2003two} festgesetzt. Dabei ist allerdings $\tau_{open}$ auf $20$ \citep[S. 134ff.]{bartocci2016computational} reduziert worden, da mit dieser Wahl ein chaotischeres Verhalten, ähnlich zum \textit{Barkley}-Modell, erzeugt wird. Dies erschwert die mögliche Vorhersage der Entwicklung, wodurch eine anspruchsvolle Herausforderung erzeugt wird.\\
+beschrieben. Dabei stehen die Parameter $\tau_{in}, \tau_{out}, \tau_{open}, \tau_{close}$ für Zeitkonstanten, welche die Form des Aktionspotentials modifizieren. Die ersten beiden Konstanten beschreiben die Geschwindigkeit, mit der die Ionen durch die Membran strömen, und die letzten beiden die Geschwindigkeit, mit der sich die verantwortlichen Ionenkanäle öffnen, beziehungsweise schließen. Zusätzlich stellt die Konstante $v_{gate}$ eine Grenzspannung dar. Sowohl beim Über- als auch beim Unterschreiten dieser Grenze ändert sich der jeweilige Zustand der Ionenkanäle, indem $h(t)$ angepasst wird. Im Rahmen dieser Arbeit werden, soweit keine anderen Angaben vorhanden sind, die Parameter durch die Werte aus Tabelle \ref{tab:ms_parameters} gemäß \citep{mitchell2003two} festgesetzt. Dabei ist allerdings $\tau_{open}$ auf $20$ \citep[S. 134ff.]{bartocci2016computational} reduziert worden, da mit dieser Wahl ein chaotischeres Verhalten, ähnlich zum \textit{Barkley}-Modell, erzeugt wird. Dies erschwert die mögliche Vorhersage der Entwicklung, wodurch eine anspruchsvolle Herausforderung erzeugt wird.\\
 
 \begin{table}[H]
 \centering
@@ -27,7 +27,7 @@ $\tau_{in}$ & $\tau_{out}$ & $\tau_{open}$ & $\tau_{close}$ & $v_{gate}$ \\
 \label{tab:ms_parameters}
 \end{table}
 
-Der erste Summand der zeitlichen Ableitung von $v$ beschreibt ein Diffusionsverhalten, welches durch die Diffusionskonstante $D$ beschrieben wird \citep{talbot2013towards}.\\
+Der erste Summand der zeitlichen Ableitung von $v$ beschreibt ein Diffusionsverhalten, welches durch die Diffusionskonstante $D$ charakterisiert wird \citep{talbot2013towards}.\\
 
 Die meisten, auf zellulärer Ebene aufgestellten, Gleichungen haben eine hohe Komplexität. Hierdurch werden numerische Berechnungen sehr aufwendig. In der Herleitung dieses Modells sind einige vereinfachende Annahmen eingeflossen, wodurch die Komplexität und somit auch der numerische Aufwand reduziert worden sind. Trotz des phänomenologischen Charakters des \textit{Mitchell-Schaeffer}-Modells besitzen die Parameter eine physiologische Interpretation. Zudem ist es in der Lage wichtige Eigenschaften des Aktionspotentials im Vergleich zu anderen Modellen gut wiederzugeben \citep{talbot2013towards}.\\
 
