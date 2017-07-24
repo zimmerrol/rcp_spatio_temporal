@@ -173,6 +173,40 @@
 	\centering
 	\begin{subfigure}{.5\textwidth}
 		\centering
+		\includegraphics[height=2.5in]{figures/results/unblur/mitchell_v_blur_orig.pdf}
+		\setcapmargin[1cm]{0.5cm}
+		\caption{Echte Erregung des Modells}
+		\label{fig:apx_unblur_mitchell_result_orig}
+	\end{subfigure}%
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[height=2.5in]{figures/results/unblur/nn_mitchell_v_blur_pred.pdf}
+		\setcapmargin[1cm]{0.5cm}
+  		\caption{Vorhersage des \textsc{NN}-Ansatzes}
+  		\label{fig:apx_unblur_mitchell_result_nn_pred}
+	\end{subfigure}
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[height=2.5in]{figures/results/unblur/rbf_mitchell_v_blur_pred.pdf}
+		\setcapmargin[1cm]{0.5cm}
+  		\caption{Vorhersage des \textsc{RBF}-Ansatzes}
+  		\label{fig:apx_unblur_mitchell_result_rbf_pred}
+	\end{subfigure}%
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[height=2.5in]{figures/results/unblur/esn_mitchell_v_blur_pred.pdf}
+		\setcapmargin[1cm]{0.5cm}
+  		\caption{Vorhersage des \textsc{ESN}}
+  		\label{fig:apx_unblur_mitchell_result_esn_pred}
+	\end{subfigure}
+	\caption{Graphische Darstellung der $v$-Variable des \textit{Mitchell-Schaeffer}-Modells für den $100$. Zeitschritt des Evaluationsdatensatzes. Oben links ist das tatsächliche Feld des Modells zu sehen. Danach folgen in Leserichtung die Vorhersagen des \textsc{NN}-Ansatzes, des \textsc{RBF}-Ansatzes und des \textsc{ESN}. Das verwendete Fernfeld ist in Abbildung \ref{fig:exp_unblur_mitchell_schaeffer_blurred} zu sehen.}
+	\label{fig:apx_unblur_mitchell_result}
+\end{figure} 
+
+\begin{figure}[h]
+	\centering
+	\begin{subfigure}{.5\textwidth}
+		\centering
 		\includegraphics[height=2.5in]{figures/results/inner_cross_prediction/mitchell_v_inner_original.pdf}
 		\setcapmargin[1cm]{0.5cm}
 		\caption{Echte Erregung des Modells}
@@ -195,7 +229,7 @@
 		\setcapmargin[1cm]{0.5cm}
   		\caption{Vorhersage des \textsc{ESN}}
 	\end{subfigure}
-	\caption{Graphische Darstellung der $v$-Variable des \textit{Mitchell-Schaeffer}-Modells für den $1000$. Zeitschritt des Evaluationsdatensatzes. Oben links ist das tatsächliche Feld des Modells zu sehen. Danach folgend in Leserichtung die Vorhersagen des \textsc{NN}-Ansatzes, des \textsc{RBF}-Ansatzes und des \textsc{ESN}.}
+	\caption{Graphische Darstellung der $v$-Variable des \textit{Mitchell-Schaeffer}-Modells für den $1000$. Zeitschritt des Evaluationsdatensatzes bei der Vorhersage des inneren Bereiches durch die Kenntnis der Randwerte. Oben links ist das tatsächliche Feld des Modells zu sehen. Danach folgend in Leserichtung die Vorhersagen des \textsc{NN}-Ansatzes, des \textsc{RBF}-Ansatzes und des \textsc{ESN}.}
 	\label{fig:apx_inner_cross_mitchell_result}
 \end{figure} 
 
