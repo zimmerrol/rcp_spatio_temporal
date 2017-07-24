@@ -1,6 +1,9 @@
+"""
+    Basic implementation of an ESN.
+"""
+
 import numpy as np
 import numpy.random as rnd
-#import pickle
 import dill as pickle
 import scipy as sp
 
@@ -182,7 +185,7 @@ class BaseESN(object):
             return np.empty((0, 1))
 
     """
-        Saves the ESN by pickling it. 
+        Saves the ESN by pickling it.
     """
     def save(self, path):
         f = open(path, "wb")

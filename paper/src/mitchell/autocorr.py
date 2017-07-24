@@ -1,8 +1,24 @@
+"""
+    Calculates the optimal delay time tau for the delay reconstruction using the auto correlation for the Mitchell-Schaeffer model.
+"""
+
 import os
 import numpy as np
 from matplotlib import pyplot as plt
 from helper import *
 import progressbar
+from mitchell_helper import generate_vh_data
+
+"""
+    Generate the data of the model.
+"""
+def generate_data(N, trans, sample_rate=1, Ngrid=100):
+    #return the u variable
+    return generate_vh_data(N, trans, sample_rate=sample_rate, Ngrid=Ngrid)[0]
+
+"""
+    Calculates the auto correlation of dat with delay k.
+"""
 def autoCorr(dat, k):
     s = np.mean(dat)
     v = np.var(dat)
@@ -15,6 +31,8 @@ def autoCorr(dat, k):
 N = 150
 ndata = 10000
 data = None
+
+#load or generate the data
 if (os.path.exists("cache/raw/{0}_{1}.dat.npy".format(ndata, N)) == False):
     print("data missing")
     print("generating data...")
@@ -26,7 +44,7 @@ else:
     data = np.load("cache/raw/{0}_{1}.dat.npy".format(ndata, N))
     print("loading finished")
 
-#find roots
+#find roots of the auto correlation for every pixel
 results = []
 for i in range(50,100):
     for j in range(50,100):
@@ -41,10 +59,11 @@ for i in range(50,100):
             if (autoY[k-1] >= 0 and autoY[k] <= 0):
                 results.append(k)
                 break
-                
-print(results)
+
+#calculate the mean of the first root for each pixel and print it
 print(np.mean(np.array(results)))
+
+#plot the auto correlation
 plt.plot(autoK, autoY)
 plt.plot([0, 50], [0, 0])
 plt.show()
-

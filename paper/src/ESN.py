@@ -1,3 +1,7 @@
+"""
+    Implementation of the general ESN model.
+"""
+
 import numpy as np
 import numpy.random as rnd
 from BaseESN import BaseESN
@@ -25,11 +29,11 @@ class ESN(BaseESN):
 
         self._solver = solver
         self._regression_parameters = regression_parameters
-        
+
         """
             allowed values for the solver:
                 pinv
-                lsqr
+                lsqr (will only be used in the thesis)
 
                 sklearn_auto
                 sklearn_svd
@@ -156,7 +160,7 @@ class ESN(BaseESN):
             else:
                 y = np.dot(self._W_out, np.vstack((self.output_bias, self.output_input_scaling*u, self._x)))
 
-            #apply the output activation function   
+            #apply the output activation function
             y = self.out_activation(y[:,0])
             Y[:,t] = update_processor(y)
             inputData = y

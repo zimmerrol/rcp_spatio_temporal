@@ -1,3 +1,7 @@
+"""
+    Live demo of the Mitchell-Schaeffer model.
+"""
+
 import os,sys,inspect
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)
@@ -28,40 +32,9 @@ def demo_mitchell():
 
 sim = demo_mitchell()
 #sim.initialize_two_spirals()
-sim.initialize_one_spiral()
-#sim.initialize_random(42, 0.1)
-"""
-datafull = np.empty((200*100, 150, 150))
+#sim.initialize_one_spiral()
+sim.initialize_random(42, 0.1)
 
-data = np.empty(9000*100)
-for i in range(len(data)):
-    data[i] = sim._v[120,20]
-    if (i > 6800*100 and i < 6800*100+200*100):
-        datafull[i-6800*100] = sim._v
-    sim.explicit_step(chaotic=True)
-
-    if (i % 500 == 0):
-        print("{0}/{1:1f}%".format(i, 100/len(data)*i))
-
-print("done!")
-
-plt.plot(np.arange(len(data))*0.01,data)
-plt.show()
-
-
-import pickle as pickle
-f = open("data.dat", "wb")
-pickle.dump(data, f)
-f.close()
-
-viewResults = [("v", datafull)]
-f = open("data.view.dat", "wb")
-pickle.dump(viewResults, f)
-f.close()
-show_results(viewResults)
-
-exit()
-"""
 frame = 0
 import time
 def update_new(data):
@@ -104,7 +77,6 @@ class StorageCallback(object):
 
         bmode.label.set_text("v" if mode else "h")
 
-
 callback = StorageCallback()
 axsave = plt.axes([0.15, 0.01, 0.1, 0.075])
 axload = plt.axes([0.65, 0.01, 0.1, 0.075])
@@ -120,8 +92,6 @@ bmode.on_clicked(callback.switch_mode)
 
 bprev = Button(axload, 'Load')
 bprev.on_clicked(callback.load)
-
-
 
 
 plt.show()

@@ -1,3 +1,7 @@
+"""
+    Can be used to generate BOCF timeseries. The usage of "demo.py" is more recommended offers more features.
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
