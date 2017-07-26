@@ -8,6 +8,9 @@ import argparse
 import inner_cross_pred_mt_p as icpmtp
 import numpy as np
 
+"""
+    Parses the arguments and sets the values in the inner_cross_pred_mt_p class.
+"""
 def parse_arguments():
     icpmtp.id = int(os.getenv("SGE_TASK_ID", 0))
 
@@ -28,6 +31,9 @@ def parse_arguments():
 
     print("Prediction via {0}".format(icpmtp.prediction_mode))
 
+"""
+    Sets the correct constants according to the used ID.
+"""
 def setup_constants():
     sge_id = icpmtp.id
     direction = icpmtp.direction
@@ -109,10 +115,6 @@ def setup_constants():
                               "v": [1e-4, 1e-5, 1e-5, 1e-5, 1e-4, 1e-4, 1e-5, 1e-4, 1e-4, 1e-4, 1e-5, 1e-5, 1e-4, 1e-4, 1e-4, 1e-4, 1e-4, 1e-4, 1e-4, 1e-5, 1e-5, ]}[direction][sge_id-1]
         icpmtp.input_density = {"u": [15, 5, 15, 5, 20, 20, 20, 5, 5, 100, 100, 5, 20, 10, 50, 100, 100, 50, 10, 100, 10],
                                "v": [20, 10, 15, 10, 100, 5, 100, 20, 15, 5, 100, 10, 15, 50, 10, 20, 20, 100, 5, 10, 15, ]}[direction][sge_id-1]
-
-
-
-
 
         icpmtp.inner_size = [4,8,16,32,64,128, 4,8,16,32,64,128, 4,8,16,32,64,128, 146,146,148][sge_id-1]
         icpmtp.border_size = [1,1,1,1,1,1, 2,2,2,2,2,2, 3,3,3,3,3,3, 1,2,1][sge_id-1]

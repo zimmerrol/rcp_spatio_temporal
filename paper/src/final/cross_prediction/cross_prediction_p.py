@@ -8,6 +8,9 @@ import argparse
 import numpy as np
 import cross_prediction_mt_p as cpmtp
 
+"""
+    Parses the arguments of the script and sets them in the cross_prediction_mt_p class.
+"""
 def parse_arguments():
     cpmtp.id = int(os.getenv("SGE_TASK_ID", 0))
 
@@ -32,6 +35,9 @@ def parse_arguments():
 
     print("Prediction via {0}: {1}".format(cpmtp.prediction_mode, cpmtp.direction))
 
+"""
+    Sets the constants for the cross_prediction_mt_p according to the submitted ID.
+"""
 def setup_constants():
     sge_id = cpmtp.id
     direction = cpmtp.direction
@@ -39,6 +45,8 @@ def setup_constants():
     print("Using parameters:")
 
     if cpmtp.prediction_mode == "ESN":
+        #hard-coded results of the grid search.
+        
         cpmtp.n_units = {"hv": [50,400, 50, 50, 400, 200, 50],
                          "vh": [50, 400, 400, 400, 200, 200, 50],
                          "vu": [50, 400, 400, 400, 400, 400, 400],
@@ -101,6 +109,7 @@ def setup_constants():
         print("\t trainLength \t = {0} \n\t sigma \t = {1}\n\t sigma_skip \t = {2}\n\t ddim \t = {3}\n\t k \t = {4}".format(cpmtp.trainLength, cpmtp.sigma, cpmtp.sigma_skip, cpmtp.ddim, cpmtp.k))
 
     elif cpmtp.prediction_mode == "NNT":
+        #can be used to examine the dependence of N_train on the MSE.
         cpmtp.prediction_mode = "NN"
 
         cpmtp.sigma = {"vh":7, "uv": 1}[cpmtp.direction]
@@ -125,6 +134,7 @@ def setup_constants():
             cpmtp.trainLength, cpmtp.sigma, cpmtp.sigma_skip, cpmtp.ddim, cpmtp.width, cpmtp.basis_points))
 
     elif cpmtp.prediction_mode == "RBFP":
+        #can be used to examine the depence of the number of placements l on the MSE.
         cpmtp.prediction_mode = "RBF"
 
         cpmtp.sigma = {"vh": 1, "hv": 5, "uv": 1, "vu": 5}[direction]

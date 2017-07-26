@@ -29,13 +29,8 @@ from helper import *
 import bocf_helper as bocfh
 import barkley_helper as bh
 import mitchell_helper as mh
+from numpy.linalg.linalg import LinAlgError
 
-
-#get V animation data -> [N, 150, 150]
-#create 2d delay coordinates -> [N, 150, 150, d]
-#create new dataset with small data groups -> [N, 150, 150, d*sigma*sigma]
-#create d*sigma*sigma-k tree from this data
-#search nearest neighbours (1 or 2) and predict new U value
 
 #set the temporary buffer for the multiprocessing module manually to the shm
 #to solve "no enough space"-problems
@@ -56,6 +51,9 @@ direction, prediction_mode, patch_radius, eff_sigma, sigma, sigma_skip = None, N
 k, width, basis_points, ddim = None, None, None, None
 n_units, spectral_radius, leaking_rate, random_seed, noise_level, regression_parameter, sparseness = None, None, None, None, None, None, None
 
+"""
+    Prepares the arrays which are used in the multiprocessing.
+"""
 def setup_arrays():
     global shared_input_data_base, shared_output_data_base, shared_prediction_base, shared_weights_base
     global shared_input_data, shared_output_data, shared_prediction, shared_weights
@@ -73,14 +71,11 @@ def setup_arrays():
     shared_prediction = np.ctypeslib.as_array(shared_prediction_base.get_obj())
     shared_prediction = shared_prediction.reshape(-1, N, N)
 
-    """
-    shared_weights_base = multiprocessing.Array(ctypes.c_double, 10*10*(9+))
-    shared_weights = np.ctypeslib.as_array(shared_weights_base.get_obj())
-    shared_weights = shared_weights.reshape(-1, N, N)
-    """
-    ###print("setting up finished")
 setup_arrays()
 
+"""
+    Generates or loads the raw data of the models.
+"""
 def generate_data(N, Ngrid):
     data = None
 
@@ -130,6 +125,9 @@ def generate_data(N, Ngrid):
     shared_input_data[:ndata] = data[0]
     shared_output_data[:ndata] = data[1]
 
+"""
+    Prepares the predicter (ESN, NN, RBF) to make predictions at the point (y,x).
+"""
 def prepare_predicter(y, x, training_data_in, training_data_out):
     if prediction_mode == "ESN":
         if y < patch_radius or y >= N-patch_radius or x < patch_radius or x >= N-patch_radius:
@@ -140,25 +138,32 @@ def prepare_predicter(y, x, training_data_in, training_data_out):
             #inner
             input_dimension = eff_sigma*eff_sigma
 
+        #if a custom input scaling according to the mutual information shall be used, the useInputScaling has to be set to True
         input_scaling = None
         if useInputScaling:
             #approximate the input scaling using the MI
             input_scaling = calculate_esn_mi_input_scaling(training_data_in, training_data_out[:, 0])
 
+        #setup the ESN
         predicter = ESN(n_input=input_dimension, n_output=1, n_reservoir=n_units,
                         weight_generation="advanced", leak_rate=leaking_rate, spectral_radius=spectral_radius,
                         random_seed=random_seed, noise_level=noise_level, sparseness=sparseness, input_scaling=input_scaling,
                         regression_parameters=[regression_parameter], solver="lsqr")
 
     elif prediction_mode == "NN":
+        #setup the NN approach.
         predicter = NN(k=k)
     elif prediction_mode == "RBF":
+        #setup the RBF approach
         predicter = RBF(sigma=width, basisPoints=basis_points)
     else:
         raise ValueError("No valid prediction_mode choosen! (Value is now: {0})".format(prediction_mode))
 
     return predicter
 
+"""
+    Returns the prediciton at the pixel (x,y)=data.
+"""
 def get_prediction(data):
     y, x = data
 
@@ -171,11 +176,16 @@ def get_prediction(data):
         pred, predicter = fit_predict_inner_pixel(y, x)
     get_prediction.q.put((y, x, pred, predicter._W_out.flatten()))
 
+"""
+    Prepares the time series of the field to be used in the NN/RBF/ESN approach.
+"""
 def prepare_fit_data(y, x, pr, skip, def_param=(shared_input_data, shared_output_data)):
     if (prediction_mode in ["NN", "RBF"]):
+        #create delay coordinates arround the desired point at first
         delayed_patched_input_data = create_2d_delay_coordinates(shared_input_data[:, y-pr:y+pr+1, x-pr:x+pr+1][:, ::skip, ::skip], ddim, tau=tau[direction])
         delayed_patched_input_data = delayed_patched_input_data.reshape(ndata, -1)
 
+        #create train/test time series of the delayed and patched values
         delayed_patched_input_data_train = delayed_patched_input_data[:trainLength]
         delayed_patched_input_data_test = delayed_patched_input_data[trainLength:trainLength+predictionLength]
 
@@ -186,6 +196,7 @@ def prepare_fit_data(y, x, pr, skip, def_param=(shared_input_data, shared_output
         test_data_out = shared_output_data[trainLength:trainLength+predictionLength, y, x].reshape(-1,1)
 
     else:
+        #create train/test time series of the patched values
         training_data_in = shared_input_data[:trainLength][:, y - pr:y + pr+1, x - pr:x + pr+1][:, ::skip, ::skip].reshape(trainLength, -1)
         test_data_in = shared_input_data[trainLength:trainLength+predictionLength][:, y - pr:y + pr+1, x - pr:x + pr+1][:, ::skip, ::skip].reshape(predictionLength, -1)
 
@@ -194,6 +205,9 @@ def prepare_fit_data(y, x, pr, skip, def_param=(shared_input_data, shared_output
 
     return training_data_in, test_data_in, training_data_out, test_data_out
 
+"""
+    Fits the predicter and gets the prediction for pixels which are near the frame/border.
+"""
 def fit_predict_frame_pixel(y, x, def_param=(shared_input_data, shared_output_data)):
     min_border_distance = np.min([y, x, N-1-y, N-1-x])
     training_data_in, test_data_in, training_data_out, _ = prepare_fit_data(y, x, min_border_distance, 1)
@@ -205,7 +219,9 @@ def fit_predict_frame_pixel(y, x, def_param=(shared_input_data, shared_output_da
 
     return pred, predicter
 
-from numpy.linalg.linalg import LinAlgError
+"""
+    Fits the predicter and gets the prediction for pixels which are not near the frame/border.
+"""
 def fit_predict_inner_pixel(y, x, def_param=(shared_input_data, shared_output_data)):
     training_data_in, test_data_in, training_data_out, _ = prepare_fit_data(y, x, patch_radius, sigma_skip)
 
@@ -222,6 +238,9 @@ def fit_predict_inner_pixel(y, x, def_param=(shared_input_data, shared_output_da
 
     return pred, predicter
 
+"""
+    Processes the results of the parallel predictions and merges them.
+"""
 def process_thread_results(q, nb_results, def_param=(shared_prediction, shared_output_data)):
     global prediction, shared_weights
 
@@ -233,18 +252,6 @@ def process_thread_results(q, nb_results, def_param=(shared_prediction, shared_o
     while True:
         if (finished_results == nb_results):
             bar.finish()
-
-            """
-            #uncomment this code to plot the weights of the ESN
-            print("results:")
-            print(len(shared_weights))
-            shared_weights = np.array(shared_weights)
-
-            print(shared_weights.shape)
-
-            plt.imshow(shared_weights)
-            plt.show()
-            """
 
             return
 
@@ -259,10 +266,17 @@ def process_thread_results(q, nb_results, def_param=(shared_prediction, shared_o
 
         bar.update(finished_results)
 
+"""
+    Sets the queue object of the threads for the multiprocessing.
+"""
 def get_prediction_init(q):
     get_prediction.q = q
 
 shared_weights = []
+
+"""
+    The mainFunction of the script, which will start the parallel training and prediction of the model.
+"""
 def mainFunction():
     global shared_prediction, shared_weights
 

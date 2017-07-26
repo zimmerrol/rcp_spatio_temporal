@@ -1,3 +1,7 @@
+"""
+    Performs a grid search to find the optimal parametes of the ESN for the cross prediction.
+"""
+
 import os
 import sys
 sys.path.insert(1, os.path.join(sys.path[0], '../..'))
@@ -36,6 +40,9 @@ ndata = 30000
 testLength = 2000
 trainLength = 15000
 
+"""
+    Parses the arguments of the script and sets them for the grid search.
+"""
 def parse_arguments():
     global id, predictionMode, direction, N, ndata
 
@@ -56,6 +63,9 @@ def parse_arguments():
     print("Prediction via: {0}".format(direction))
 parse_arguments()
 
+"""
+    Generates or loads the raw data of the models.
+"""
 def generate_data(N, trans, sample_rate, Ngrid):
     data = None
 
@@ -68,8 +78,6 @@ def generate_data(N, trans, sample_rate, Ngrid):
     elif direction in ["bocf_uv", "bocf_uw", "bocf_us"]:
         if not os.path.exists("../../cache/bocf/raw/{0}_{1}.uvws.dat.npy".format(N, Ngrid)):
             print("NO BOCF data set found. Please generate a chaotic data set manually.")
-            #data = bocfh.generate_uvws_data(N, 50000, 50, Ngrid=Ngrid)
-            #np.save("../../cache/bocf/raw/{0}_{1}.uvws.dat.npy".format(N, Ngrid), data)
         else:
             data = np.load("../../cache/bocf/raw/{0}_{1}.uvws.dat.npy".format(N, Ngrid))
     else:
@@ -101,6 +109,9 @@ def generate_data(N, trans, sample_rate, Ngrid):
 
     return data
 
+"""
+    The mainFunction of the script, which will start the parallel gridsearch (GridSearchP) for the model to find the optimal hyperparameters.
+"""
 def mainFunction():
     data = generate_data(ndata, 20000, 50, Ngrid=N)
 
@@ -131,6 +142,9 @@ def mainFunction():
     print("\r\nBest result (mse =  {0}):\r\n".format(gridsearch._best_mse))
     print("best parameters {0}".format(gridsearch._best_params))
 
+"""
+    Optimized IO stream which will print the input directly without buffering.
+"""
 class ForceIOStream:
     def __init__(self, stream):
         self.stream = stream

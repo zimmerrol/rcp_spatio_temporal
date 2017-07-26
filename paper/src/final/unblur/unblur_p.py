@@ -2,12 +2,14 @@
     Parses the arguments and sets the constants etc. to run the real unblur code (in unblur_mt_p.py) on a unix device.
 """
 
-
 import os
 import argparse
 import numpy as np
 import unblur_mt_p as ubmtp
 
+"""
+    Parses the arguments of the script and sets them in the unblur_mt_p class.
+"""
 def parse_arguments():
     ubmtp.id = int(os.getenv("SGE_TASK_ID", 0))
 
@@ -28,6 +30,9 @@ def parse_arguments():
 
     print("Prediction via {0}".format(ubmtp.prediction_mode))
 
+"""
+    Sets the constants for the unblur_mt_p according to the submitted ID.
+"""
 def setup_constants():
     sge_id = ubmtp.id
     direction = ubmtp.direction

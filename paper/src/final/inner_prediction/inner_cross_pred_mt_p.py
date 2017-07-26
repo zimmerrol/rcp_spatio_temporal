@@ -46,6 +46,9 @@ border_size, inner_size, center, half_inner_size, right_border_add, basis_points
 shared_input_data, shared_data, prediction = None, None, None
 constants_setup = False
 
+"""
+    Prepares the arrays which are used in the multiprocessing.
+"""
 def setup_arrays():
     global shared_input_data_base, shared_data_base, prediction_base
     global shared_input_data, shared_data, prediction
@@ -71,6 +74,9 @@ def setup_arrays():
     prediction = prediction.reshape(predictionLength, N, N)
 setup_arrays()
 
+"""
+    Generates or loads the raw data of the models.
+"""
 def generate_data(N, trans, sample_rate, Ngrid, def_param=(shared_input_data, shared_data)):
     data = None
 
@@ -105,6 +111,9 @@ def generate_data(N, trans, sample_rate, Ngrid, def_param=(shared_input_data, sh
     prediction[:] = data[trainLength:trainLength+predictionLength]
     prediction[:, output_y, output_x] = 0.0
 
+"""
+    Prepares the predicter (ESN, NN, RBF) to make predictions at the point (y,x).
+"""
 def prepare_predicter(y, x):
     if prediction_mode == "ESN":
         predicter = ESN(n_input=shared_input_data.shape[1], n_output=1, n_reservoir=n_units,
@@ -120,6 +129,9 @@ def prepare_predicter(y, x):
 
     return predicter
 
+"""
+    Fits the predicter and gets the prediction for one pixel.
+"""
 def fit_predict_pixel(y, x, predicter, def_param=(shared_input_data, shared_data)):
     training_data_in = shared_input_data[:trainLength]
     test_data_in = shared_input_data[trainLength:trainLength+predictionLength]
@@ -131,9 +143,15 @@ def fit_predict_pixel(y, x, predicter, def_param=(shared_input_data, shared_data
 
     return pred
 
+"""
+    Sets the queue object of the threads for the multiprocessing.
+"""
 def get_prediction_init(q):
     get_prediction.q = q
 
+"""
+    Returns the prediciton at the pixel (x,y)=data.
+"""
 def get_prediction(data):
     y, x = data
 
@@ -141,6 +159,9 @@ def get_prediction(data):
     pred = fit_predict_pixel(y, x, predicter)
     get_prediction.q.put((y, x, pred))
 
+"""
+    Processes the results of the parallel predictions and merges them.
+"""
 def process_thread_results(q, nb_results):
     global prediction
 
@@ -161,6 +182,9 @@ def process_thread_results(q, nb_results):
 
         bar.update(finished_results)
 
+"""
+    The mainFunction of the script, which will start the parallel training and prediction of the model.
+"""
 def mainFunction():
     generate_data(ndata, 20000, 50, Ngrid=N)
 

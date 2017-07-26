@@ -1,3 +1,7 @@
+"""
+    Performs a grid search to find the optimal parametes of the ESN for the outer->inner prediction.
+"""
+
 import os,sys,inspect
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)
@@ -35,6 +39,9 @@ ndata =30000
 testLength = 2000
 trainLength = 15000
 
+"""
+    Parses the arguments of the script and sets them for the grid search.
+"""
 def parse_arguments():
     global id, predictionMode, direction
 
@@ -50,6 +57,9 @@ def parse_arguments():
     print("Prediction via: {0}".format(direction))
 parse_arguments()
 
+"""
+    Sets the constants a,b for the outer->inner prediction according to the used ID.
+"""
 def setup_constants():
     global innerSize, halfInnerSize, borderSize, center, rightBorderAdd
 
@@ -65,6 +75,9 @@ def setup_constants():
     rightBorderAdd = 1 if innerSize != 2*halfInnerSize else 0
 setup_constants()
 
+"""
+    Generates or loads the raw data of the models.
+"""
 def generate_data(N, trans, sample_rate, Ngrid):
     data = None
 
@@ -100,6 +113,9 @@ def generate_data(N, trans, sample_rate, Ngrid):
 
     return inputData, outputData
 
+"""
+    The mainFunction of the script, which will start the parallel gridsearch (GridSearchP) for the model to find the optimal hyperparameters.
+"""
 def mainFunction():
     global output_weights, frame_output_weights, last_states
 
@@ -131,6 +147,9 @@ def mainFunction():
     print("\r\nBest result (mse =  {0}):\r\n".format(gs._best_mse))
     print("best parameters {0}".format(gs._best_params))
 
+"""
+    Optimized IO stream which will print the input directly without buffering.
+"""
 class ForceIOStream:
     def __init__(self, stream):
         self.stream = stream

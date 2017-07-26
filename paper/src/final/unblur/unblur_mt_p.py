@@ -43,6 +43,9 @@ direction, prediction_mode, patch_radius, eff_sigma, sigma, sigma_skip = None, N
 k, width, basis_points, ddim, useInputScaling = None, None, None, None, None
 n_units, spectral_radius, leaking_rate, random_seed, noise_level, regression_parameter, sparseness = None, None, None, None, None, None, None
 
+"""
+    Prepares the arrays which are used in the multiprocessing.
+"""
 def setup_arrays():
     global shared_input_data_base, shared_output_data_base, shared_prediction_base
     global shared_input_data, shared_output_data, shared_prediction
@@ -60,6 +63,9 @@ def setup_arrays():
     shared_prediction = shared_prediction.reshape(predictionLength, N, N)
 setup_arrays()
 
+"""
+    Generates or loads the raw data of the models.
+"""
 def generate_data(N, Ngrid):
     data = None
 
@@ -82,6 +88,9 @@ def generate_data(N, Ngrid):
     for n in range(ndata):
         shared_input_data[n, :, :] = gaussian_filter(shared_output_data[n], sigma=9.0)
 
+"""
+    Prepares the predicter (ESN, NN, RBF) to make predictions at the point (y,x).
+"""
 def prepare_predicter(y, x, training_data_in, training_data_out):
     if prediction_mode == "ESN":
         if y < patch_radius or y >= N-patch_radius or x < patch_radius or x >= N-patch_radius:
@@ -111,6 +120,9 @@ def prepare_predicter(y, x, training_data_in, training_data_out):
 
     return predicter
 
+"""
+    Returns the prediciton at the pixel (x,y)=data.
+"""
 def get_prediction(data):
     y, x = data
 
@@ -123,6 +135,9 @@ def get_prediction(data):
         pred = fit_predict_inner_pixel(y, x)
     get_prediction.q.put((y, x, pred))
 
+"""
+    Prepares the time series of the field to be used in the NN/RBF/ESN approach.
+"""
 def prepare_fit_data(y, x, pr, skip, def_param=(shared_input_data, shared_output_data)):
     if prediction_mode in ["NN", "RBF"]:
         delayed_patched_input_data = hp.create_2d_delay_coordinates(shared_input_data[:, y-pr:y+pr+1, x-pr:x+pr+1][:, ::skip, ::skip], ddim, tau=tau[direction])
@@ -146,6 +161,9 @@ def prepare_fit_data(y, x, pr, skip, def_param=(shared_input_data, shared_output
 
     return training_data_in, test_data_in, training_data_out, test_data_out
 
+"""
+    Fits the predicter and gets the prediction for pixels which are near the frame/border.
+"""
 def fit_predict_frame_pixel(y, x, def_param=(shared_input_data, shared_output_data)):
     min_border_distance = np.min([y, x, N-1-y, N-1-x])
     training_data_in, test_data_in, training_data_out, _ = prepare_fit_data(y, x, min_border_distance, 1)
@@ -157,6 +175,9 @@ def fit_predict_frame_pixel(y, x, def_param=(shared_input_data, shared_output_da
 
     return pred
 
+"""
+    Fits the predicter and gets the prediction for pixels which are not near the frame/border.
+"""
 def fit_predict_inner_pixel(y, x, def_param=(shared_input_data, shared_output_data)):
     training_data_in, test_data_in, training_data_out, _ = prepare_fit_data(y, x, patch_radius, sigma_skip)
 
@@ -167,6 +188,9 @@ def fit_predict_inner_pixel(y, x, def_param=(shared_input_data, shared_output_da
 
     return pred
 
+"""
+    Processes the results of the parallel predictions and merges them.
+"""
 def process_thread_results(q, nb_results, def_param=(shared_prediction, shared_output_data)):
     global prediction
 
@@ -187,9 +211,15 @@ def process_thread_results(q, nb_results, def_param=(shared_prediction, shared_o
 
         bar.update(finished_results)
 
+"""
+    Sets the queue object of the threads for the multiprocessing.
+"""
 def get_prediction_init(q):
     get_prediction.q = q
 
+"""
+    The mainFunction of the script, which will start the parallel training and prediction of the model.
+"""
 def mainFunction():
     generate_data(ndata, Ngrid=N)
 

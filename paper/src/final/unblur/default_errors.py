@@ -1,3 +1,7 @@
+"""
+    Calculates the default errors for the blurred source->source prediction for the 3 different models.
+"""
+
 import os,sys,inspect
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)

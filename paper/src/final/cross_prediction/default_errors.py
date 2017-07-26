@@ -1,3 +1,7 @@
+"""
+    Calculates the default errors for the cross prediction for the 3 different models.
+"""
+
 import os
 import sys
 sys.path.insert(1, os.path.join(sys.path[0], '../..'))
@@ -58,6 +62,7 @@ if (direction in ["vu", "hv"]):
     data[0] = data[1].copy()
     data[1] = tmp.copy()
 
+#switch direction for the BOCF model
 if direction in ["bocf_uv", "bocf_uw", "bocf_ws"]:
     real_data = np.empty((2, ndata, N, N))
     real_data[0] = data[0].copy()

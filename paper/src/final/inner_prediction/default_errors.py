@@ -1,3 +1,7 @@
+"""
+    Calculates the default errors for the outer->inner prediction for the 3 different models.
+"""
+
 import os,sys,inspect
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)
@@ -49,6 +53,9 @@ else:
 
 data = data[0]
 
+"""
+    Creates the source (outer values) and the target (inner values) from the data time series.
+"""
 def create_data(innerSize, borderSize, data):
     halfInnerSize = int(np.floor(innerSize / 2))
     borderSize = 1
@@ -73,6 +80,9 @@ def create_data(innerSize, borderSize, data):
 
     return train_data_in, train_data_out, test_data_in, test_data_out
 
+"""
+    Calcualtes the default errors for the specified values of a and b (see thesis).
+"""
 def default_errors(innerSize, borderSize, data):
     train_data_in, train_data_out, test_data_in, test_data_out = create_data(innerSize, borderSize, data)
 
@@ -86,6 +96,8 @@ def default_errors(innerSize, borderSize, data):
 
     print("{0}\t{1}\t{2}\t{3}".format(innerSize, borderSize, msemean, msemeanborder))
 
+
+#calculate and print the default error for all used configurations
 settings = [(4,1), (8,1), (16,1), (32,1), (64,1), (128,1),
             (4,2), (8,2), (16,2), (32,2), (64,2), (128,2),
             (4,3), (8,3), (16,3), (32,3), (64,3), (128,3),
