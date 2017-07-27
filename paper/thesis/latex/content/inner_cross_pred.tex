@@ -228,12 +228,12 @@ Für einen genaueren Vergleich der drei Methoden bietet es sich an die Ergebniss
 	\label{tab:exp_inner_cross_comparison_results}
 \end{table}
 
-Ergänzend ist ein grafischer Vergleich der Fehlerwerte MSE für alle untersuchen Abmessungen $a$ durchgeführt worden, welcher in Abbildung \ref{fig:inner_prediction_error_size_comparison_barkley} für das \textit{Barkley}-Modell zu finden ist. Eine analoge Darstellung für das \textit{Mitchell-Schaeffer}-Modell ist in Abbildung \ref{fig:apx_inner_prediction_error_size_comparison_ms} aufgetragen. Wieder zeigt sich, dass die Vorhersagen der klassischen Methoden einen höheren Fehler haben. Während der \textsc{NN}-Ansatz bei beiden Modellen schlechtere Ergebnisse als die Vorhersage mittels des Mittelwertes liefert, sind die radialen Basisfunktionen und die \textsc{ESN}s geringfügig besser als diese für $a=64$. Dabei erreichen die \textsc{ESN}s und radialen Basisfunktionen in etwa die gleiche Genauigkeit. Da der NRMSE für beide Methoden nah an $1.0$ liegt, ist die Vorhersage kaum besser als die Vorhersage mittels des Mittelwertes. Die Vorhersagequalität reicht bei keiner der drei Methoden aus, um sie tatsächlich sinnvoll verwenden zu können.
+Ergänzend ist ein grafischer Vergleich der normalisierten Fehlerwerte NRMSE für alle untersuchen Abmessungen $a$ durchgeführt worden, welcher in Abbildung \ref{fig:inner_prediction_error_size_comparison_barkley} für das \textit{Barkley}-Modell zu finden ist. Eine analoge Darstellung für das \textit{Mitchell-Schaeffer}-Modell ist in Abbildung \ref{fig:apx_inner_prediction_error_size_comparison_ms} aufgetragen. Wieder zeigt sich, dass die Vorhersagen der klassischen Methoden einen höheren Fehler haben. Während der \textsc{NN}-Ansatz bei beiden Modellen schlechtere Ergebnisse als die Vorhersage mittels des Mittelwertes liefert, sind die radialen Basisfunktionen und die \textsc{ESN}s geringfügig besser als diese für $a=64$. Dabei erreichen die \textsc{ESN}s und radialen Basisfunktionen in etwa die gleiche Genauigkeit. Da der NRMSE für beide Methoden nah an $1.0$ liegt, ist die Vorhersage kaum besser als die Vorhersage mittels des Mittelwertes. Die Vorhersagequalität reicht bei keiner der drei Methoden aus, um sie tatsächlich sinnvoll verwenden zu können.
 
 \begin{figure}[H]
 	\centering
 	\includegraphics[height=3.7in]{figures/results/inner_cross_prediction/barkley_error_size_comparison.pdf}
-	\caption{Darstellung des Fehlerwertes MSE für die drei Ansätze in Abhängigkeit von der Größe $a$ des vorherzusagenden Bereichs für das \textit{Barkley}-Modell.}
+	\caption{Darstellung des normalisierten Fehlerwertes NRMSE für die drei Ansätze in Abhängigkeit von der Größe $a$ des vorherzusagenden Bereichs für das \textit{Barkley}-Modell.}
 	\label{fig:inner_prediction_error_size_comparison_barkley}
 \end{figure}
  
