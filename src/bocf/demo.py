@@ -5,6 +5,7 @@ from BOCFSimulation import BOCFSimulation
 from matplotlib.widgets import Button
 from matplotlib.widgets import Slider
 from scipy.misc import imresize
+import cv2
 
 def demo_chaotic():
     #for chaotic u^3 simulation
@@ -13,12 +14,12 @@ def demo_chaotic():
     Nx = 500
     Ny = 500
     deltaT = 0.1#0.001
-    deltaX = 0.125#1.0#0.1#0.25
-    D = 0.01#0.2#0.2#1.71#1.171
+    deltaX = 1.0#0.125#1.0#0.1#0.25
+    D = 0.2#0.01#0.2#0.2#1.71#1.171
 
     #Erzeugt sowohl mit "pb", "epi", "tnpp" als Wert für parameters eine anhaltende Dynamik, die allerdings kaum chaotisch ist.
     #Mit "thomas" als parameters zerfällt die erregung schnell
-    return BOCFSimulation(Nx, Ny, D, deltaT, deltaX, parameters="virtheart")
+    return BOCFSimulation(Nx, Ny, D, deltaT, deltaX, parameters="tnpp")
 
 sim = demo_chaotic()
 sim.initialize_spiral_virtheart()
@@ -36,32 +37,81 @@ sim._w = data[:, :, 2]
 sim._s = data[:, :, 3]
 """
 
+
+data = np.load("D:\\real_field_01.npy")
+sim._u = data[0]
+sim._v = data[1]
+sim._w = data[2]
+sim._s = data[3]
+data = None
+import gc
+gc.collect()
+
+plt.imshow(sim._u)
+plt.show()
+
+
 pace_times = []#[3000]
 vertical_wave_times = []#[3500]
 pertubation_time = 2500
 
-save_data = np.empty((4, 20000, 150, 150))
+save_data = np.empty((4, 10000, 150, 150))
 frame = 0
+print(save_data.dtype)
 
+def calc():
+    global frame, save_data
+    for j in range(450000):
+        sim.explicit_step()
+        frame += 1
 
-for j in range(450000):
-    sim.explicit_step()
-    frame += 1
+        if frame == pertubation_time:
+            #sim._u[sim._Ny//2:, :sim._Nx//2] = 0.0
+            #sim._u[:sim._Ny//2, sim._Nx//2:] = 0.0
 
-    if frame % 20 == 0:
-        print(frame)
+            pass
+            #sim._u[:sim._Ny//2, :] = 0.0
 
-    if frame > 5000 and frame < 400000:
-        #skip transient time
+        if frame in pace_times:
+            sim.initialize_left_wave(2)
+            #sim._u[sim._Ny//2:, :] = 0.0
+
+        if frame in vertical_wave_times:
+            sim._u[:2, :] = 1.0
+
+        if np.abs(np.max(sim._u)) < 1e-3:
+            print("no more excitated.")
+            plt.imshow(sim._u)
+            plt.show()
+
+            save_data = save_data[:, :frame//20, :]
+            np.save("D:\\bocf_data_02.npy", save_data)
+
+            exit()
+
         if frame % 20 == 0:
-            #save data
-            save_data[0, frame//20-5000] = imresize(sim._u, (150, 150))
-            save_data[1, frame//20-5000] = imresize(sim._v, (150, 150))
-            save_data[2, frame//20-5000] = imresize(sim._w, (150, 150))
-            save_data[3, frame//20-5000] = imresize(sim._s, (150, 150))
+            print(frame)
 
-    if frame > 405000:
-        np.save("D:\\bocf_data.npy", save_data)
+        if frame > 0000 and frame < 400000:
+            #skip transient time
+            if frame % 20 == 0:
+                #save data
+                save_data[0, (frame-0000)//20] = cv2.resize(sim._u, (150, 150))
+                save_data[1, (frame-0000)//20] = cv2.resize(sim._v, (150, 150))
+                save_data[2, (frame-0000)//20] = cv2.resize(sim._w, (150, 150))
+                save_data[3, (frame-0000)//20] = cv2.resize(sim._s, (150, 150))
+                print((frame-0000)//20)
+
+        if frame >= 200000-1:
+            np.save("D:\\bocf_data_02.npy", save_data)
+            real_field = np.empty((4, 500, 500))
+            real_field[0] = sim._u
+            real_field[1] = sim._v
+            real_field[2] = sim._w
+            real_field[3] = sim._s
+            np.save("D:\\real_field_02.npy", real_field)
+            print("done.")
+            exit()
 
 def show_animation():
     def update_new(data):
@@ -82,18 +132,6 @@ def show_animation():
 
             if frame in vertical_wave_times:
                 sim._u[:2, :] = 1.0
-
-            if (frame > 5000 and frame < 400000):
-                #skip transient time
-                if (frame % 20 == 0):
-                    #save data
-                    data[0, frame//20-5000] = imresize(sim._u, 150, 150)
-                    data[1, frame//20-5000] = imresize(sim._v, 150, 150)
-                    data[2, frame//20-5000] = imresize(sim._w, 150, 150)
-                    data[3, frame//20-5000] = imresize(sim._s, 150, 150)
-
-            if (frame > 400000):
-                np.save("D:\\bocf_data.npy",save_data)
 
         field = sim._u
         mat.set_data(field)
@@ -141,3 +179,6 @@ def show_animation():
     bprev.on_clicked(callback.load)
 
     plt.show()
+
+calc()
+#show_animation()

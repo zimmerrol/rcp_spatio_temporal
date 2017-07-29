@@ -1,3 +1,7 @@
+"""
+    Performs basic parallelized grid search for ESNs in which the parameter space will be searched in discrete steps. 
+"""
+
 import numpy as np
 import itertools
 from ESN import ESN
@@ -8,15 +12,20 @@ import sys
 from multiprocessing import Process, Queue, Manager, Pool #we require Pathos version >=0.2.6. Otherwise we will get an "EOFError: Ran out of input" exception
 import multiprocessing
 
+"""
+    Performs basic parallelized grid search for ESNs in which the parameter space will be searched in discrete steps. 
+"""
 class GridSearchP:
     def __init__(self, param_grid, fixed_params, esnType):
         self.esnType = esnType
         self.param_grid = param_grid
         self.fixed_params = fixed_params
 
+    """
+        Fits an ESN with one specified set of hyperparameters, evaluates and returns its performance.
+    """
     def _get_score(data):
         params, fixed_params, trainingInput, trainingOutput, testingDataSequence, esnType = data
-
 
         output_postprocessor = lambda x:x
 
@@ -47,13 +56,21 @@ class GridSearchP:
 
         return dat
 
+    """
+        Initializes the queue object of the _get_score method.
+    """
     def _get_score_init(q):
         GridSearchP._get_score.q = q
 
+    """
+        Processes the async. results of the _get_score methods and indicates the progress to the user.
+    """
     def processThreadResults(threadname, q, numberOfWorkers, numberOfResults, verbose):
+        #no output wanted
         if (verbose == 0):
             return
 
+        #initialize the progressbar to indicate the progress
         if (verbose == 1):
             bar = progressbar.ProgressBar(max_value=numberOfResults, redirect_stdout=True)
             bar.update(0)
@@ -61,15 +78,16 @@ class GridSearchP:
 
         print_step = numberOfResults//200
 
-        print(print_step)
-
         while True:
+            #leave this method only if all results have been fetched
             if (finishedResults == numberOfResults):
                 break
 
+            #fetch new data
             newData = q.get()
             finishedResults += 1
 
+            #print progress
             if (verbose == 1):
                 bar.update(finishedResults)
             else:
@@ -80,6 +98,10 @@ class GridSearchP:
         if (verbose == 1):
             bar.finish()
 
+    """
+        Fits an ESN for each of the wanted hyperparameters and predicts the output async.
+        The best results parameters will be stores in _best_params.
+    """
     def fit(self, trainingInput, trainingOutput, testingDataSequence, output_postprocessor = lambda x: x, printfreq=None, n_jobs=1, verbose=0):
         def enumerate_params():
             keys, values = zip(*self.param_grid.items())

@@ -1,8 +1,18 @@
+"""
+    Simulates a 2D Mitchell-Schaeffer system.
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
+"""
+    Simulates a 2D Mitchell-Schaeffer system.
+"""
 class MitchellSimulation:
+    """
+        Initializes the system.
+    """
     def __init__(self, Nx, Ny, deltaT, deltaX, Dx, Dy, t_in, t_out, t_close, t_open, v_gate, boundary_mode = "noflux"):
         self.Nx = Nx
         self.Ny = Ny
@@ -18,6 +28,10 @@ class MitchellSimulation:
 
         self._boundary_mode = boundary_mode
 
+    """
+        Seperates the fields in equally spaced and sized squares with are
+        homogeneously filled with random values.
+    """
     def initialize_random(self, seed, delta_x):
         np.random.seed(seed)
 
@@ -35,6 +49,9 @@ class MitchellSimulation:
         self._h = np.repeat(tmp, np.ones(len(self._h), dtype=int)*n, axis=1)
         self._h = gaussian_filter(self._h, sigma=3)
 
+    """
+        Initiliazes the system so, that one spiral exist.
+    """
     def initialize_one_spiral(self):
         self._v = np.zeros((self.Nx, self.Ny))
         self._h = np.zeros((self.Nx, self.Ny))
@@ -42,11 +59,14 @@ class MitchellSimulation:
         #for one spiral
         for i in range(self.Ny):
             for j in range(self.Nx):
-                if (i >= self.Ny//2):
+                if i >= self.Ny//2:
                     self._v[i, j] = 1.0
-                if (j >= self.Nx//2):
+                if j >= self.Nx//2:
                     self._h[i, j] = 1.0/2.0
 
+    """
+        Initiliazes the system so, that two spirals exist.
+    """
     def initialize_two_spirals(self):
         self._v = np.zeros((self.Nx, self.Ny))
         self._h = np.zeros((self.Nx, self.Ny))
@@ -54,19 +74,25 @@ class MitchellSimulation:
         #for two spirals
         for i in range(self.Ny):
             for j in range(self.Nx):
-                if (i >= self.Ny//3 and i <= self.Ny//3*2):
+                if i >= self.Ny//3 and i <= self.Ny//3*2:
                     self._v[i, j] = 1.0
-                if (j >= self.Nx//2):
+                if j >= self.Nx//2:
                     self._h[i, j] = 1.0/2.0
 
+    """
+        Sets the von Neumann boundaries.
+    """
     def _set_boundaries(self, oldFields):
-        if (self._boundary_mode == "noflux"):
+        if self._boundary_mode == "noflux":
             for (field, oldField) in zip((self._v, self._h), oldFields):
-                field[:,0] = oldField[:,1]
-                field[:,-1] = oldField[:,-2]
-                field[0,:] = oldField[1,:]
-                field[-1,:] = oldField[-2,:]
+                field[:, 0] = oldField[:, 1]
+                field[:, -1] = oldField[:, -2]
+                field[0, :] = oldField[1, :]
+                field[-1, :] = oldField[-2, :]
 
+    """
+        Performs a discrete and explicit time step to solve the PDE.
+    """
     def explicit_step(self, chaotic=False):
         vOld = self._v.copy()
         hOld = self._h.copy()

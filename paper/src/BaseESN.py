@@ -47,6 +47,9 @@ class BaseESN(object):
         self.output_input_scaling = output_input_scaling
         self._create_reservoir(weight_generation, feedback)
 
+    """
+        Generates a random rotation matrix, used in the SORM initilization (see http://ftp.math.uni-rostock.de/pub/preprint/2012/pre12_01.pdf)
+    """
     def create_random_rotation_matrix(self):
         h = rnd.randint(low=0, high=self.n_reservoir)
         k = rnd.randint(low=0, high=self.n_reservoir)
@@ -62,7 +65,11 @@ class BaseESN(object):
 
         return Q
 
+    """
+        Internal method to create the matrices W_in, W and W_fb of the ESN
+    """
     def _create_reservoir(self, weight_generation, feedback=False, verbose=False):
+        #naive generation of the matrix W by using random weights
         if weight_generation == 'naive':
             #random weight matrix from -0.5 to 0.5
             self._W = rnd.rand(self.n_reservoir, self.n_reservoir) - 0.5
@@ -73,6 +80,8 @@ class BaseESN(object):
 
             _W_eigenvalues = np.abs(np.linalg.eig(self._W)[0])
             self._W *= self.spectral_radius / np.max(_W_eigenvalues)
+
+        #generation using the SORM technique (see http://ftp.math.uni-rostock.de/pub/preprint/2012/pre12_01.pdf)
         elif weight_generation == "SORM":
             self._W = np.identity(self.n_reservoir)
 
@@ -85,6 +94,8 @@ class BaseESN(object):
                 self._W = Q.dot(self._W)
             print(i)
             self._W *= self.spectral_radius
+
+        #generation using the proposed method of Yildiz
         elif weight_generation == 'advanced':
             #two create W we must follow some steps:
             #at first, create a W = |W|
@@ -126,11 +137,12 @@ class BaseESN(object):
         else:
             raise ValueError("The weight_generation property must be one of the following values: naive, advanced, SORM, custom")
 
-
+        #check of the user is really using one of the internal methods, or wants to create W by his own
         if (weight_generation != 'custom'):
             #random weight matrix for the input from -0.5 to 0.5
             self._W_input = np.random.rand(self.n_reservoir, 1+self.n_input)-0.5
 
+            #scale the input_density to prevent saturated reservoir nodes
             if (self.input_density != 1.0):
                 #make the input matrix as dense as requested
                 input_topology = (np.ones_like(self._W_input) == 1.0)

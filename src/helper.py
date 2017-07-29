@@ -1,11 +1,14 @@
-"""
-
+﻿"""
+    Utility methods which are used for the ESNs and the visualisation methods.
 """
 
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
+"""
+    Calculates the mutual information between the two signals x and y.
+"""
 def calculate_mutualinformation(x, y, bins):
     pxy, _, _ = np.histogram2d(x, y, bins)
     px, _, = np.histogram(x, bins)
@@ -27,6 +30,9 @@ def calculate_mutualinformation(x, y, bins):
 
     return MI
 
+"""
+    Tries to calculate the input scaling of an ESN by using the mutual information.
+"""
 def calculate_esn_mi_input_scaling(input_data, output_data):
     if len(input_data) != len(output_data):
         raise ValueError("input_data and output_data do not have the same length -  {0} vs. {1}".format(len(input_data), len(output_data)))
@@ -42,6 +48,9 @@ def calculate_esn_mi_input_scaling(input_data, output_data):
 
     return scaling
 
+"""
+    Creates the delay coordinates of a signal € R^3. 
+"""
 def create_2d_delay_coordinates(data, delay_dimension, tau):
     result = np.repeat(data[:, :, :, np.newaxis], repeats=delay_dimension, axis=3)
 
@@ -51,6 +60,9 @@ def create_2d_delay_coordinates(data, delay_dimension, tau):
 
     return result
 
+"""
+    Creates the delay coordinates of a signal € R^2. 
+"""
 def create_1d_delay_coordinates(data, delay_dimension, tau):
     result = np.repeat(data[:, :, np.newaxis], repeats=delay_dimension, axis=2)
 
@@ -60,6 +72,9 @@ def create_1d_delay_coordinates(data, delay_dimension, tau):
 
     return result
 
+"""
+    Creates the delay coordinates of a signal € R^1. 
+"""
 def create_0d_delay_coordinates(data, delay_dimension, tau):
     result = np.repeat(data[:, np.newaxis], repeats=delay_dimension, axis=1)
 
@@ -69,12 +84,20 @@ def create_0d_delay_coordinates(data, delay_dimension, tau):
 
     return result
 
+"""
+    Calculates the indices of a rectangluar shape for a numpy array.
+    May be obsolete.
+"""
 def create_rectangle_indices(range_x, range_y):
     ind_x = np.tile(range(range_x[0], range_x[1]), range_y[1] - range_y[0])
     ind_y = np.repeat(range(range_y[0], range_y[1]), range_x[1] - range_x[0])
 
     return ind_y, ind_x
 
+"""
+    Calculates the indices for the Messsondentechnik of the thesis:
+    an inner square and its outer boundaries will be computed.
+"""
 def create_patch_indices(outer_range_x, outer_range_y, inner_range_x, inner_range_y):
     outer_ind_x = np.tile(range(outer_range_x[0], outer_range_x[1]), outer_range_y[1]-outer_range_y[0])
     outer_ind_y = np.repeat(range(outer_range_y[0], outer_range_y[1]), outer_range_x[1]-outer_range_x[0])
@@ -90,6 +113,9 @@ def create_patch_indices(outer_range_x, outer_range_y, inner_range_x, inner_rang
 
     return real_list[:,0], real_list[:,1], inner_list[:, 0], inner_list[:, 1]
 
+"""
+    Shows a animation of multiple fields one-by-one using pyplot.
+"""
 def show_results(packedData, forced_clim=None):
     shape = None
     data = []
@@ -181,7 +207,7 @@ def show_results(packedData, forced_clim=None):
             ax = savefig.add_subplot(111)
             savemat = ax.imshow(data[image_mode][1][i], origin="lower", interpolation="none")
             saveclb = plt.colorbar(savemat)
-            saveclb.set_clim(vmin=0, vmax=1)
+            saveclb.set_clim(vmin=0, vmax=1.2)
             saveclb.draw_all()
             savefig.savefig(path, bbox_inches='tight')
             saveclb.remove()
@@ -214,6 +240,9 @@ def show_results(packedData, forced_clim=None):
 
     plt.show()
 
+"""
+    Shows a animation of multiple fields side-by-side using pyplot.
+"""
 def show_results_splitscreen(packedData, forced_clim=None, name=None):
     minLength = np.inf
     data = []
