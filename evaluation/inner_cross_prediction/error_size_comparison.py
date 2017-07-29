@@ -1,4 +1,4 @@
-import matplotlib.pyplot as plt
+﻿import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import numpy as np
 import matplotlib.ticker as mticker
@@ -39,6 +39,7 @@ plt.ylabel("NRMSE")
 plt.legend()
 plt.savefig("images/barkley_error_size_comparison.pdf")
 #plt.show()
+plt.clf()
 
 plt.plot(sizes, nn_v_errors, "--o", label="NN")
 plt.plot(sizes, rbf_v_errors, "--o", label="RBF")

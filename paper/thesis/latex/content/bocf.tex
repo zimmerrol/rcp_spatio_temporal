@@ -4,9 +4,9 @@ Ebenso wie die beiden vorherigen Modelle ist das \textit{Bueno-Orovio-Cherry-Fen
 Die Dynamik wird durch die Gleichungen 
 \begin{align}
 \begin{aligned}
-\frac{\partial u}{\partial t} &= D \nabla^2 u + - (J_{si} + J_{fi} + J_{so})\\
-\frac{\partial v}{\partial t} &= (1-H(u-\theta_w))((v_\infty - v)/\tau_v^- - H(u-\theta_v)v/\tau_v^+ \\
-\frac{\partial w}{\partial t} &= (1-H(u-\theta_w))((v_\infty - w)/\tau_v^- - H(u-\theta_w)v/\tau_w^+ \\
+\frac{\partial u}{\partial t} &= D \nabla^2 u - (J_{si} + J_{fi} + J_{so})\\
+\frac{\partial v}{\partial t} &= \left(1-H(u-\theta_w)\right)(v_\infty - v)/\tau_v^- - H(u-\theta_v)v/\tau_v^+ \\
+\frac{\partial w}{\partial t} &= (1-H(u-\theta_w))(v_\infty - w)/\tau_v^- - H(u-\theta_w)v/\tau_w^+ \\
 \frac{\partial s}{\partial t} &= ((1 + \tanh(k_s(u-u_s)))/2 - s)/\tau_s
 \end{aligned}
 \end{align}
