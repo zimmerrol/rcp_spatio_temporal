@@ -18,6 +18,7 @@ parser.add_argument('--clim', default=[0.0, 1.0], nargs=2, type=float, help="the
 parser.add_argument('--times', "--t", default=[2000], type=int, nargs="*")
 parser.add_argument('-fieldname', "-fn", type=str, default=None, nargs="*", help='the name of the field to render and save')
 parser.add_argument("--extension", "--ext", default="pdf", type=str, help="extension of the image (default: pdf)")
+parser.add_argument("--colormap", "--cmp", default=None, type=str, help="colormap")
 parser.add_argument("--colorbar", "--cb", action='store_true', help="show colorbar")
 parser.add_argument("--axes", "--ax",  action='store_true', help="show axes")
 args = parser.parse_args()
@@ -63,7 +64,7 @@ for name in args.fieldname:
 
 		if True:
 			fig = plt.figure(figsize=(5,5))
-			savemat = plt.imshow(data[name][i], origin="lower", interpolation="none")
+			savemat = plt.imshow(data[name][i], origin="lower", interpolation="none", cmap=args.cmap)
 
 			if args.colorbar:
 				saveclb = plt.colorbar(savemat)
