@@ -1,7 +1,11 @@
 import os,sys,inspect
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)
+grandparentdir = os.path.dirname(parentdir)
+grandgrandparentdir = os.path.dirname(grandparentdir)
 sys.path.insert(0,parentdir)
+sys.path.insert(0,grandparentdir)
+sys.path.insert(0,grandgrandparentdir)
 
 from ffnnESN import ffnnESN
 from CESN import CESN
@@ -35,7 +39,7 @@ def sineshit():
 
     print(x[5000:].shape)
     print(Y[:, 0].shape)
-    plt.plot(x,y[:,0], "b", linestyle="--")
+    #plt.plot(x,y[:,0], "b", linestyle="--")
     plt.plot(x[5000:],Y[:, 0], "r", linestyle=":")
     #plt.plot(x[5000:],Y[0,:]-y[5000:,0], linestyle=":")
     plt.show()

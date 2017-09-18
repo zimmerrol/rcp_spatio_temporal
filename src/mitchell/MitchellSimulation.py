@@ -40,11 +40,11 @@ class MitchellSimulation:
         self._h = np.zeros((self.Nx, self.Ny))
 
         #for one spiral
-        for i in range(self.Nx):
-            for j in range(self.Ny):
-                if (i >= self.Nx//2):
+        for i in range(self.Ny):
+            for j in range(self.Nx):
+                if (i >= self.Ny//2):
                     self._v[i, j] = 1.0
-                if (j >= self.Ny//2):
+                if (j >= self.Nx//2):
                     self._h[i, j] = 1.0/2.0
 
     def initialize_two_spirals(self):
@@ -52,11 +52,11 @@ class MitchellSimulation:
         self._h = np.zeros((self.Nx, self.Ny))
 
         #for two spirals
-        for i in range(self.Nx):
-            for j in range(self.Ny):
-                if (i >= self.Nx//3 and i <= self.Nx//3*2):
+        for i in range(self.Ny):
+            for j in range(self.Nx):
+                if (i >= self.Ny//3 and i <= self.Ny//3*2):
                     self._v[i, j] = 1.0
-                if (j >= self.Ny//2):
+                if (j >= self.Nx//2):
                     self._h[i, j] = 1.0/2.0
 
     def _set_boundaries(self, oldFields):

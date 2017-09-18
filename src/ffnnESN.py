@@ -15,6 +15,8 @@ import progressbar
 
 from keras.models import Sequential
 from keras.layers import Dense
+from keras.layers import Dropout
+import keras as keras
 
 
 class ffnnESN(BaseESN):
@@ -44,13 +46,13 @@ class ffnnESN(BaseESN):
 
         # create model
         self.model = Sequential()
-        self.model.add(Dense((1+self.n_input+self.n_reservoir)*2, input_dim=1+self.n_input+self.n_reservoir, activation='sigmoid'))
-        self.model.add(Dense((1+self.n_input+self.n_reservoir), activation='sigmoid'))
-        #model.add(Dense((1+self.n_input+self.n_reservoir)//4, activation='relu'))
-        self.model.add(Dense(1, activation='sigmoid'))
+        self.model.add(Dense((1+self.n_input+self.n_reservoir), input_dim=1+self.n_input+self.n_reservoir, activation='relu'))
+        #self.model.add(Dense((1+self.n_input+self.n_reservoir), activation='relu'))
+        self.model.add(Dense(1, activation='relu'))
 
         # Compile model
-        self.model.compile(loss='hinge', optimizer='adam')
+        #mean_squared_error
+        self.model.compile(loss='mean_squared_error', optimizer="adagrad", metrics=['mean_squared_error'])
 
 
         if (verbose > 0):
@@ -72,7 +74,12 @@ class ffnnESN(BaseESN):
         #                                  +1
         Y_target = self.out_inverse_activation(outputData).T[:,skipLength:]
 
-        self.model.fit(X.T, Y_target.T, nb_epoch=30, batch_size=10, verbose=2)
+        from sklearn.preprocessing import StandardScaler
+
+        self.sc = StandardScaler()
+        X = self.sc.fit_transform(X.T).T
+
+        self.model.fit(X.T, Y_target.T, epochs=20, batch_size=20, verbose=1)
         # evaluate the model
         scores = self.model.evaluate(X.T, Y_target.T)
         print(scores)
@@ -110,7 +117,7 @@ class ffnnESN(BaseESN):
         for t in range(predLength):
             u = super(ffnnESN, self).update(inputData)
 
-            y = self.model.predict(np.vstack((self.output_bias, self.output_input_scaling*u, self._x)).T)
+            y = self.model.predict(self.sc.transform(np.vstack((self.output_bias, self.output_input_scaling*u, self._x)).T))
 
             #y = np.dot(self._W_out, np.vstack((self.output_bias, self.output_input_scaling*u, self._x)))
             y = self.out_activation(y[:,0])

@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
+import scipy.ndimage.filters as filters
 
 class BOCFSimulation:
     def __init__(self, Nx, Ny, D, delta_t, delta_x, parameters="tnpp"):
@@ -15,6 +16,10 @@ class BOCFSimulation:
         self._v = np.ones((Nx, Ny))
         self._w = np.ones((Nx, Ny))
         self._s = np.zeros((Nx, Ny))
+
+        self._laplacian_matrix = np.array([[1, 4, 1],
+                                          [4, -20, 4],
+                                          [1, 4, 1]])/6.0
 
 
         def init_old_spiral():
@@ -329,15 +334,35 @@ class BOCFSimulation:
             field[0, :] = old_field[1, :]
             field[-1, :] = old_field[-2, :]
 
+
     def _laplace(self, field):
+        """"
+        #5point stencel
+
         laplace = -4*field.copy()
 
         laplace += np.roll(field, +1, axis=0)
         laplace += np.roll(field, -1, axis=0)
         laplace += np.roll(field, +1, axis=1)
         laplace += np.roll(field, -1, axis=1)
+        """
 
-        return laplace/(self._delta_x**2)
+        return filters.convolve(field, self._laplacian_matrix)
+
+        """
+        laplace = -5.0*field.copy()
+
+        laplace += np.roll(field, +1, axis=0)/3.0*4.0
+        laplace += np.roll(field, -1, axis=0)/3.0*4.0
+        laplace += np.roll(field, +1, axis=1)/3.0*4.0
+        laplace += np.roll(field, -1, axis=1)/3.0*4.0
+
+        laplace -= np.roll(field, +2, axis=0)/12.0
+        laplace -= np.roll(field, -2, axis=0)/12.0
+        laplace -= np.roll(field, +2, axis=1)/12.0
+        laplace -= np.roll(field, -2, axis=1)/12.0
+        """
+        #return laplace/(self._delta_x**2)
 
     def H(self, y):
         return (y > 0.0).astype(float)

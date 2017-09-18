@@ -4,6 +4,25 @@
 
 \begin{table}[h]
 	\centering
+	\begin{tabular}{cccccccccc}
+		\hline
+		$u_o$ & $u_u$ & $\theta_v$ & $\theta_w$ & $\theta_v^-$ & $\theta_o$ & $\tau_{v1}^-$ & $\tau_{v2}^-$ & $\tau_v^+$ & $\tau_{w1}^-$\\
+		0 & 1.58 & 0.3 & 0.015 & 0.015 & 0.006 & 60 & 1150 & 1.4506 & 70 \\
+		\hline
+		 $\tau_{w2}^-$ & $k_w^-$ & $u_w^-$ & $\tau_w^+$ & $\tau_{fi}$ & $\tau_{o1}$ & $\tau_{o2}$ & $\tau_{so1}$ & $\tau_{so2}$ & $k_{so}$\\
+		20 & 65 & 0.03 & 280 & 0.11 & 6 & 6 & 43 & 0.2 & 2\\
+		\hline
+
+		$u_{so}$ & $\tau_{s1}$ & $\tau_{s2}$ & $k_s$ & $u_s$ & $\tau_{si}$ & $\tau_{w\infty}$ & $w_\infty^*$ &&\\
+		0.65 & 2.7342 & 3 & 2.0994 & 0.9087 & 2.8723 & 0.07 & 0.94 &&\\
+		\hline
+	\end{tabular}
+		\caption{Auflistung der verwendeten Konstanten des \textit{TNPP}-Satzes für das \textit{Bueno-Orovio-Cherry-Fenton-Modell}.}
+\label{tab:apx_bocf_tnpp_constants}	
+	\end{table}
+
+\begin{table}[h]
+	\centering
 
 	\resizebox{\columnwidth}{!}{%
 		\begin{tabular}{cccccccc}
@@ -53,7 +72,7 @@
 		\end{tabular} 
 	}
 
-	\caption{Vollständige Auflistung der gefundenen Hyperparameter der \textsc{ESN}s für das \textit{Mitchell-Schaeffer}-Modell (unten) für verschiedene Größen $a$ des vorherzusagenden Bereichs, welche zu den geringsten Fehlern führen. Zudem sind die benötigte Laufzeit und die erreichten Fehler angeführt. Die Größe $b$ ist ebenfalls optimiert worden.}
+	\caption{Vollständige Auflistung der gefundenen Hyperparameter der \textsc{ESN}s für das \textit{Mitchell-Schaeffer}-Modell für verschiedene Größen $a$ des vorherzusagenden Bereichs, welche zu den geringsten Fehlern führen. Zudem sind die benötigte Laufzeit und die erreichten Fehler angeführt. Die Größe $b$ ist ebenfalls optimiert worden.}
 \label{tab:apx_inner_cross_esn_results_ms}
 \end{table}
 
@@ -86,7 +105,7 @@
 		\setcapmargin[1cm]{0.5cm}
 		\caption{Erregung für $n=150$}
 	\end{subfigure}
-	\caption{Graphische Darstellung der zeitlichen Entwicklung der $u$-Variable des \textit{Barkley}-Modells. In Leserichtung sind die Felder der $u$-Variable für die Zeitpunkte $t=0,\, 50,\, 100,\, 150$ des Evaluationsdatensatzes dargestellt.}
+	\caption{Graphische Darstellung der zeitlichen Entwicklung der $u$-Variable des \textit{Barkley}-Modells. In Leserichtung sind die Felder der $u$-Variable für die Zeitpunkte $n=0,\, 50,\, 100,\, 150$ des Evaluationsdatensatzes dargestellt.}
 	\label{fig:apx_barkley_evolution}
 \end{figure} 
 
@@ -116,8 +135,72 @@
 		\setcapmargin[1cm]{0.5cm}
 		\caption{Erregung für $n=150$}
 	\end{subfigure}
-	\caption{Graphische Darstellung der zeitlichen Entwicklung der $u$-Variable des \textit{Mitchell-Schaeffer}-Modells. In Leserichtung sind die Felder der $v$-Variable für die Zeitpunkte $n=0,\, 50,\, 100,\, 150$ des Evaluationsdatensatzes dargestellt.}
+	\caption{Graphische Darstellung der zeitlichen Entwicklung der $v$-Variable des \textit{Mitchell-Schaeffer}-Modells. In Leserichtung sind die Felder der $v$-Variable für die Zeitpunkte $n=0,\, 50,\, 100,\, 150$ des Evaluationsdatensatzes dargestellt.}
 	\label{fig:apx_mitchell_evolution}
+\end{figure} 
+
+\begin{figure}[h]
+	\centering
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[height=2.5in]{figures/results/dynamics/bocf_0.pdf}
+		\setcapmargin[1cm]{0.5cm}
+		\caption{Erregung für $n=0$}
+	\end{subfigure}%
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[height=2.5in]{figures/results/dynamics/bocf_50.pdf}
+		\setcapmargin[1cm]{0.5cm}
+		\caption{Erregung für $n=50$}
+	\end{subfigure}
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[height=2.5in]{figures/results/dynamics/bocf_100.pdf}
+		\setcapmargin[1cm]{0.5cm}
+		\caption{Erregung für $n=100$}
+	\end{subfigure}%
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[height=2.5in]{figures/results/dynamics/bocf_150.pdf}
+		\setcapmargin[1cm]{0.5cm}
+		\caption{Erregung für $n=150$}
+	\end{subfigure}
+	\caption{Graphische Darstellung der zeitlichen Entwicklung der $u$-Variable des \textit{Bueno-Orovio-Cherry-Fenton}-Modells. In Leserichtung sind die Felder der $u$-Variable für die Zeitpunkte $n=0,\, 50,\, 100,\, 150$ des Evaluationsdatensatzes dargestellt.}
+	\label{fig:apx_bocf_evolution}
+\end{figure} 
+
+\begin{figure}[h]
+	\centering
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[height=2.5in]{figures/results/unblur/mitchell_v_blur_orig.pdf}
+		\setcapmargin[1cm]{0.5cm}
+		\caption{Echte Erregung des Modells}
+		\label{fig:apx_unblur_mitchell_result_orig}
+	\end{subfigure}%
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[height=2.5in]{figures/results/unblur/nn_mitchell_v_blur_pred.pdf}
+		\setcapmargin[1cm]{0.5cm}
+  		\caption{Vorhersage des \textsc{NN}-Ansatzes}
+  		\label{fig:apx_unblur_mitchell_result_nn_pred}
+	\end{subfigure}
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[height=2.5in]{figures/results/unblur/rbf_mitchell_v_blur_pred.pdf}
+		\setcapmargin[1cm]{0.5cm}
+  		\caption{Vorhersage des \textsc{RBF}-Ansatzes}
+  		\label{fig:apx_unblur_mitchell_result_rbf_pred}
+	\end{subfigure}%
+	\begin{subfigure}{.5\textwidth}
+		\centering
+		\includegraphics[height=2.5in]{figures/results/unblur/esn_mitchell_v_blur_pred.pdf}
+		\setcapmargin[1cm]{0.5cm}
+  		\caption{Vorhersage des \textsc{ESN}}
+  		\label{fig:apx_unblur_mitchell_result_esn_pred}
+	\end{subfigure}
+	\caption{Graphische Darstellung der $v$-Variable des \textit{Mitchell-Schaeffer}-Modells für den $100$. Zeitschritt des Evaluationsdatensatzes. Oben links ist das tatsächliche Feld des Modells zu sehen. Danach folgen in Leserichtung die Vorhersagen des \textsc{NN}-Ansatzes, des \textsc{RBF}-Ansatzes und des \textsc{ESN}. Das verwendete Fernfeld ist in Abbildung \ref{fig:exp_unblur_mitchell_schaeffer_blurred} zu sehen.}
+	\label{fig:apx_unblur_mitchell_result}
 \end{figure} 
 
 \begin{figure}[h]
@@ -146,7 +229,7 @@
 		\setcapmargin[1cm]{0.5cm}
   		\caption{Vorhersage des \textsc{ESN}}
 	\end{subfigure}
-	\caption{Graphische Darstellung der $v$-Variable des \textit{Mitchell-Schaeffer}-Modells für den $1000$. Zeitschritt des Evaluationsdatensatzes. Oben links ist das tatsächliche Feld des Modells zu sehen. Danach folgenden in Leserichtung die Vorhersagen des \textsc{NN}-Ansatzes, des \textsc{RBF}-Ansatzes und des \textsc{ESN}.}
+	\caption{Graphische Darstellung der $v$-Variable des \textit{Mitchell-Schaeffer}-Modells für den $1000$. Zeitschritt des Evaluationsdatensatzes bei der Vorhersage des inneren Bereiches durch die Kenntnis der Randwerte. Oben links ist das tatsächliche Feld des Modells zu sehen. Danach folgend in Leserichtung die Vorhersagen des \textsc{NN}-Ansatzes, des \textsc{RBF}-Ansatzes und des \textsc{ESN}.}
 	\label{fig:apx_inner_cross_mitchell_result}
 \end{figure} 
 
@@ -164,7 +247,7 @@
 		\includegraphics[width=4.8in]{figures/results/cross_prediction/nn_trainlength_vh_mse.pdf}
 		\caption{Abhängigkeit des \textit{MSE}s.}
 	\end{subfigure}
-	\caption{Darstellung der Abhängigkeit des benötigten Laufzeit (oben) und des MSE (unten) von der verwendeten Anzahl an Trainingsdaten $N_{Training}$ (unten) für das \textit{Mitchell-Schaeffer}-Modell bei der Verwendung einer nächsten Nachbar Vorhersage.}
+	\caption{Darstellung der Abhängigkeit der benötigten Laufzeit (oben) und des MSE (unten) von der verwendeten Anzahl an Trainingsdaten $N_{Training}$ für das \textit{Mitchell-Schaeffer}-Modell bei der Verwendung einer \textit{Nächsten-Nachbar}-Vorhersage.}
 	\label{fig:apx_exp_cross_nn_trainlength_mse_time_ms}
 \end{figure}
 
@@ -181,14 +264,14 @@
 		\includegraphics[width=4.8in]{figures/results/cross_prediction/rbf_placements_vh_mse.pdf}
   		\caption{Abhängigkeit des \textit{MSE}s von $l$.}
 	\end{subfigure}
-	\caption{Darstellung der Abhängigkeit des benötigten Laufzeit (oben) und des \textit{MSE}s (unten) von der Anzahl der Basisfunktionen $l$ für das \textit{Mitchell-Schaeffer}-Modell bei der Verwendung radialer Basisfunktionen.}
+	\caption{Darstellung der Abhängigkeit der benötigten Laufzeit (oben) und des \textit{MSE}s (unten) von der Anzahl der Basisfunktionen $l$ für das \textit{Mitchell-Schaeffer}-Modell bei der Verwendung radialer Basisfunktionen.}
 	\label{fig:apx_exp_cross_rbf_placements_time_mse_ms}
 \end{figure}
 
 \begin{figure}[h]
 	\centering
 	\includegraphics[height=4.2in]{figures/results/inner_cross_prediction/mitchell_error_size_comparison.pdf}
-	\caption{Graphische Darstellung des Fehlerwertes MSE für die drei verschiedenen Ansätze in Abhängigkeit von der Größe $a$ des vorherzusagenden Bereichs für das \textit{Mitchell-Schaeffer}-Modell.}
+	\caption{Graphische Darstellung des normalisierten Fehlerwertes NRMSE für die drei verschiedenen Ansätze in Abhängigkeit von der Größe $a$ des vorherzusagenden Bereichs für das \textit{Mitchell-Schaeffer}-Modell.}
 	\label{fig:apx_inner_prediction_error_size_comparison_ms}
 \end{figure} 
 
@@ -200,7 +283,7 @@ Im Folgenden wird eine Beweisskizze für das Stabilitätskriterium
 \begin{align*}
 |1-\alpha(1-\sigma_{max}(\mathbf{W}))| < 1
 \end{align*}
-nach \cite{jaeger2010} vorgeführt. Hierfür wird die Distanz der \textit{l2-Norm} $||\cdot||$ zwischen den Zustandsfolgen $(\vec{s}(n))_n$ und $(\vec{s'}(n))_n$ für das Eingangssignal $\vec{u}$ betrachtet. Es wird zudem die Zustandsgleichung \ref{eq:esn_stateeq} und die Abkürzung $\vec{v} = [b_{in}; \vec{u}(n)]$ verwendet. 
+nach \cite{jaeger2010} vorgeführt. Hierfür wird die Distanz der \textit{$l^2$-Norm} $||\cdot||$ zwischen den Zustandsfolgen $(\vec{s}(n))_n$ und $(\vec{s'}(n))_n$ für das Eingangssignal $\vec{u}$ betrachtet. Es wird zudem die Zustandsgleichung \ref{eq:esn_stateeq} und die Abkürzung $\vec{v}(n) = [b_{in}; \vec{u}(n)]$ verwendet. 
 
 \begin{align*}
 &~||\vec{s}(n+1))- \vec{s}\,'(n+1)|| \\
@@ -215,57 +298,57 @@ nach \cite{jaeger2010} vorgeführt. Hierfür wird die Distanz der \textit{l2-Nor
 &:= \lambda ||\vec{s}(n)-\vec{s'}(n)||
 \end{align*}
 
-Dabei ist in Schritt $\mathrm{(a)}$ die Dreiecksungleichung verwendet worden. Da $f_{in}$ eine \textit{sigmoid}-förmige Funktion ist, gilt zudem $f'_{in}(x) < 1 \forall x$; dies wird in Schritt $\mathrm{(b)}$ ausgenutzt. Zudem wird in Schritt $\mathrm{(c)}$ die Beziehung
+Dabei ist in Schritt $\mathrm{(a)}$ die Dreiecksungleichung verwendet worden. Da $f_{in}$ eine \textit{sigmoid}-förmige Funktion ist, gilt zudem $f'_{in}(x) < 1,\, \forall x$; dies wird in Schritt $\mathrm{(b)}$ benutzt. Zudem wird in Schritt $\mathrm{(c)}$ die Beziehung
 \begin{align*}
 ||\mathbf{A} \vec{x}|| \leq \sigma_{max}\left(\mathbf{A} \right) ||\vec{x}||
 \end{align*}
-zwischen dem maximalen Sprektralwert $\sigma_{max}$ der Matrix $\mathbf{A}$ und der \textit{l2-Norm} ausgenutzt.\\
+zwischen dem maximalen Sprektralwert $\sigma_{max}$ der Matrix $\mathbf{A}$ und der \textit{$l^2$-Norm} ausgenutzt.\\
 
-Gilt nun $\lambda < 1$, so nähern sich die beiden Zustandsfolgen immer näher aneinander an, bis sie schließlich gegeneinander konvergieren. Das bedeutet, dass es eine Nullfolge $(\delta(n))_n$ gibt, für die $||\vec{s}(n) - \vec{s}\,'(n)|| < \delta(n)$; somit liegt die \textit{ESP} vor. Dies bedeutet, dass der beliebig gewählte Anfangszustand des \textsc{ESN}s $\vec{s}(0)$ beziehungsweise $\vec{s}\,'(0)$ nach einer ausreichenden Zeit keinen Einfluss mehr auf die Dynamik des Systems nimmt.
+Gilt nun $\lambda < 1$, so nähern sich die beiden Zustandsfolgen immer weiter aneinander an, bis sie schließlich gegeneinander konvergieren. Das bedeutet, dass es eine Nullfolge $(\delta(n))_n$ gibt, für die $||\vec{s}(n) - \vec{s}\,'(n)|| < \delta(n)$ gilt; somit liegt die \textit{ESP} vor. Folglich nimmt der beliebig gewählte Anfangszustand des \textsc{ESN}s $\vec{s}(0)$ (beziehungsweise $\vec{s}\,'(0)$) nach einer ausreichenden Zeit keinen Einfluss mehr auf die Dynamik des Systems.
 
 \section{Laufzeitanalyse}
 \label{sc:apx_runtime_complexity}
-Im Folgenden soll die theoretische Laufzeitkomplexität $T$ des Trainings und Vorhersagevorgangs eines \textsc{ESN}s unter Veränderung von $N$ betrachtet und hergeleitet werden.
+Im Folgenden wird die theoretische Laufzeitkomplexität $T$ des Trainings- und Vorhersagevorgangs eines \textsc{ESN}s unter Veränderung von $N$ betrachtet und hergeleitet.
 Zuerst werden die Abkürzungen
 \begin{align*}
 \beta = T-T_{0} \qquad\qquad\qquad \gamma = 1+N_u+N
 \end{align*}
-eingeführt. Für die Matrixmultiplikation und Matrixinversion wird ein optimierter Algorithmus wie beispielsweise der \textit{Coppersmith–Winograd}-Algorithmus angenommen. Dieser hat für Matrizen $\in \mathbb{R}^{n \times n}$ eine Laufzeit $\mathcal{O}(n^{2.376})$. \improvement{Add source}\\
+eingeführt. Die Matrixmultiplikation zweier Matrizen $\in \mathbb{R}^{n \times n}$ hat eine Laufzeit von $\mathcal{O}(n^3)$. Wird die Matrixinversion durch das \textit{Gauß'sche Eliminationsverfahren} durchgeführt, besitzt diese ebenfalls die Laufzeit $\mathcal{O}(n^3)$.\\
 Die Komplexität der Zustandsgleichung \ref{eq:esn_stateeq} wird durch die Ausdrücke $\mathbf{W_{in}} \vec{u} \in \mathcal{O}(N_U N)$ und $\mathbf{W}\vec{x} \in \mathcal{O}(N^2)$ bestimmt. Somit ergibt sich eine Gesamtkomplexität $\mathcal{O}(N_u \cdot N + N^2) = \mathcal{O}(N^2)$ für $N_u < N$.\\
 
 Im Trainingsvorgang wird zunächst die Zustandsgleichung $\beta$ Mal durchlaufen. Bei der Betrachtung der Lösungsgleichung \ref{eq:tikhonov} müssen die Laufzeiten von vier Teilausdrücken analysiert werden:
 \begin{align*}
 T\left(\mathbf{X}\mathbf{X}^T \right) = \mathcal{O}(\gamma^2 \beta) \\
-T\left((\mathbf{X}\mathbf{X})^{-1} \right) = \mathcal{O}(\gamma^{2.376}) \\
+T\left((\mathbf{X}\mathbf{X}^T+\beta \mathbf{I})^{-1} \right) = \mathcal{O}(\gamma^{3}) \\
 T\left(\mathbf{Y_{target}}\mathbf{X}^T \right) = \mathcal{O}(N_y \beta \gamma).
 \end{align*}
-Somit ergibt sich für das Bestimmten der Auslesematrix $\mathbf{W_{out}}$ eine Laufzeit $\mathcal{O}(\gamma^2 \beta + \gamma^{2.376} + \beta \gamma N_y) = \mathcal{O}(\gamma^{2.376})$  für $N_u < N$.
-Insgesamt ergibt sich der Aufwand des Trainingsvorgangs somit inklusive der Berechnung der Zustandsgleichung zu $\mathcal{O}(N^2 + N^{2.376}) = \mathcal{O}(N^{2.376})$\\
+Somit ergibt sich für das Bestimmen der Auslesematrix $\mathbf{W_{out}}$ eine Laufzeit $\mathcal{O}(\gamma^2 \beta + \gamma^{3} + \beta \gamma N_y) = \mathcal{O}(\gamma^{3})$  für $N_u < N$.
+Insgesamt beträgt der Aufwand des Trainingsvorgangs somit inklusive der Berechnung der Zustandsgleichung zu $\mathcal{O}(N^2 + N^{3}) = \mathcal{O}(N^{3})$\\
 
 Der Vorhersagevorgang besteht jeweils aus Berechnungen der Zustandsgleichung und der  Berechnung der Ausgabe $\vec{y} = \mathbf{W_{out}} \vec{x}$. Hierbei ergibt sich analog die Laufzeitkomplexität zu $\mathcal{O}(N^2)$.\\
 
-Bei dieser Betrachtung sind noch nicht die auftretenden Laufzeiten durch das Initialisieren der Matrizen im Speicher und das Berechnen des Spektralradius zur Reskalierung von $\mathbf{W}$ berücksichtigt. 
+Die auftretenden Laufzeiten durch das Initialisieren der Matrizen im Speicher und das Berechnen des Spektralradius zur Reskalierung von $\mathbf{W}$ sind bei dieser Betrachtung noch nicht berücksichtigt.
 
 \chapter{Programmüberblick}
 
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=0.9\textwidth]{figures/illustrations/esn_flow_chart.pdf}
-  	\caption{Ablauf bei Verwendung eines \textsc{ESN}s. Dabei dabei relevanten Funktionen des Quellcodes sind kursiv geschrieben. In Leserichtung wird zuerst das \textsc{ESN} mit seinen Matrizen $\mathbf{W}$ und $\mathbf{W_{in}}$ generiert. Anschließend wird es trainiert (siehe Abbildung \ref{fig:apx_esn_training_flowchart}), um danach eine Vorhersage durchzuführen.}
+  	\caption{Ablauf bei Verwendung eines \textsc{ESN}s. Die dabei relevanten Funktionen des Quellcodes sind kursiv geschrieben. In Leserichtung wird zuerst das \textsc{ESN} mit seinen Matrizen $\mathbf{W}$ und $\mathbf{W_{in}}$ generiert. Anschließend wird es trainiert (siehe Abbildung \ref{fig:apx_esn_training_flowchart}), um danach eine Vorhersage durchzuführen.}
   	  \label{fig:apx_esn_flowchart}
 \end{figure}%
 
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=0.9\textwidth]{figures/illustrations/esn_training_flow_chart.pdf}
-  	\caption{Ablaufes des Trainingsvorgangs des \textsc{ESN}s. Zuerst wird die Zeitreihe der Trainingsdaten in zwei Zeitreihen unterteilt. Der erste Teil wird benutzt um das \textit{transiente} Verhalten des Reservoirs abzuwarten, wohingegen der Rest benutzt wird, um die Auslesematrix $\mathbf{W_{out}}$ zu bestimmen.}
+  	\caption{Ablauf des Trainingsvorgangs des \textsc{ESN}s. Zuerst wird die Zeitreihe der Trainingsdaten in zwei Zeitreihen unterteilt. Der erste Teil der Zeitreihe wird benutzt, um das \textit{transiente} Verhalten des Reservoirs abzuwarten, wohingegen der Rest benutzt wird, um die Auslesematrix $\mathbf{W_{out}}$ zu bestimmen.}
   	\label{fig:apx_esn_training_flowchart}
 \end{figure}%
 
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=0.9\textwidth]{figures/illustrations/general_predicition_flow_chart.pdf}
-  	\caption{Allgemeines Vorgehen zum Bestimmen der Vorhersage in einem zweidimensionalen System. Für jeden Bildpunkt wird eine einzelne Zeitreihe betrachtet, welche in Trainings- und Testdaten unterteilt wird. Mit den Trainingsdaten wird nun das ausgewählte Modell (\textsc{NN}-Ansatz, \textsc{RBF}-Ansatz oder \textsc{ESN}) trainiert. Anschließend liefert das Modell mit der Quellvariable der Testdaten eine Vorhersage, welche mit den Zielvariable verglichen wird. Daraus kann der \textit{MSE} bestimmt werden. Durch das Durchführen dieser Prozedur für alle Bildpunkt ergibt sich schlussendlich eine Vorhersage des räumlich ausgedehnten Systems.}
+  	\caption{Allgemeines Vorgehen zum Bestimmen der Vorhersage in einem zweidimensionalen System. Für jeden Bildpunkt wird eine einzelne Zeitreihe betrachtet, welche in Trainings- und Testdaten unterteilt wird. Mit den Trainingsdaten wird nun das ausgewählte Modell (\textsc{NN}-Ansatz, \textsc{RBF}-Ansatz oder \textsc{ESN}) trainiert. Anschließend liefert das Modell mit der Quellvariable der Testdaten eine Vorhersage, welche mit der Zielvariable verglichen wird. Daraus kann der \textit{MSE} bestimmt werden. Durch das Durchführen dieser Prozedur für alle Bildpunkte ergibt sich schlussendlich eine Vorhersage des räumlich ausgedehnten Systems.}
   	  \label{fig:apx_general_prediction_flowchart}
 \end{figure}%
 

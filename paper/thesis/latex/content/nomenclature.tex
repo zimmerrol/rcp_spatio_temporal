@@ -1,27 +1,45 @@
 \begin{nomenclature}
 %% Fuer die Berechnung der Spaltenbreiten muss \usepackage{calc}
 %% geladen sein!
+\onehalfspacing
 
-\begin{longtable}[c]{p{0.15\textwidth}p{0.80\textwidth-4\tabcolsep}}
-\centering
-  \tabheadfont{Symbol}&\tabheadfont{Bedeutung}\\\midrule\endhead
-  $N$ & Anzahl der Einheiten im Reservoir $\mathbf{W}$\\\\
-  $\alpha$ & Verlustrate des \textit{Leaky Integrators}\\\\
-  $\lambda$ & Stärke der \textit{Tikhonov Regularisierung}\\\\
-  $\rho(\mathbf{W})$) & Spektralradius von $\mathbf{W}$\\\\
-  $\sigma(\mathbf{W})$ & Singulärwert von $\mathbf{W}$\\\\
-  $\nu_{max}$ & Maximalwert des hinzugefügten Rauschens $\nu(n)$ für die Erhöhung der Stabilität\\\\
-  $\eta$ & Anzahl der eingehenden Verbindungen für jede interne Einheit\\\\
-  $\epsilon$ & Dünnheit der Gewichtsmatrix $\mathbf{W}$\\\\
-  $\sigma$ & Räumliche Ausdehnung der \textit{Messsondentechnik}\\\\
-  $\Delta \sigma$ & Größe der Leerstellen in der \textit{Messsondentechnik}\\\\
-  $\sigma_{RBF}$ & Breite der gaußschen Basisfunktion\\\\
-  $\delta$ & Dimension der \textit{Verzögerungskoordinaten}\\\\
-  $[\cdot\,;\,\cdot]$ & Vertikales Aneinanderfügen von Vektoren/Matrizen
-  
+\section{Symbole}
+
+\begin{longtable}[l]{p{0.2\textwidth}p{0.80\textwidth-4\tabcolsep}}
+  \tabheadfont{Symbol} & \tabheadfont{Bedeutung}\\\midrule\endhead
+  $N$ & Anzahl der Einheiten im Reservoir $\mathbf{W}$\\
+  $\alpha$ & Verlustrate des \textit{Leaky Integrators}\\
+  $\lambda$ & Stärke der \textit{Tikhonov Regularisierung}\\
+  $\rho(\mathbf{W})$ & Spektralradius von $\mathbf{W}$\\
+  $\sigma_{max}(\mathbf{W})$ & Maximaler Singulärwert von $\mathbf{W}$\\
+  $\nu_{max}$ & Maximalwert des hinzugefügten Rauschens $\nu(n)$ für die Erhöhung der Stabilität\\
+  $\eta$ & Anzahl der eingehenden Verbindungen für jede interne Einheit\\
+  $\epsilon$ & Dünnheit der Gewichtsmatrix $\mathbf{W}$\\
+  $\sigma$ & Räumliche Ausdehnung der \textit{Messsondentechnik}\\
+  $\Delta \sigma$ & Größe der Leerstellen in der \textit{Messsondentechnik}\\
+  $\sigma_{RBF}$ & Breite der gauß'schen Basisfunktion\\
+  $\delta$ & Dimension der \textit{Verzögerungskoordinaten}\\
+  $[\cdot\,;\,\cdot]$ & Vertikales Aneinanderfügen von Vektoren/Matrizen\\
+  $\lceil \cdot \rceil$ & Aufrundungsfunktion
 \end{longtable}
 
+\newpage
 
+\section{Abkürzungen}
+\begin{longtable}[l]{p{0.2\textwidth}p{0.8\textwidth-4\tabcolsep}}
+  \tabheadfont{Abkürzung}&\tabheadfont{Bedeutung}\\\midrule\endhead
+  MSE & Mittlerer quadratischer Fehler (\textit{mean squared error})\\
+  NRMSE & Normalisierter quadratischer Mittelwert der Fehler (\textit{normalized root mean squared error})\\
+  ESN & Echo State Network\\
+  NN & Nächste-Nachbar Vorhersage\\
+  RBF & Radiale Basisfunktionen\\
+  FFNN & Feed Forward Neural Networks\\
+  RNN & Recurrent Neural Networks\\
+  BOCF-Modell & Bueno-Orovio-Cherry-Fenton-Modell\\
+  TNNP-Modell & Tuscher-Noble-Noble-Panfilov-Modell\\
+
+  \end{longtable}
+\singlespacing
 
 %\section*{Lateinische Buchstaben}
 %\noindent

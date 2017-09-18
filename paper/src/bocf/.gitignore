@@ -1,0 +1,6 @@
+*.dat
+*.dat.npy
+*.log
+cache/*
+cache
+*.npy

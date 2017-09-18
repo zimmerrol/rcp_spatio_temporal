@@ -68,14 +68,14 @@ setup_constants()
 def generate_data(N, trans, sample_rate, Ngrid):
     data = None
 
-    if (direction == "u"):
-        if (os.path.exists("../../cache/barkley/raw/{0}_{1}.uv.dat.npy".format(N, Ngrid)) == False):
+    if direction == "u":
+        if not os.path.exists("../../cache/barkley/raw/{0}_{1}.uv.dat.npy".format(N, Ngrid)):
             data = bh.generate_uv_data(N, 50000, 5, Ngrid=Ngrid)
             np.save("../../cache/barkley/raw/{0}_{1}.uv.dat.npy".format(N, Ngrid), data)
         else:
             data = np.load("../../cache/barkley/raw/{0}_{1}.uv.dat.npy".format(N, Ngrid))
     else:
-        if (os.path.exists("../../cache/mitchell/raw/{0}_{1}.vh.dat.npy".format(N, Ngrid)) == False):
+        if not os.path.exists("../../cache/mitchell/raw/{0}_{1}.vh.dat.npy".format(N, Ngrid)):
             data = mh.generate_vh_data(N, 20000, 50, Ngrid=Ngrid)
             np.save("../../cache/mitchell/raw/{0}_{1}.vh.dat.npy".format(N, Ngrid), data)
         else:
@@ -111,7 +111,7 @@ def mainFunction():
 
     param_grid = {"n_reservoir": [50, 200, 400], "spectral_radius": [0.1, 0.5, 0.8, 0.95, 1.0, 1.1, 1.5, 3.0], "leak_rate": [.05, .2, .5 , .7, .9, .95],
                   "random_seed": [42,41,40,39],  "sparseness": [.1, .2], "noise_level": [0.0001, 0.00001], "input_density": [n/inputData.shape[1] for n in [5, 10, 15, 20, 50, 100]],
-                  "regression_parameters": [[5e4], [5e3], [5e2], [5e1], [5e0], [5e-1], [5e-2],[5e-3],[5e-4]]}
+                  "regression_parameters": [[5e4], [5e3], [5e2], [5e1], [5e0], [5e-1], [5e-2], [5e-3], [5e-4]]}
 
     #predict 4 pixels in the centre of the inner square
     fixed_params = {"n_output": 4, "n_input": inputData.shape[1], "solver": "lsqr", "weight_generation": "advanced"}
@@ -144,7 +144,7 @@ class ForceIOStream:
     def __getattr__(self, attr):
         return getattr(self.stream, attr)
 
-if __name__== '__main__':
+if __name__ == '__main__':
     sys.stdout = ForceIOStream(sys.stdout)
     sys.stderr = ForceIOStream(sys.stderr)
 
