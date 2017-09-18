@@ -57,6 +57,7 @@ if args.fieldname is None:
 
 #show the results
 from matplotlib.ticker import NullLocator
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 print("Rendering results from '{0}'...".format(args.file[0]))
 for name in args.fieldname:
 	for i in args.times:
@@ -66,13 +67,22 @@ for name in args.fieldname:
 			fig = plt.figure(figsize=(5,5))
 			savemat = plt.imshow(data[name][i], origin="lower", interpolation="none", cmap=args.colormap)
 
+			if not args.axes:
+				plt.axis('off')
+				plt.gca().set_axis_off()
+				plt.subplots_adjust(top = 0.95, bottom = 0.05, left = 0, hspace = 0, wspace = 0)
+				plt.margins(0,0)
+				plt.gca().xaxis.set_major_locator(NullLocator())
+				plt.gca().yaxis.set_major_locator(NullLocator())
+
+
 			if args.colorbar:
-				saveclb = plt.colorbar(savemat)
+				divider = make_axes_locatable(plt.gca())
+				cax = divider.append_axes("right", size="5%", pad=0.05)
+				saveclb = plt.colorbar(savemat, cax=cax)
 				saveclb.set_clim(vmin=clim[0], vmax=clim[1])
 				saveclb.draw_all()
 
-			if not args.axes:
-				plt.axis('off')
 
 			if not (args.colorbar or args.axes):
 				plt.gca().set_axis_off()
