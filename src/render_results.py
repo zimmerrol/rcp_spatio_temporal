@@ -64,7 +64,7 @@ for name in args.fieldname:
 
 		if True:
 			fig = plt.figure(figsize=(5,5))
-			savemat = plt.imshow(data[name][i], origin="lower", interpolation="none", cmap=args.cmap)
+			savemat = plt.imshow(data[name][i], origin="lower", interpolation="none", colormap=args.cmap)
 
 			if args.colorbar:
 				saveclb = plt.colorbar(savemat)
