@@ -2,7 +2,9 @@
 	Loads and renderes computated fields from a pickle object and saves the images.
 """
 
-from helper import *
+import matplotlib as mpl
+mpl.use('Agg')
+import matplotlib.pyplot as plt
 
 import argparse
 import dill as pickle
