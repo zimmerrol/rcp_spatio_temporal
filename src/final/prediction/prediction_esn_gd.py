@@ -143,7 +143,7 @@ def plot_errors(predicter, trainDataX, trainDataY, testDataX, testDataY):
     lr_range = (0.4, 0.6)
     sr_range = (0.4, 0.6)
 
-    steps = 5
+    steps = 10
 
     lr_values = np.linspace(lr_range[0], lr_range[1], steps)
     sr_values = np.linspace(sr_range[0], sr_range[1], steps)
@@ -156,16 +156,16 @@ def plot_errors(predicter, trainDataX, trainDataY, testDataX, testDataY):
 
         for j in range(steps):
             print("{0}, {1}".format(i, j))
-            predicter.leaking_rate = lr_values[j]
+            predicter.leak_rate = lr_values[j]
             grid[0, i, j] = predicter.fit(trainDataX, trainDataY)
             grid[1, i, j] = np.mean((predicter.predict(testDataX)-testDataY)**2)
 
     fig, ax = plt.subplots()
     mat = plt.imshow(grid[0], extent=(lr_range[0], lr_range[1], sr_range[1], sr_range[0]))
-    clb = fig.colorbar(mat)
+    #clb = fig.colorbar(mat)
     plt.show()
     mat = plt.imshow(grid[1], extent=(lr_range[0], lr_range[1], sr_range[1], sr_range[0]))
-    clb = fig.colorbar(mat)
+    #clb = fig.colorbar(mat)
     plt.show()
 
 def mainFunction():
@@ -181,6 +181,9 @@ def mainFunction():
     print("start fitting...")
 
     plot_errors(predicter, input_data[:trainLength], output_data[:trainLength], input_data[trainLength:trainLength+testLength], output_data[trainLength:trainLength+testLength])
+
+
+    exit()
 
     sys.stdout.flush()
 
