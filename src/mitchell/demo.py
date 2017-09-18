@@ -10,14 +10,16 @@ def demo_mitchell():
     Ny = 150
     deltaT = 1e-2
     deltaX = 0.1
-    D = 5e-3  #1e-1
-    h = D/deltaX**2  #1.0#0.2
-    print(h)
+    Dx = 3e-3#5e-3  #1e-1
+    Dy = 3e-4
+    hx = Dx/deltaX**2  #1.0#0.2
+    hy = Dy/deltaX**2
+    #print(h)
     #h = D over delta_x
 
     #tau constants according to https://books.google.de/books?id=aB34DAAAQBAJ&pg=PA134&lpg=PA134&dq=mitchell-schaefer+model&source=bl&ots=RVuc3hoJwW&sig=ukfFhjF_COsljaaznv5uB6Cn5V8&hl=de&sa=X&ved=0ahUKEwiozdj8ic7TAhURLVAKHfa3A5wQ6AEIOTAC#v=onepage&q=mitchell-schaefer%20model&f=false
     #here might be some interesting things about the D value: http://ac.els-cdn.com/S0025556416301225/1-s2.0-S0025556416301225-main.pdf?_tid=875d11c0-3e31-11e7-a57a-00000aab0f26&acdnat=1495376990_ecb27e6ed1dd80a86e9d62e38a6c187e
-    return MitchellSimulation(Nx, Ny, deltaT, deltaX, D, D, t_in=0.3, t_out=6.0, t_close=150, t_open=120, v_gate=0.13,)
+    return MitchellSimulation(Nx, Ny, deltaT, deltaX, Dx, Dy, t_in=0.8, t_out=18.0, t_close=80, t_open=250, v_gate=0.13,)
 
 sim = demo_mitchell()
 #sim.initialize_two_spirals()

@@ -10,8 +10,8 @@ def demo_chaotic():
     #for chaotic u^3 simulation
 
     #150x150 with D=0.1 is stable
-    Nx = 500
-    Ny = 500
+    Nx = 450
+    Ny = 450
     deltaT = 0.1#0.001
     deltaX = 0.125#1.0#0.1#0.25
     D = 0.01#0.2#0.2#1.71#1.171
@@ -43,6 +43,9 @@ pertubation_time = 2500
 save_data = np.empty((4, 20000, 150, 150))
 frame = 0
 
+def rebin(a, shape):
+    sh = shape[0],a.shape[0]//shape[0],shape[1],a.shape[1]//shape[1]
+    return a.reshape(sh).mean(-1).mean(1)
 
 for j in range(450000):
     sim.explicit_step()
@@ -55,13 +58,15 @@ for j in range(450000):
         #skip transient time
         if frame % 20 == 0:
             #save data
-            save_data[0, frame//20-5000] = imresize(sim._u, (150, 150))
-            save_data[1, frame//20-5000] = imresize(sim._v, (150, 150))
-            save_data[2, frame//20-5000] = imresize(sim._w, (150, 150))
-            save_data[3, frame//20-5000] = imresize(sim._s, (150, 150))
+            save_data[0, (frame-5000)//20] = rebin(sim._u, (150, 150))#imresize(sim._u, size=(150, 150))
+            save_data[1, (frame-5000)//20] = rebin(sim._v, (150, 150))#imresize(sim._v, size=(150, 150))
+            save_data[2, (frame-5000)//20] = rebin(sim._w, (150, 150))#imresize(sim._w, size=(150, 150))
+            save_data[3, (frame-5000)//20] = rebin(sim._s, (150, 150))#imresize(sim._s, size=(150, 150))
 
     if frame > 405000:
-        np.save("D:\\bocf_data.npy", save_data)
+        np.save("../cache/bocf_data_new.npy", save_data)
+        print("saved!")
+        exit()
 
 def show_animation():
     def update_new(data):
@@ -93,7 +98,7 @@ def show_animation():
                     data[3, frame//20-5000] = imresize(sim._s, 150, 150)
 
             if (frame > 400000):
-                np.save("D:\\bocf_data.npy",save_data)
+                np.save("../cache/bocf_data.npy", save_data)
 
         field = sim._u
         mat.set_data(field)
