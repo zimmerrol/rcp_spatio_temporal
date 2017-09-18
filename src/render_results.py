@@ -57,7 +57,7 @@ from matplotlib.ticker import NullLocator
 print("Rendering results from '{0}'...".format(args.file[0]))
 for name in args.fieldname:
 	for i in args.times:
-		path = os.path.join(os.path.dirname(args.file[0]), os.path.basename(args.file[0])) + ".{0}.{1}.{2}".format(name, i, args.extension)
+		path = os.path.basename(args.file[0]) + ".{0}.{1}.{2}".format(name, i, args.extension)
 
 		if True:
 			fig = plt.figure(figsize=(5,5))
