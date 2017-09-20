@@ -78,8 +78,8 @@ for name in args.fieldname:
 
 			if args.colorbar:
 				divider = make_axes_locatable(plt.gca())
-				cax = divider.append_axes("right", size="5%", pad=0.05)
-				saveclb = plt.colorbar(savemat, cax=cax)
+				cax = divider.append_axes("bottom", size="5%", pad=0.15)
+				saveclb = plt.colorbar(savemat, orientation="horizontal", cax=cax)
 				saveclb.set_clim(vmin=clim[0], vmax=clim[1])
 				saveclb.draw_all()
 
