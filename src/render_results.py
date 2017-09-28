@@ -5,6 +5,7 @@
 import matplotlib as mpl
 mpl.use('Agg')
 import matplotlib.pyplot as plt
+import numpy as np
 
 import argparse
 import dill as pickle
@@ -21,7 +22,8 @@ parser.add_argument("--extension", "--ext", default="pdf", type=str, help="exten
 parser.add_argument("--colormap", "--cmp", default=None, type=str, help="colormap")
 parser.add_argument("--colorbar", "--cb", action='store_true', help="show colorbar")
 parser.add_argument("--axes", "--ax",  action='store_true', help="show axes")
-parser.add_argument("--dynamicclim", "--dclim",  action='store_true', help="detect clim dynamically")
+parser.add_argument("--dynamicclim", "--dclim", action='store_true', help="detect clim dynamically")
+parser.add_argument("--absolutevalue", "--abs",  action='store_true', help="plot only the absolute values")
 args = parser.parse_args()
 
 if args.fieldname is not None and len(args.fieldname) == 0:
@@ -56,17 +58,35 @@ if args.fieldname is None:
 	for key in data.keys():
 		args.fieldname.append(key)
 
+import matplotlib
+#matplotlib.rcParams['axes.unicode_minus'] = False
+
+from math import log10, floor
+def roundsig(x):
+	return round(x, -int(floor(log10(abs(x)))))
+
 #show the results
 from matplotlib.ticker import NullLocator
+from matplotlib.ticker import FormatStrFormatter
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from matplotlib import ticker
 print("Rendering results from '{0}'...".format(args.file[0]))
 for name in args.fieldname:
 	for i in args.times:
 		path = os.path.basename(args.file[0]) + ".{0}.{1}.{2}".format(name, i, args.extension)
+		
+		if args.absolutevalue:
+			print("using absolute value")
+			data[name][i] = np.abs(data[name][i])
 
 		if args.dynamicclim:
 			clim = [np.min(data[name][i]), np.max(data[name][i])]
+			print(clim)
+			clim = roundsig(np.max(np.abs(clim)))
+			clim = [-clim, clim]
+			if args.absolutevalue:
+				clim[0] = 0.0
+			print(clim)
 
 		if True:
 			fig = plt.figure(figsize=(5,5))
@@ -83,11 +103,16 @@ for name in args.fieldname:
 			if args.colorbar:
 				divider = make_axes_locatable(plt.gca())
 				cax = divider.append_axes("bottom", size="5%", pad=0.15)
-				saveclb = plt.colorbar(savemat, orientation="horizontal", cax=cax)
+				saveclb = plt.colorbar(savemat, orientation="horizontal", cax=cax, format=FormatStrFormatter('%.2f'))
 				saveclb.ax.tick_params(labelsize=25)
 				saveclb.set_clim(vmin=clim[0], vmax=clim[1])
 
-				saveclb.ax.set_xticklabels(saveclb.ax.get_xticklabels(), rotation=315)
+				saveclb.ax.set_xticklabels(saveclb.ax.get_xticklabels(), rotation=270)
+
+				tick_locator = ticker.MaxNLocator(nbins=4)
+				saveclb.locator = tick_locator
+				saveclb.ax.xaxis.set_major_locator(ticker.AutoLocator())
+				saveclb.update_ticks()
 
 				saveclb.draw_all()
 
