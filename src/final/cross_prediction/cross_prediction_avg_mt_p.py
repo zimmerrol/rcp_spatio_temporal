@@ -57,11 +57,13 @@ useInputScaling = False
 #will be set by the *_p.py file
 direction, prediction_mode, patch_radius, eff_sigma, sigma, sigma_skip = None, None, None, None, None, None,
 k, width, basis_points, ddim = None, None, None, None
+noise = None
 n_units, spectral_radius, leaking_rate, random_seed, noise_level, regression_parameter, sparseness = None, None, None, None, None, None, None
 
 def load_settings():
     global direction, prediction_mode, patch_radius, eff_sigma, sigma, sigma_skip, k, width, basis_points, ddim, n_units
     global spectral_radius, leaking_rate, random_seed, noise_level, regression_parameter, sparseness
+    global noise
 
     direction = cpmtps.direction
     prediction_mode = cpmtps.prediction_mode
@@ -80,6 +82,7 @@ def load_settings():
     noise_level = cpmtps.noise_level
     regression_parameter = cpmtps.regression_parameter
     sparseness = cpmtps.sparseness
+    noise = cpmtps.noise
 load_settings()
 
 prediction_border = patch_radius
@@ -162,6 +165,12 @@ def generate_data(N, Ngrid):
     means_train = [0, 0] #np.mean(data[:trainLength], axis=(1, 2))
     data[0] -= means_train[0]
     data[1] -= means_train[1]
+
+    data[0] += np.random.normal(loc=0.0, scale=noise, size=data[0].shape)
+
+    if not direction.startswith("bocf"):
+        data[0][data[0] < 0.0] = 0.0
+        data[0][data[0] > 1.0] = 1.0
 
     shared_input_data[:ndata] = data[0]
     shared_output_data[:ndata] = data[1]
@@ -420,14 +429,14 @@ def mainFunction():
         model = "bocf"
 
     if prediction_mode == "NN":
-        output_file = open("../../cache/{0}/viewdata/{1}/{2}_viewdata_avg_{3}_{4}_{5}_{6}_{7}.dat".format(
-            model, direction, prediction_mode.lower(), trainLength, sigma, sigma_skip, ddim, k), "wb")
+        output_file = open("../../cache/{0}/viewdata/{1}/{2}_viewdata_avg_noise_{3}_{4}_{5}_{6}_{7}_{8}.dat".format(
+            model, direction, prediction_mode.lower(), trainLength, sigma, sigma_skip, ddim, k, noise), "wb")
     elif prediction_mode == "RBF":
-        output_file = open("../../cache/{0}/viewdata/{1}/{2}_viewdata_avg_{3}_{4}_{5}_{6}_{7}_{8}.dat".format(
-            model, direction, prediction_mode.lower(), trainLength, sigma, sigma_skip, ddim, width, basis_points), "wb")
+        output_file = open("../../cache/{0}/viewdata/{1}/{2}_viewdata_avg_noise_{3}_{4}_{5}_{6}_{7}_{8}_{9}.dat".format(
+            model, direction, prediction_mode.lower(), trainLength, sigma, sigma_skip, ddim, width, basis_points, noise), "wb")
     else:
-        output_file = open("../../cache/{0}/viewdata/{1}/{2}_viewdata_avg_{3}_{4}_{5}_{6}_{7}.dat".format(
-            model, direction, prediction_mode.lower(), trainLength, sigma, sigma_skip, regression_parameter, n_units), "wb")
+        output_file = open("../../cache/{0}/viewdata/{1}/{2}_viewdata_avg_noise_{3}_{4}_{5}_{6}_{7}_{8}.dat".format(
+            model, direction, prediction_mode.lower(), trainLength, sigma, sigma_skip, regression_parameter, n_units, noise), "wb")
     pickle.dump(view_data, output_file)
     output_file.close()
 

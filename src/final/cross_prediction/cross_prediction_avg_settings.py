@@ -22,3 +22,5 @@ ndata = 30000
 trainLength = 10000
 predictionLength = 4000
 testLength = 2000
+
+noise = 0.1
