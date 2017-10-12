@@ -168,6 +168,10 @@ def generate_data(N, Ngrid):
 
     data[0] += np.random.normal(loc=0.0, scale=noise, size=data[0].shape)
 
+    if not direction.startswith("bocf"):
+        data[0][data[0] < 0.0] = 0.0
+        data[0][data[0] > 1.0] = 1.0
+
     shared_input_data[:ndata] = data[0]
     shared_output_data[:ndata] = data[1]
 
@@ -425,14 +429,14 @@ def mainFunction():
         model = "bocf"
 
     if prediction_mode == "NN":
-        output_file = open("../../cache/{0}/viewdata/{1}/{2}_viewdata_avg_{3}_{4}_{5}_{6}_{7}.dat".format(
-            model, direction, prediction_mode.lower(), trainLength, sigma, sigma_skip, ddim, k), "wb")
+        output_file = open("../../cache/{0}/viewdata/{1}/{2}_viewdata_avg_noise_{3}_{4}_{5}_{6}_{7}_{8}.dat".format(
+            model, direction, prediction_mode.lower(), trainLength, sigma, sigma_skip, ddim, k, noise), "wb")
     elif prediction_mode == "RBF":
-        output_file = open("../../cache/{0}/viewdata/{1}/{2}_viewdata_avg_{3}_{4}_{5}_{6}_{7}_{8}.dat".format(
-            model, direction, prediction_mode.lower(), trainLength, sigma, sigma_skip, ddim, width, basis_points), "wb")
+        output_file = open("../../cache/{0}/viewdata/{1}/{2}_viewdata_avg_noise_{3}_{4}_{5}_{6}_{7}_{8}_{9}.dat".format(
+            model, direction, prediction_mode.lower(), trainLength, sigma, sigma_skip, ddim, width, basis_points, noise), "wb")
     else:
-        output_file = open("../../cache/{0}/viewdata/{1}/{2}_viewdata_avg_{3}_{4}_{5}_{6}_{7}.dat".format(
-            model, direction, prediction_mode.lower(), trainLength, sigma, sigma_skip, regression_parameter, n_units), "wb")
+        output_file = open("../../cache/{0}/viewdata/{1}/{2}_viewdata_avg_noise_{3}_{4}_{5}_{6}_{7}_{8}.dat".format(
+            model, direction, prediction_mode.lower(), trainLength, sigma, sigma_skip, regression_parameter, n_units, noise), "wb")
     pickle.dump(view_data, output_file)
     output_file.close()
 

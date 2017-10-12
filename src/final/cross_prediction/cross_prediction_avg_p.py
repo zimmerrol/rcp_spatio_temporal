@@ -140,6 +140,7 @@ def setup_constants():
     else:
         raise ValueError("No valid prediction_mode choosen! (Value is now: {0})".format(cpmtps.prediction_mode))
 
+    cpmtps.noise = 0.075
     cpmtps.eff_sigma = int(np.ceil(cpmtps.sigma/cpmtps.sigma_skip))
     cpmtps.patch_radius = cpmtps.sigma//2
 
