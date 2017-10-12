@@ -19,6 +19,6 @@ sparseness = None
 tau = {"uv" : 32, "vu" : 32, "vh" : 119, "hv" : 119}
 N = 150
 ndata = 30000
-trainLength = 15000
+trainLength = 10000
 predictionLength = 4000
 testLength = 2000
