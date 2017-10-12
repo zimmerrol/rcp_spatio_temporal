@@ -57,11 +57,13 @@ useInputScaling = False
 #will be set by the *_p.py file
 direction, prediction_mode, patch_radius, eff_sigma, sigma, sigma_skip = None, None, None, None, None, None,
 k, width, basis_points, ddim = None, None, None, None
+noise = None
 n_units, spectral_radius, leaking_rate, random_seed, noise_level, regression_parameter, sparseness = None, None, None, None, None, None, None
 
 def load_settings():
     global direction, prediction_mode, patch_radius, eff_sigma, sigma, sigma_skip, k, width, basis_points, ddim, n_units
     global spectral_radius, leaking_rate, random_seed, noise_level, regression_parameter, sparseness
+    global noise
 
     direction = cpmtps.direction
     prediction_mode = cpmtps.prediction_mode
@@ -80,6 +82,7 @@ def load_settings():
     noise_level = cpmtps.noise_level
     regression_parameter = cpmtps.regression_parameter
     sparseness = cpmtps.sparseness
+    noise = cpmtps.noise
 load_settings()
 
 prediction_border = patch_radius
@@ -162,6 +165,8 @@ def generate_data(N, Ngrid):
     means_train = [0, 0] #np.mean(data[:trainLength], axis=(1, 2))
     data[0] -= means_train[0]
     data[1] -= means_train[1]
+
+    data[0] += np.random.normal(loc=0.0, scale=noise, size=data[0].shape)
 
     shared_input_data[:ndata] = data[0]
     shared_output_data[:ndata] = data[1]
