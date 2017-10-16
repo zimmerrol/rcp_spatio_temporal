@@ -144,7 +144,7 @@ def show_results(packedData, forced_clim=None, pause=False):
     image_mode = 0
 
     def update_new(nextFrame):
-        nonlocal i
+        nonlocal i, pause
 
         if not pause:
             mat.set_data(data[image_mode][1][i])
@@ -276,7 +276,7 @@ def show_results_splitscreen(packedData, forced_clim=None, name=None, pause=Fals
     image_mode = [0, 1]
 
     def update_new(nextFrame):
-        nonlocal i
+        nonlocal i, pause
 
         if not pause:
             for n in range(2):
