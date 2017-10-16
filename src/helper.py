@@ -115,7 +115,7 @@ def create_patch_indices(outer_range_x, outer_range_y, inner_range_x, inner_rang
 """
     Shows a animation of multiple fields one-by-one using pyplot.
 """
-def show_results(packedData, forced_clim=None, pause=False):
+def show_results(packedData, forced_clim=None, pause=True):
     shape = None
     data = []
 
@@ -243,7 +243,7 @@ def show_results(packedData, forced_clim=None, pause=False):
 """
     Shows a animation of multiple fields side-by-side using pyplot.
 """
-def show_results_splitscreen(packedData, forced_clim=None, name=None, pause=False):
+def show_results_splitscreen(packedData, forced_clim=None, name=None, pause=True):
     minLength = np.inf
     data = []
 
