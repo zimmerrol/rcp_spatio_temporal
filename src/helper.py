@@ -48,7 +48,7 @@ def calculate_esn_mi_input_scaling(input_data, output_data):
     return scaling
 
 """
-    Creates the delay coordinates of a signal € R^3. 
+    Creates the delay coordinates of a signal € R^3.
 """
 def create_2d_delay_coordinates(data, delay_dimension, tau):
     result = np.repeat(data[:, :, :, np.newaxis], repeats=delay_dimension, axis=3)
@@ -60,7 +60,7 @@ def create_2d_delay_coordinates(data, delay_dimension, tau):
     return result
 
 """
-    Creates the delay coordinates of a signal € R^2. 
+    Creates the delay coordinates of a signal € R^2.
 """
 def create_1d_delay_coordinates(data, delay_dimension, tau):
     result = np.repeat(data[:, :, np.newaxis], repeats=delay_dimension, axis=2)
@@ -72,7 +72,7 @@ def create_1d_delay_coordinates(data, delay_dimension, tau):
     return result
 
 """
-    Creates the delay coordinates of a signal € R^1. 
+    Creates the delay coordinates of a signal € R^1.
 """
 def create_0d_delay_coordinates(data, delay_dimension, tau):
     result = np.repeat(data[:, np.newaxis], repeats=delay_dimension, axis=1)
@@ -156,7 +156,7 @@ def show_results(packedData, forced_clim=None, pause=False):
                 clb.set_clim(vmin=forced_clim[0], vmax=forced_clim[1])
             clb.draw_all()
 
-        
+
             i = (i+1) % shape[0]
             sposition.set_val(i)
         return [mat]
@@ -253,7 +253,9 @@ def show_results_splitscreen(packedData, forced_clim=None, name=None, pause=Fals
             if type(value) is not np.ndarray:
                 raise ValueError("Item for key '{0}' is not of the type numpy.ndarray".format(key))
             else:
-                if shape != value.shape:
+                if shape is None:
+                    shape = value.shape
+                elif shape != value.shape:
                     raise ValueError("Item for key '{0}' has the shape {1} and not {2}".format(key, value.shape, shape))
             data.append(tmpItem)
             minLength = min(minLength, len(tmpItem[1]))
@@ -276,7 +278,7 @@ def show_results_splitscreen(packedData, forced_clim=None, name=None, pause=Fals
     def update_new(nextFrame):
         nonlocal i
 
-	if not pause:
+        if not pause:
             for n in range(2):
                 matarr[n].set_data(data[image_mode[n]][1][i])
 
@@ -286,7 +288,7 @@ def show_results_splitscreen(packedData, forced_clim=None, name=None, pause=Fals
                 else:
                     clbarr[n].set_clim(vmin=forced_clim[0], vmax=forced_clim[1])
                 clbarr[n].draw_all()
-  
+
             i = (i+1) % minLength
             sposition.set_val(i)
         return None
