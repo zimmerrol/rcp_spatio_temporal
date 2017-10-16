@@ -115,7 +115,7 @@ def create_patch_indices(outer_range_x, outer_range_y, inner_range_x, inner_rang
 """
     Shows a animation of multiple fields one-by-one using pyplot.
 """
-def show_results(packedData, forced_clim=None):
+def show_results(packedData, forced_clim=None, pause=False):
     shape = None
     data = []
 
@@ -140,22 +140,23 @@ def show_results(packedData, forced_clim=None):
         shape = data[0][1].shape
 
     i = 0
-    pause = False
+
     image_mode = 0
 
     def update_new(nextFrame):
         nonlocal i
 
-        mat.set_data(data[image_mode][1][i])
-
-        if forced_clim is None:
-            if i < shape[0]-50 and i > 50:
-                clb.set_clim(vmin=min(0, np.min(data[image_mode][1][i-50:i+50])), vmax=np.max(data[image_mode][1][i-50:i+50]))
-        else:
-            clb.set_clim(vmin=forced_clim[0], vmax=forced_clim[1])
-        clb.draw_all()
-
         if not pause:
+            mat.set_data(data[image_mode][1][i])
+
+            if forced_clim is None:
+                if i < shape[0]-50 and i > 50:
+                    clb.set_clim(vmin=min(0, np.min(data[image_mode][1][i-50:i+50])), vmax=np.max(data[image_mode][1][i-50:i+50]))
+            else:
+                clb.set_clim(vmin=forced_clim[0], vmax=forced_clim[1])
+            clb.draw_all()
+
+        
             i = (i+1) % shape[0]
             sposition.set_val(i)
         return [mat]
@@ -242,7 +243,7 @@ def show_results(packedData, forced_clim=None):
 """
     Shows a animation of multiple fields side-by-side using pyplot.
 """
-def show_results_splitscreen(packedData, forced_clim=None, name=None):
+def show_results_splitscreen(packedData, forced_clim=None, name=None, pause=False):
     minLength = np.inf
     data = []
 
@@ -269,24 +270,23 @@ def show_results_splitscreen(packedData, forced_clim=None, name=None):
         show_results(data, forced_clim)
 
     i = 0
-    pause = False
+
     image_mode = [0, 1]
 
     def update_new(nextFrame):
         nonlocal i
 
-        for n in range(2):
-            matarr[n].set_data(data[image_mode[n]][1][i])
+	if not pause:
+            for n in range(2):
+                matarr[n].set_data(data[image_mode[n]][1][i])
 
-            if forced_clim is None:
-                if i < minLength-50 and i > 50:
-                    clbarr[n].set_clim(vmin=min(0, np.min(data[image_mode[n]][1][i-50:i+50])), vmax=np.max(data[image_mode[n]][1][i-50:i+50]))
-            else:
-                clbarr[n].set_clim(vmin=forced_clim[0], vmax=forced_clim[1])
-            clbarr[n].draw_all()
-
-
-        if not pause:
+                if forced_clim is None:
+                    if i < minLength-50 and i > 50:
+                        clbarr[n].set_clim(vmin=min(0, np.min(data[image_mode[n]][1][i-50:i+50])), vmax=np.max(data[image_mode[n]][1][i-50:i+50]))
+                else:
+                    clbarr[n].set_clim(vmin=forced_clim[0], vmax=forced_clim[1])
+                clbarr[n].draw_all()
+  
             i = (i+1) % minLength
             sposition.set_val(i)
         return None
