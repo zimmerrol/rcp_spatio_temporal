@@ -11,8 +11,8 @@ sys.path.insert(1, os.path.join(sys.path[0], '../../mitchell'))
 sys.path.insert(1, os.path.join(sys.path[0], '../../bocf'))
 
 import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.animation as animation
+#import matplotlib.pyplot as plt
+#import matplotlib.animation as animation
 import progressbar
 import dill as pickle
 
@@ -129,7 +129,7 @@ def generate_data(N, Ngrid):
             np.save("../../cache/barkley/raw/{0}_{1}.uv.dat.npy".format(N, Ngrid), data)
         else:
             data = np.load("../../cache/barkley/raw/{0}_{1}.uv.dat.npy".format(N, Ngrid))
-    elif direction in ["bocf_uv", "bocf_uw", "bocf_us"]:
+    elif direction.startswith("bocf_"):
         if not os.path.exists("../../cache/bocf/raw/{0}_{1}.uvws.dat.npy".format(N, Ngrid)):
             print("NO BOCF data set found. Please generate a chaotic data set manually.")
         else:
@@ -148,15 +148,25 @@ def generate_data(N, Ngrid):
         data[0] = data[1].copy()
         data[1] = tmp.copy()
 
-    if direction in ["bocf_uv", "bocf_uw", "bocf_ws"]:
+    if direction.startswith("bocf_"):
         real_data = np.empty((2, N, Ngrid, Ngrid))
-        real_data[0] = data[0].copy()
 
-        if direction == "bocf_uv":
+        if direction[5] == "u":
+            real_data[0] = data[0].copy()
+        elif direction[5] == "v":
+            real_data[0] = data[1].copy()
+        elif direction[5] == "w":
+            real_data[0] = data[2].copy()
+        elif direction[5] == "s":
+            real_data[0] = data[3].copy()
+
+        if direction[6] == "u":
+            real_data[1] = data[0].copy()
+        elif direction[6] == "v":
             real_data[1] = data[1].copy()
-        elif direction == "bocf_uw":
+        elif direction[6] == "w":
             real_data[1] = data[2].copy()
-        elif direction == "bocf_us":
+        elif direction[6] == "s":
             real_data[1] = data[3].copy()
 
         data = real_data
@@ -166,7 +176,8 @@ def generate_data(N, Ngrid):
     data[0] -= means_train[0]
     data[1] -= means_train[1]
 
-    data[0] += np.random.normal(loc=0.0, scale=noise, size=data[0].shape)
+    if cpmtps.use_noise:
+        data[0] += np.random.normal(loc=0.0, scale=noise, size=data[0].shape)
 
     if not direction.startswith("bocf"):
         data[0][data[0] < 0.0] = 0.0
@@ -425,18 +436,30 @@ def mainFunction():
     model = "mitchell"
     if direction in ["uv", "vu"]:
         model = "barkley"
-    elif direction in ["bocf_uv", "bocf_uw", "bocf_us"]:
+    elif direction.startswith("bocf_"):
         model = "bocf"
 
-    if prediction_mode == "NN":
-        output_file = open("../../cache/{0}/viewdata/{1}/{2}_viewdata_avg_noise_{3}_{4}_{5}_{6}_{7}_{8}.dat".format(
-            model, direction, prediction_mode.lower(), trainLength, sigma, sigma_skip, ddim, k, noise), "wb")
-    elif prediction_mode == "RBF":
-        output_file = open("../../cache/{0}/viewdata/{1}/{2}_viewdata_avg_noise_{3}_{4}_{5}_{6}_{7}_{8}_{9}.dat".format(
-            model, direction, prediction_mode.lower(), trainLength, sigma, sigma_skip, ddim, width, basis_points, noise), "wb")
+    if cpmtps.use_noise:
+        if prediction_mode == "NN":
+            output_file = open("../../cache/{0}/viewdata/{1}/{2}_viewdata_avg_noise_{3}_{4}_{5}_{6}_{7}_{8}.dat".format(
+                model, direction, prediction_mode.lower(), trainLength, sigma, sigma_skip, ddim, k, noise), "wb")
+        elif prediction_mode == "RBF":
+            output_file = open("../../cache/{0}/viewdata/{1}/{2}_viewdata_avg_noise_{3}_{4}_{5}_{6}_{7}_{8}_{9}.dat".format(
+                model, direction, prediction_mode.lower(), trainLength, sigma, sigma_skip, ddim, width, basis_points, noise), "wb")
+        else:
+            output_file = open("../../cache/{0}/viewdata/{1}/{2}_viewdata_avg_noise_{3}_{4}_{5}_{6}_{7}_{8}.dat".format(
+                model, direction, prediction_mode.lower(), trainLength, sigma, sigma_skip, regression_parameter, n_units, noise), "wb")
+
     else:
-        output_file = open("../../cache/{0}/viewdata/{1}/{2}_viewdata_avg_noise_{3}_{4}_{5}_{6}_{7}_{8}.dat".format(
-            model, direction, prediction_mode.lower(), trainLength, sigma, sigma_skip, regression_parameter, n_units, noise), "wb")
+        if prediction_mode == "NN":
+            output_file = open("../../cache/{0}/viewdata/{1}/{2}_viewdata_avg_no_noise_{3}_{4}_{5}_{6}_{7}_{8}.dat".format(
+                model, direction, prediction_mode.lower(), trainLength, sigma, sigma_skip, ddim, k, noise), "wb")
+        elif prediction_mode == "RBF":
+            output_file = open("../../cache/{0}/viewdata/{1}/{2}_viewdata_avg_no_noise_{3}_{4}_{5}_{6}_{7}_{8}_{9}.dat".format(
+                model, direction, prediction_mode.lower(), trainLength, sigma, sigma_skip, ddim, width, basis_points, noise), "wb")
+        else:
+            output_file = open("../../cache/{0}/viewdata/{1}/{2}_viewdata_avg_no_noise_{3}_{4}_{5}_{6}_{7}_{8}.dat".format(
+                model, direction, prediction_mode.lower(), trainLength, sigma, sigma_skip, regression_parameter, n_units, noise), "wb")
     pickle.dump(view_data, output_file)
     output_file.close()
 

@@ -24,3 +24,5 @@ predictionLength = 4000
 testLength = 2000
 
 noise = 0.1
+
+use_noise = True
